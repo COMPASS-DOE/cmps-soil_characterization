@@ -34,7 +34,7 @@ import_ts_data = function(FILEPATH){
   
   filePaths_ts <- list.files(path = FILEPATH, pattern = "totalS", full.names = TRUE)
   ts_dat <- do.call(bind_rows, lapply(filePaths_ts, function(path) {
-    df <- read.csv(path, header=TRUE, check.names = F, sep= "\t", skip = 1)
+    df <- read.csv(path, header=TRUE, check.names = F)
     df %<>%
       dplyr::select(Name, `S  [%]`, Memo) %>% 
       rename(TS_perc = `S  [%]`) %>% 
