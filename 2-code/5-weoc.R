@@ -13,7 +13,8 @@ source("2-code/0-packages.R")
 
 #
 # import data -------------------------------------------------------------
-npoc_data = read_tsv("1-data/npoc/20220616_Summary_Raw_COMPASS_toledo.txt", skip = 10)
+npoc_data_wle = read_tsv("1-data/npoc/20220616_Summary_Raw_COMPASS_toledo.txt", skip = 10)
+npoc_data_cb = read_tsv("1-data/npoc/20220720_Summary_Raw_COMPASS_cb.txt", skip = 10)
 gwc = read.csv("1-data/processed/gravimetric_water.csv")
 subsampling = read.csv("1-data/subsampling_weights.csv")
 analysis_key = read.csv("1-data/analysis_key.csv")
@@ -22,7 +23,8 @@ sample_key = read.csv("1-data/sample_key.csv")
 
 # process data ------------------------------------------------------------
 npoc_processed = 
-  npoc_data %>% 
+  npoc_data_wle %>%
+  bind_rows(npoc_data_cb) %>% 
   # remove skipped samples
   filter(!`Sample ID` %in% "skip") %>% 
   # keep only relevant columns and rename them
@@ -57,7 +59,7 @@ npoc_samples =
 # graphs ------------------------------------------------------------------
 npoc_samples_key = 
   npoc_samples %>% 
-  left_join(sample_key) %>% 
+  left_join(sample_key, by = "sample_label") %>% 
     filter(!is.na(npoc_ug_g))
 
 npoc_samples_key %>% 
