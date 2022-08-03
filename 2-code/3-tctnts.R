@@ -97,5 +97,5 @@ data_with_key %>%
 #
 
 # export ------------------------------------------------------------------
-tctnts_samples %>% write.csv("1-data/processed/total_CNS.csv", row.names = F, na = "")
+tctnts_samples %>% write.csv("1-data/processed/total_CNS_partial_2022-07-24.csv", row.names = F, na = "")
 
