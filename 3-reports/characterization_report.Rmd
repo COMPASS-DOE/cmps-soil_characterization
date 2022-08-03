@@ -1,0 +1,52 @@
+---
+title: "Untitled"
+output: 
+  github_document:
+  html_preview: true
+  
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE)
+```
+
+
+```{r moisture}
+tar_read(gg_moisture)
+```
+
+
+```{r pH}
+tar_read(gg_pH)
+```
+
+```{r sp_cond}
+tar_read(gg_sp_cond)
+```
+
+```{r tctnts}
+tar_read(gg_tctnts)
+```
+
+```{r weoc}
+tar_read(gg_weoc)
+```
+
+```{r din}
+tar_read(gg_din)
+```
+
+---
+
+<details>
+  <summary> Session Info </summary>
+
+Date run: `r Sys.Date()`
+
+```{r}
+sessionInfo()
+```
+
+</details>
