@@ -13,7 +13,9 @@
 source("2-code/0-packages.R")
 
 #
-# sample key --------------------------------------------------------------
+
+# download sample data files ----------------------------------------------
+## sample key --------------------------------------------------------------
 ## load and clean sample key
 sample_key = read_sheet("1ThSoogME7LvBl5U5FSi7sm601WvlV2fKrBsi43g7kvk") %>% mutate_all(as.character)
 sample_key_subset = 
@@ -27,7 +29,7 @@ sample_key_subset[sample_key_subset == "NULL"] <- NA
 sample_key_subset %>% write.csv("1-data/sample_key.csv", row.names = FALSE, na = "")
 
 #
-# subsampling weights -----------------------------------------------------
+## subsampling weights -----------------------------------------------------
 ## load and clean subsampling weight
 subsampling_weights = read_sheet("12mTWytgKryo5CkKVOba32XWhwzhvsADsaXp2A25wyA0", sheet = "subsampling_weights") %>% mutate_all(as.character)
 subsampling_weights_subset = 
@@ -40,10 +42,17 @@ subsampling_weights_subset =
 subsampling_weights_subset %>% write.csv("1-data/subsampling_weights.csv", row.names = F, na = "")
 
 #
-# analysis key ------------------------------------------------------------
+## analysis key ------------------------------------------------------------
 ## load and clean analysis key
 analysis_key = read_sheet("12mTWytgKryo5CkKVOba32XWhwzhvsADsaXp2A25wyA0", sheet = "analysis_key") %>% mutate_all(as.character)
 analysis_key[analysis_key == "NULL"] <- NA
 
 ## export
 analysis_key %>% write.csv("1-data/analysis_key.csv", row.names = F, na = "")
+
+
+#
+
+# download data files -----------------------------------------------------
+
+
