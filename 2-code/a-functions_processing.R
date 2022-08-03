@@ -9,6 +9,22 @@ import_gsheet = function(dat){
 }
 
 
+#
+
+# refactor/reorder functions ----------------------------------------------
+## functions to set the order of factors
+
+reorder_horizon = function(dat){
+  dat %>% 
+    mutate(horizon = factor(horizon, levels = c("O", "A", "B")))
+}
+
+reorder_transect = function(dat){
+  dat %>% 
+    mutate(transect = factor(transect, levels = c("upland", "transition", "wte", "wc")))
+}
+
+
 # process data ------------------------------------------------------------
 # Moisture
 process_moisture = function(moisture_dat){

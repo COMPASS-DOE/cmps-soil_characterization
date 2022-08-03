@@ -20,6 +20,7 @@ tar_option_set(
 # Install packages {{future}}, {{future.callr}}, and {{future.batchtools}} to allow use_targets() to configure tar_make_future() options.
 
 # Load the R scripts with your custom functions:
+source("2-code/0-packages.R")
 source("2-code/a-functions_processing.R")
 source("2-code/b-functions_analysis.R")
 # source("other_functions.R") # Source other scripts as needed. # nolint
@@ -43,15 +44,17 @@ list(
   tar_target(weoc_data, import_weoc_data(FILEPATH = "1-data/npoc", PATTERN = "Summary_Raw")),
   tar_target(weoc_processed, process_weoc(weoc_data, analysis_key, moisture_processed, subsampling)),
   tar_target(din_data, readxl::read_xlsx("1-data/223013_Patel_Preliminary_NO3.xlsx", sheet = "NO3-N data")),
-  tar_target(din_processed, process_din(din_data, analysis_key, moisture_processed, subsampling))
+  tar_target(din_processed, process_din(din_data, analysis_key, moisture_processed, subsampling)),
   
-  # analysis
-  
-  
-  
-  
-  
-#  tar_target(gg_moisture, plot_moisture(moisture_processed, sample_key)),
-#  tar_render(report, path = "3-reports.Rmd")
+  # analysis - graphs
+  tar_target(gg_moisture, plot_moisture(moisture_processed, sample_key)),
+  tar_target(gg_pH, plot_pH(pH_processed, sample_key)),
+  tar_target(gg_sp_cond, plot_sp_cond(pH_processed, sample_key)),
+  tar_target(gg_tctnts, plot_tctnts(tctnts_data_samples, sample_key)),
+  tar_target(gg_weoc, plot_weoc(weoc_processed, sample_key)),
+  tar_target(gg_din, plot_din(din_processed, sample_key)),
+
+  # report  
+  tar_render(report, path = "3-reports/characterization_report.Rmd")
   
 )
