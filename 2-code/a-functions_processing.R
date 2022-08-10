@@ -166,17 +166,19 @@ process_din = function(din_data, analysis_key, moisture_processed, subsampling){
   din_processed = 
     din_data %>% 
     rename(analysis_ID = `Customer ID #`,
-           NO3_mgL = `NO3-N (ppm raw extract)`) %>% 
+           NO3N_mgL = `NO3-N (ppm of raw extract)`,
+           NH4N_mgL = `NH4-N (ppm of raw extract)`) %>% 
     mutate(analysis_ID = str_pad(analysis_ID, 4, pad = "0"),
            analysis_ID = paste0("NIT_CMPS_KFP_", analysis_ID),
-           NO3_mgL = as.numeric(NO3_mgL)) %>% 
+           NO3N_mgL = as.numeric(NO3N_mgL),
+           NH4N_mgL = as.numeric(NH4N_mgL)) %>% 
     left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) %>%
-    mutate(blank_mgL = case_when(sample_label == "blank-filter" ~ NO3_mgL))
+    mutate(blank_mgL = case_when(sample_label == "blank-filter" ~ NO3N_mgL))
   
   din_samples = 
     din_processed %>% 
     filter(grepl("COMPASS", sample_label)) %>% 
-    dplyr::select(sample_label, NO3_mgL) %>% 
+    dplyr::select(sample_label, NO3N_mgL, NH4N_mgL) %>% 
     
     # join gwc and subsampling weights to normalize data to soil weight
     left_join(moisture_processed) %>% 
@@ -184,9 +186,11 @@ process_din = function(din_data, analysis_key, moisture_processed, subsampling){
     rename(fm_g = NH4_NO3_g) %>% 
     mutate(od_g = fm_g/((gwc_perc/100)+1),
            soilwater_g = fm_g - od_g,
-           no3_ug_g = NO3_mgL * ((25 + soilwater_g)/od_g),
-           no3_ug_g = round(no3_ug_g, 2)) %>% 
-    dplyr::select(sample_label, NO3_mgL, no3_ug_g) %>% 
+           no3n_ug_g = NO3N_mgL * ((25 + soilwater_g)/od_g),
+           no3n_ug_g = round(no3n_ug_g, 2),
+           nh4n_ug_g = NH4N_mgL * ((25 + soilwater_g)/od_g),
+           nh4n_ug_g = round(nh4n_ug_g, 2)) %>% 
+    dplyr::select(sample_label, NO3N_mgL, NH4N_mgL, no3n_ug_g, nh4n_ug_g) %>% 
     arrange(sample_label)
   
   din_samples

@@ -117,12 +117,25 @@ plot_din = function(din_processed, sample_key){
     left_join(sample_key) %>% 
     reorder_horizon() %>% reorder_transect()
   
-  din %>% 
-    ggplot(aes(x = site, y = no3_ug_g, color = transect, shape = horizon))+
+  gg_no3 = 
+    din %>% 
+    ggplot(aes(x = site, y = no3n_ug_g, color = transect, shape = horizon))+
     geom_point(position = position_dodge(width = 0.4),
                size = 2)+
     facet_wrap(region ~ ., scales = "free_x")+
-    labs(y = "Extractable nitrate, μg/g")+
+    labs(y = "Extractable nitrate-N, μg/g")+
     scale_color_manual(values = pal_transect)
+  
+  gg_nh4 = 
+    din %>% 
+    ggplot(aes(x = site, y = nh4n_ug_g, color = transect, shape = horizon))+
+    geom_point(position = position_dodge(width = 0.4),
+               size = 2)+
+    facet_wrap(region ~ ., scales = "free_x")+
+    labs(y = "Extractable ammonium-N, μg/g")+
+    scale_color_manual(values = pal_transect)
+  
+  list(gg_no3 = gg_no3,
+       gg_nh4 = gg_nh4)
   
 }
