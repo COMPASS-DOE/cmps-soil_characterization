@@ -43,7 +43,8 @@ list(
   tar_target(tctnts_data_samples, process_tctnts(tctn_data, ts_data)),
   tar_target(weoc_data, import_weoc_data(FILEPATH = "1-data/npoc", PATTERN = "Summary_Raw")),
   tar_target(weoc_processed, process_weoc(weoc_data, analysis_key, moisture_processed, subsampling)),
-  tar_target(din_data, readxl::read_xlsx("1-data/din/223013 Patel Final Report.xlsx", sheet = "NO3-N and NH4-N data")),
+  #tar_target(din_data, readxl::read_xlsx("1-data/din/223013 Patel Final Report.xlsx", sheet = "NO3-N and NH4-N data")),
+  tar_target(din_data, import_din_data("1-data/din")),
   tar_target(din_processed, process_din(din_data, analysis_key, moisture_processed, subsampling)),
   
   # analysis - graphs
