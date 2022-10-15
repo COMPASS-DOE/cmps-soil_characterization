@@ -102,7 +102,8 @@ process_tctnts = function(tctn_data, ts_data){
   ts_samples = 
     ts_data %>% 
     filter(grepl("COMPASS_", Name)) %>% 
-    dplyr::select(-Memo)
+    dplyr::select(-Memo) %>% 
+    mutate(Name = str_replace(Name, "MAY_2022", "May22"))
   
   # tctnts_samples = 
     tctn_samples %>% 
@@ -161,19 +162,29 @@ process_weoc = function(weoc_data, analysis_key, moisture_processed, subsampling
 
 
 # DIN
+import_din_data = function(FILEPATH){
+  
+  filePaths_din <- list.files(path = FILEPATH, pattern = "din", full.names = TRUE)
+  din_dat <- do.call(bind_rows, lapply(filePaths_din, function(path) {
+    df <- read_csv(path)
+    df}))
+  
+  
+}
 process_din = function(din_data, analysis_key, moisture_processed, subsampling){
   
   din_processed = 
     din_data %>% 
     rename(analysis_ID = `Customer ID #`,
-           NO3N_mgL = `NO3-N (ppm of raw extract)`,
-           NH4N_mgL = `NH4-N (ppm of raw extract)`) %>% 
+           NO3N_mgL = `NO3-N (ppm)`,
+           NH4N_mgL = `NH4-N (ppm)`) %>% 
     mutate(analysis_ID = str_pad(analysis_ID, 4, pad = "0"),
            analysis_ID = paste0("NIT_CMPS_KFP_", analysis_ID),
            NO3N_mgL = as.numeric(NO3N_mgL),
            NH4N_mgL = as.numeric(NH4N_mgL)) %>% 
     left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) %>%
-    mutate(blank_mgL = case_when(sample_label == "blank-filter" ~ NO3N_mgL))
+    mutate(blank_NO3N_mgL = case_when(sample_label == "blank-filter" ~ NO3N_mgL),
+           blank_NH4N_mgL = case_when(sample_label == "blank-filter" ~ NH4N_mgL))
   
   din_samples = 
     din_processed %>% 
@@ -195,3 +206,55 @@ process_din = function(din_data, analysis_key, moisture_processed, subsampling){
   
   din_samples
 }
+
+# ICP
+import_icp_data = function(FILEPATH){
+  
+  filePaths_icp <- list.files(path = FILEPATH, pattern = "csv", full.names = TRUE)
+  icp_dat <- do.call(bind_rows, lapply(filePaths_icp, function(path) {
+    df <- read_csv(path, skip = 3)
+    df}))
+  
+}
+
+process_icp = function(icp_data){
+  
+  icp_processed = 
+    icp_data %>% 
+    rename(sample = `...2`) %>% 
+    dplyr::select(-starts_with("...")) %>% 
+    filter(grepl("PNNL", sample)) %>% 
+    mutate(sample = str_remove(sample, "PNNL "),
+           sample = str_pad(sample, 4, pad = "0"),
+           analysis_ID = paste0("CAT_CMPS_KFP_", sample)) %>% 
+    dplyr::select(-sample) %>% 
+    arrange(analysis_ID) %>% 
+    left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) %>% 
+    relocate(analysis_ID, sample_label) 
+    
+  icp = 
+    icp_processed %>% 
+    left_join(sample_key) %>% 
+    filter(!is.na(site))
+
+  icp_long = 
+    icp %>%
+    pivot_longer(cols = c(Na:S), names_to = "species", values_to = "ppm") %>% 
+    mutate(ppm = as.numeric(ppm)) %>% 
+    reorder_transect() %>% 
+    reorder_horizon()
+    
+  
+  icp_long %>% 
+    ggplot(aes(x = site, y = ppm, color = transect, shape = horizon)) +
+    geom_point(position = position_dodge(width = 0.3))+
+    facet_wrap(species ~ region, scales = "free")
+  
+}
+
+
+
+
+FILEPATH = "1-data/icp"
+analysis_key = read.csv("1-data/analysis_key.csv")
+sample_key = read.csv("1-data/sample_key.csv")
