@@ -17,6 +17,9 @@ knitr::opts_chunk$set(echo = FALSE,
 tar_read(gg_moisture)
 ```
 
+```{r loi}
+tar_read(gg_loi)
+```
 
 ```{r pH}
 tar_read(gg_pH)

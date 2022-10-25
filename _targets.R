@@ -36,6 +36,8 @@ list(
   # data files
   tar_target(moisture_data, import_gsheet("1nYzExPmpv01IYalqo2L3pmDsBDvhjdvHYMJo31N5_MA")),
   tar_target(moisture_processed, process_moisture(moisture_data)),
+  tar_target(loi_data, import_gsheet("1vvNKOtewhjR0PVYCLfvpRxY9QiOWzUvRV0WX5ou2qT4")),
+  tar_target(loi_processed, process_loi(loi_data)),
   tar_target(pH_data, import_gsheet("177ZR7O9JpsgVmFfLh72LfJ72oM-oTc6k_r1qE0XHL64")),
   tar_target(pH_processed, process_pH(pH_data)),
   tar_target(tctn_data, import_tctn_data(FILEPATH = "1-data/tctnts")),
@@ -49,6 +51,7 @@ list(
   
   # analysis - graphs
   tar_target(gg_moisture, plot_moisture(moisture_processed, sample_key)),
+  tar_target(gg_loi, plot_loi(loi_processed, sample_key)),
   tar_target(gg_pH, plot_pH(pH_processed, sample_key)),
   tar_target(gg_sp_cond, plot_sp_cond(pH_processed, sample_key)),
   tar_target(gg_tctnts, plot_tctnts(tctnts_data_samples, sample_key)),

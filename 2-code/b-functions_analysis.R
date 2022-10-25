@@ -19,6 +19,23 @@ plot_moisture = function(moisture_processed, sample_key){
   
 }
 
+plot_loi = function(loi_processed, sample_key){
+  
+  loi = 
+    loi_processed %>% 
+    left_join(sample_key) %>% 
+    reorder_horizon() %>% reorder_transect()  
+  
+  loi %>% 
+    ggplot(aes(x = site, y = percent_om, color = transect, shape = horizon))+
+    geom_point(position = position_dodge(width = 0.4),
+               size = 2)+
+    facet_wrap(region ~ ., scales = "free_x")+
+    labs(y = "Organic Matter, %")+
+    scale_color_manual(values = pal_transect)
+  
+}
+
 plot_pH = function(pH_processed, sample_key){
   
   pH =

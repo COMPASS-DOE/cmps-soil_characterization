@@ -46,6 +46,17 @@ process_moisture = function(moisture_dat){
 }
 
 
+# loss on ignition
+process_loi = function(loi_data){
+  
+  #loi = 
+  loi_data %>%
+    mutate_at(vars(contains("wt_")), as.numeric) %>% 
+  mutate(percent_om = ((wt_tray_drysoil_g - wt_tray_combustedsoil_g)/(wt_tray_drysoil_g - wt_tray_g))*100,
+         percent_om = round(percent_om, 2))  
+  
+}
+
 # pH
 process_pH = function(pH_data){
 #pH_samples = 
