@@ -189,21 +189,24 @@ plot_icp = function(icp_processed, sample_key){
     filter(grepl("base cations", group)) %>% 
     ggplot(aes(x = site, y = ug_g, color = transect, shape = horizon)) +
     geom_point(position = position_dodge(width = 0.3))+
-    facet_grid(species ~ region, scales = "free")
+    facet_grid(species ~ region, scales = "free")+
+    scale_color_manual(values = pal_transect)
   
   gg_other_cations = 
     icp_labels %>% 
     filter(grepl("other cations", group)) %>% 
     ggplot(aes(x = site, y = ug_g, color = transect, shape = horizon)) +
     geom_point(position = position_dodge(width = 0.3))+
-    facet_grid(species ~ region, scales = "free")
+    facet_grid(species ~ region, scales = "free")+
+    scale_color_manual(values = pal_transect)
   
   gg_others = 
     icp_labels %>% 
     filter(grepl("others", group)) %>% 
     ggplot(aes(x = site, y = ug_g, color = transect, shape = horizon)) +
     geom_point(position = position_dodge(width = 0.3))+
-    facet_grid(species ~ region, scales = "free")
+    facet_grid(species ~ region, scales = "free")+
+    scale_color_manual(values = pal_transect)
 
   list(gg_base_cations = gg_base_cations,
        gg_other_cations = gg_other_cations,
