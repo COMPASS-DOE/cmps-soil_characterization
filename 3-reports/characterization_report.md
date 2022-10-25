@@ -1,13 +1,25 @@
-Untitled
+Synpotic Soil Characterization
 ================
+
+------------------------------------------------------------------------
+
+**Gravimetric moisture**
 
 ![](characterization_report_files/figure-gfm/moisture-1.png)<!-- -->
 
+**Loss on ignition (% organic matter)**
+
 ![](characterization_report_files/figure-gfm/loi-1.png)<!-- -->
+
+**pH**
 
 ![](characterization_report_files/figure-gfm/pH-1.png)<!-- -->
 
+**specific conductance**
+
 ![](characterization_report_files/figure-gfm/sp_cond-1.png)<!-- -->
+
+**total CNS**
 
     ## $gg_tc
 
@@ -23,7 +35,13 @@ Untitled
 
 ![](characterization_report_files/figure-gfm/tctnts-3.png)<!-- -->
 
+**Water extractable organic C**
+
 ![](characterization_report_files/figure-gfm/weoc-1.png)<!-- -->
+
+**Extractable inorganic N**
+
+Inorganic N was extracted using 2M KCl
 
     ## $gg_no3
 
@@ -34,9 +52,21 @@ Untitled
 
 ![](characterization_report_files/figure-gfm/din-2.png)<!-- -->
 
+**ICP results: base cations**
+
+Extracted using 1M NH4Cl
+
 ![](characterization_report_files/figure-gfm/icp-base%20cations-1.png)<!-- -->
 
+**ICP results: other cations**
+
+Extracted using 1M NH4Cl
+
 ![](characterization_report_files/figure-gfm/icp-other%20cations-1.png)<!-- -->
+
+**ICP results: others**
+
+Extracted using 1M NH4Cl
 
 ![](characterization_report_files/figure-gfm/icp-others-1.png)<!-- -->
 

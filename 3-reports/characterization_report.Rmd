@@ -1,5 +1,5 @@
 ---
-title: "Untitled"
+title: "Synpotic Soil Characterization"
 output: 
   github_document:
   html_preview: true
@@ -12,42 +12,73 @@ knitr::opts_chunk$set(echo = FALSE,
                       warning = FALSE)
 ```
 
+---
+
+**Gravimetric moisture**
 
 ```{r moisture}
 tar_read(gg_moisture)
 ```
 
+
+**Loss on ignition (% organic matter)**
+
 ```{r loi}
 tar_read(gg_loi)
 ```
+
+**pH**
 
 ```{r pH}
 tar_read(gg_pH)
 ```
 
+**specific conductance**
+
 ```{r sp_cond}
 tar_read(gg_sp_cond)
 ```
 
+**total CNS**
 ```{r tctnts}
 tar_read(gg_tctnts)
 ```
+
+**Water extractable organic C**
 
 ```{r weoc}
 tar_read(gg_weoc)
 ```
 
+**Extractable inorganic N**
+
+Inorganic N was extracted using 2M KCl
+
 ```{r din}
 tar_read(gg_din)
 ```
+
+**ICP results: base cations**
+
+Extracted using 1M NH4Cl
 
 ```{r icp-base cations, fig.height=12, fig.width=7}
 tar_read(gg_icp)$gg_base_cations
 ```
 
+
+**ICP results: other cations**
+
+Extracted using 1M NH4Cl
+
 ```{r icp-other cations, fig.height=9, fig.width=7}
 tar_read(gg_icp)$gg_other_cations
 ```
+
+
+**ICP results: others**
+
+Extracted using 1M NH4Cl
 
 ```{r icp-others, fig.height=4, fig.width=7}
 tar_read(gg_icp)$gg_others
