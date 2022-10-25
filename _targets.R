@@ -48,6 +48,8 @@ list(
   #tar_target(din_data, readxl::read_xlsx("1-data/din/223013 Patel Final Report.xlsx", sheet = "NO3-N and NH4-N data")),
   tar_target(din_data, import_din_data("1-data/din")),
   tar_target(din_processed, process_din(din_data, analysis_key, moisture_processed, subsampling)),
+  tar_target(icp_data, import_icp_data(FILEPATH = "1-data/icp")),
+  tar_target(icp_processed, process_icp(icp_data, moisture_processed, subsampling)),
   
   # analysis - graphs
   tar_target(gg_moisture, plot_moisture(moisture_processed, sample_key)),
@@ -57,6 +59,7 @@ list(
   tar_target(gg_tctnts, plot_tctnts(tctnts_data_samples, sample_key)),
   tar_target(gg_weoc, plot_weoc(weoc_processed, sample_key)),
   tar_target(gg_din, plot_din(din_processed, sample_key)),
+  tar_target(gg_icp, plot_icp(icp_processed, sample_key)),
 
   # report  
   tar_render(report, path = "3-reports/characterization_report.Rmd")

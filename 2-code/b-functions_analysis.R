@@ -156,3 +156,56 @@ plot_din = function(din_processed, sample_key){
        gg_nh4 = gg_nh4)
   
 }
+
+plot_icp = function(icp_processed, sample_key){
+  
+  icp = 
+    icp_processed %>% 
+    dplyr::select(sample_label, ends_with("_ug_g")) %>% 
+    pivot_longer(-sample_label, names_to = "species", values_to = "ug_g") %>% 
+    left_join(sample_key) %>% 
+    filter(!is.na(site)) %>% 
+    reorder_transect() %>% 
+    reorder_horizon()
+
+#  icp_long_outliers = 
+#    icp_long %>% 
+#    group_by(region, site, transect, horizon, species) %>% 
+#    mutate(sd = sd(ppm),
+#           mean = mean(ppm),
+#           outlier = ppm > mean + (3*sd) | ppm < mean - (3*sd),
+#           outlier2 = case_when(outlier == TRUE ~ 1,
+#                                outlier == FALSE ~ 0))
+
+  icp_labels = 
+    icp %>% 
+    mutate(group = case_when(grepl("Ca|Mg|Na|K", species) ~ "1-base cations",
+                             grepl("Al|Fe|Mn", species) ~ "2-other cations",
+                             grepl("S", species) ~ "3-others")) %>% 
+    filter(!is.na(group))
+  
+  gg_base_cations = 
+    icp_labels %>% 
+    filter(grepl("base cations", group)) %>% 
+    ggplot(aes(x = site, y = ug_g, color = transect, shape = horizon)) +
+    geom_point(position = position_dodge(width = 0.3))+
+    facet_grid(species ~ region, scales = "free")
+  
+  gg_other_cations = 
+    icp_labels %>% 
+    filter(grepl("other cations", group)) %>% 
+    ggplot(aes(x = site, y = ug_g, color = transect, shape = horizon)) +
+    geom_point(position = position_dodge(width = 0.3))+
+    facet_grid(species ~ region, scales = "free")
+  
+  gg_others = 
+    icp_labels %>% 
+    filter(grepl("others", group)) %>% 
+    ggplot(aes(x = site, y = ug_g, color = transect, shape = horizon)) +
+    geom_point(position = position_dodge(width = 0.3))+
+    facet_grid(species ~ region, scales = "free")
+
+  list(gg_base_cations = gg_base_cations,
+       gg_other_cations = gg_other_cations,
+       gg_others = gg_others)
+}

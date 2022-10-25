@@ -34,6 +34,12 @@ Untitled
 
 ![](characterization_report_files/figure-gfm/din-2.png)<!-- -->
 
+![](characterization_report_files/figure-gfm/icp-base%20cations-1.png)<!-- -->
+
+![](characterization_report_files/figure-gfm/icp-other%20cations-1.png)<!-- -->
+
+![](characterization_report_files/figure-gfm/icp-others-1.png)<!-- -->
+
 ------------------------------------------------------------------------
 
 <details>

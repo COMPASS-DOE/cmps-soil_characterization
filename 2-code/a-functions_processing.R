@@ -228,7 +228,7 @@ import_icp_data = function(FILEPATH){
   
 }
 
-process_icp = function(icp_data){
+process_icp = function(icp_data, moisture_processed, subsampling){
   
   icp_processed = 
     icp_data %>% 
@@ -242,25 +242,27 @@ process_icp = function(icp_data){
     arrange(analysis_ID) %>% 
     left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) %>% 
     relocate(analysis_ID, sample_label) 
-    
-  icp = 
+  
+  icp_samples = 
     icp_processed %>% 
-    left_join(sample_key) %>% 
-    filter(!is.na(site))
-
-  icp_long = 
-    icp %>%
     pivot_longer(cols = c(Na:S), names_to = "species", values_to = "ppm") %>% 
-    mutate(ppm = as.numeric(ppm)) %>% 
-    reorder_transect() %>% 
-    reorder_horizon()
-    
-  
-  icp_long %>% 
-    ggplot(aes(x = site, y = ppm, color = transect, shape = horizon)) +
-    geom_point(position = position_dodge(width = 0.3))+
-    facet_wrap(species ~ region, scales = "free")
-  
+    left_join(moisture_processed) %>% 
+    left_join(subsampling %>% dplyr::select(sample_label, base_cations_g)) %>% 
+    rename(fm_g = base_cations_g) %>% 
+    mutate(ppm = as.numeric(ppm),
+           od_g = fm_g/((gwc_perc/100)+1),
+           soilwater_g = fm_g - od_g,
+           ug_g = ppm * ((25 + soilwater_g)/od_g),
+           ug_g = round(ug_g, 2)) %>% 
+    dplyr::select(sample_label, species, ppm, ug_g) %>% 
+    arrange(sample_label) %>% 
+    pivot_longer(-c(sample_label, species)) %>% 
+    mutate(name = paste0(species, "_", name)) %>% 
+    dplyr::select(-species) %>% 
+    filter(!grepl("blank", sample_label)) %>% 
+    pivot_wider()
+
+  icp_samples
 }
 
 

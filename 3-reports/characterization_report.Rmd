@@ -41,6 +41,18 @@ tar_read(gg_weoc)
 tar_read(gg_din)
 ```
 
+```{r icp-base cations, fig.height=12, fig.width=7}
+tar_read(gg_icp)$gg_base_cations
+```
+
+```{r icp-other cations, fig.height=9, fig.width=7}
+tar_read(gg_icp)$gg_other_cations
+```
+
+```{r icp-others, fig.height=4, fig.width=7}
+tar_read(gg_icp)$gg_others
+```
+
 ---
 
 <details>
