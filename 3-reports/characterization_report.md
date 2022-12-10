@@ -107,16 +107,17 @@ Date run: 2022-12-10
     ##  [9] evaluate_0.16     highr_0.9         httr_1.4.4        pillar_1.8.1     
     ## [13] rlang_1.0.5       readxl_1.4.1      rstudioapi_0.14   data.table_1.14.4
     ## [17] callr_3.7.2       rmarkdown_2.16    labeling_0.4.2    googledrive_2.0.0
-    ## [21] igraph_1.3.4      munsell_0.5.0     broom_1.0.0       compiler_4.2.1   
-    ## [25] modelr_0.1.9      xfun_0.32         pkgconfig_2.0.3   htmltools_0.5.3  
-    ## [29] tidyselect_1.1.2  codetools_0.2-18  fansi_1.0.3       crayon_1.5.1     
-    ## [33] tzdb_0.3.0        dbplyr_2.2.1      withr_2.5.0       grid_4.2.1       
-    ## [37] jsonlite_1.8.0    gtable_0.3.0      lifecycle_1.0.1   DBI_1.1.3        
-    ## [41] scales_1.2.1      cli_3.3.0         stringi_1.7.8     farver_2.1.1     
-    ## [45] fs_1.5.2          xml2_1.3.3        ellipsis_0.3.2    generics_0.1.3   
-    ## [49] vctrs_0.4.1       tools_4.2.1       glue_1.6.2        hms_1.1.2        
-    ## [53] fastmap_1.1.0     processx_3.7.0    yaml_2.3.5        colorspace_2.0-3 
-    ## [57] gargle_1.2.0      base64url_1.4     rvest_1.0.3       knitr_1.40       
-    ## [61] haven_2.5.1
+    ## [21] bit_4.0.4         igraph_1.3.4      munsell_0.5.0     broom_1.0.0      
+    ## [25] compiler_4.2.1    modelr_0.1.9      xfun_0.32         pkgconfig_2.0.3  
+    ## [29] htmltools_0.5.3   tidyselect_1.1.2  codetools_0.2-18  fansi_1.0.3      
+    ## [33] crayon_1.5.1      tzdb_0.3.0        dbplyr_2.2.1      withr_2.5.0      
+    ## [37] grid_4.2.1        jsonlite_1.8.0    gtable_0.3.0      lifecycle_1.0.1  
+    ## [41] DBI_1.1.3         scales_1.2.1      vroom_1.6.0       cli_3.3.0        
+    ## [45] stringi_1.7.8     farver_2.1.1      fs_1.5.2          xml2_1.3.3       
+    ## [49] ellipsis_0.3.2    generics_0.1.3    vctrs_0.4.1       tools_4.2.1      
+    ## [53] bit64_4.0.5       glue_1.6.2        hms_1.1.2         parallel_4.2.1   
+    ## [57] fastmap_1.1.0     processx_3.7.0    yaml_2.3.5        colorspace_2.0-3 
+    ## [61] gargle_1.2.0      base64url_1.4     rvest_1.0.3       knitr_1.40       
+    ## [65] haven_2.5.1
 
 </details>
