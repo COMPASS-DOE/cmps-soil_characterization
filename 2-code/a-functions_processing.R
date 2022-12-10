@@ -227,7 +227,7 @@ import_icp_data = function(FILEPATH){
   
   filePaths_icp <- list.files(path = FILEPATH, pattern = "csv", full.names = TRUE)
   icp_dat <- do.call(bind_rows, lapply(filePaths_icp, function(path) {
-    df <- read_csv(path, skip = 3)
+    df <- read_csv(path, skip = 3) %>% mutate_all(as.character)
     df}))
   
 }
