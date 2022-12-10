@@ -108,13 +108,17 @@ process_tctnts = function(tctn_data, ts_data){
   tctn_samples = 
     tctn_data %>% 
     filter(grepl("COMPASS_", Name) & !Memo %in% c("skip")) %>% 
-    dplyr::select(-Memo)
+    dplyr::select(-Memo) %>% 
+    mutate(Name = str_replace(Name, "MAY22", "May22"),
+           Name = str_replace(Name, "AUG22", "Aug22"))
   
   ts_samples = 
     ts_data %>% 
-    filter(grepl("COMPASS_", Name)) %>% 
+    filter(grepl("COMPASS_", Name) & !Memo %in% c("skip")) %>% 
     dplyr::select(-Memo) %>% 
-    mutate(Name = str_replace(Name, "MAY_2022", "May22"))
+    mutate(Name = str_replace(Name, "MAY_2022", "May22"),
+           Name = str_replace(Name, "AUG22", "Aug22"),
+           Name = str_remove(Name, "KFP_"))
   
   # tctnts_samples = 
     tctn_samples %>% 
