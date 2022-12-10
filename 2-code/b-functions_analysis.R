@@ -140,7 +140,8 @@ plot_din = function(din_processed, sample_key){
     geom_point(position = position_dodge(width = 0.4),
                size = 2)+
     facet_wrap(region ~ ., scales = "free_x")+
-    labs(y = "Extractable nitrate-N, μg/g")+
+    labs(y = "Extractable nitrate-N, μg/g",
+         caption = "NO3 was below-detect for most CB soils")+
     scale_color_manual(values = pal_transect)
   
   gg_nh4 = 
