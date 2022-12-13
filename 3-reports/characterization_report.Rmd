@@ -84,6 +84,16 @@ Extracted using 1M NH4Cl
 tar_read(gg_icp)$gg_others
 ```
 
+**HCl-extractable iron - ferrozine method**
+
+Extracted using 0.5 M HCl
+
+```{r iron-ferrozine, fig.height=5, fig.width=7}
+tar_read(gg_ferrozine)
+```
+
+
+
 ---
 
 <details>
