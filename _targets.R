@@ -50,7 +50,10 @@ list(
   tar_target(din_data, import_din_data("1-data/din")),
   tar_target(din_processed, process_din(din_data, analysis_key, moisture_processed, subsampling)),
   tar_target(icp_data, import_icp_data(FILEPATH = "1-data/icp")),
-  tar_target(icp_processed, process_icp(icp_data, moisture_processed, subsampling)),
+  tar_target(icp_processed, process_icp(icp_data, analysis_key, moisture_processed, subsampling)),
+  tar_target(ferrozine_data, import_iron(FILEPATH = "1-data/iron-ferrozine")$ferrozine_data),
+  tar_target(ferrozine_map, import_iron(FILEPATH = "1-data/iron-ferrozine")$ferrozine_map),
+  tar_target(ferrozine_processed, process_iron(ferrozine_map, ferrozine_data, moisture_processed, subsampling)),
   
   # analysis - graphs
   tar_target(gg_moisture, plot_moisture(moisture_processed, sample_key)),
@@ -61,6 +64,7 @@ list(
   tar_target(gg_weoc, plot_weoc(weoc_processed, sample_key)),
   tar_target(gg_din, plot_din(din_processed, sample_key)),
   tar_target(gg_icp, plot_icp(icp_processed, sample_key)),
+  tar_target(gg_ferrozine, plot_ferrozine(ferrozine_processed, sample_key)),
 
   # report  
   tar_render(report, path = "3-reports/characterization_report.Rmd")

@@ -213,3 +213,40 @@ plot_icp = function(icp_processed, sample_key){
        gg_other_cations = gg_other_cations,
        gg_others = gg_others)
 }
+
+plot_ferrozine = function(ferrozine_processed, sample_key){
+  
+  ferrozine = 
+    ferrozine_processed %>% 
+    mutate(Fe_2_3 = Fe2_ppm/Fe3_ppm) %>% 
+   # dplyr::select(sample_label, ends_with("_ug_g")) %>% 
+  #  pivot_longer(-sample_label, names_to = "species", values_to = "ug_g") %>% 
+    left_join(sample_key) %>% 
+    filter(!is.na(site)) %>% 
+    reorder_transect() %>% 
+    reorder_horizon()
+  
+  gg_fe_2_3 = 
+    ferrozine %>% 
+    filter(Fe_2_3 > 0) %>% 
+    ggplot(aes(x = site, y = Fe_2_3, color = transect, shape = horizon)) +
+    geom_point(position = position_dodge(width = 0.3))+
+    facet_grid(. ~ region, scales = "free")+
+    scale_color_manual(values = pal_transect)+
+    labs(title = "Fe-II/III",
+         subtitle = "ferrozine method")
+  
+  gg_fe_total = 
+    ferrozine %>% 
+    #filter(Fe_2_3 > 0) %>% 
+    ggplot(aes(x = site, y = Fe_total_ug_g, color = transect, shape = horizon)) +
+    geom_point(position = position_dodge(width = 0.3))+
+    facet_grid(. ~ region, scales = "free")+
+    scale_color_manual(values = pal_transect)+
+    labs(title = "total Fe",
+         subtitle = "ferrozine method")
+  
+  list(gg_fe_2_3 = gg_fe_2_3,
+       gg_fe_total = gg_fe_total)
+  
+}

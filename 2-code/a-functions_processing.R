@@ -232,7 +232,7 @@ import_icp_data = function(FILEPATH){
   
 }
 
-process_icp = function(icp_data, moisture_processed, subsampling){
+process_icp = function(icp_data, analysis_key, moisture_processed, subsampling){
   
   icp_processed = 
     icp_data %>% 
@@ -270,8 +270,114 @@ process_icp = function(icp_data, moisture_processed, subsampling){
 }
 
 
+# Iron - ferrozine
+import_iron = function(FILEPATH){
+  
+  # import map
+  cb = read_sheet("1pzvGUvjK6qV8BVYSfoc2cid88dx3v7ZOD7TnYFgyWbc", sheet = "cb") %>% mutate_all(as.character) %>% mutate(region = "CB")
+  wle = read_sheet("1pzvGUvjK6qV8BVYSfoc2cid88dx3v7ZOD7TnYFgyWbc", sheet = "wle") %>% mutate_all(as.character) %>% mutate(region = "WLE")
+  ferrozine_map = bind_rows(cb, wle)
+  
+  # import data files (plate reader)
+  filePaths_ferrozine <- list.files(path = FILEPATH, pattern = "csv", full.names = TRUE, recursive = TRUE)
+  ferrozine_data <- do.call(bind_rows, lapply(filePaths_ferrozine, function(path) {
+    df <- read.csv(path, skip = 24, header = TRUE) %>% mutate_all(as.character) %>% janitor::clean_names()
+    df = df %>% mutate(source = basename(path))
+    df}))
+  
+  list(ferrozine_map = ferrozine_map,
+       ferrozine_data = ferrozine_data)
+  
+}
 
 
-FILEPATH = "1-data/icp"
-analysis_key = read.csv("1-data/analysis_key.csv")
-sample_key = read.csv("1-data/sample_key.csv")
+process_iron = function(ferrozine_map, ferrozine_data, moisture_processed, subsampling){
+  
+  # clean the map
+  map_processed = 
+    ferrozine_map %>% 
+    mutate(tray_number = parse_number(tray_number)) %>% 
+    filter(!is.na(sample_name) & !is.na(tray_number)) %>% 
+    rename(sample_label = sample_name)
+  
+  # clean the data
+  data_processed = 
+    ferrozine_data %>% 
+    mutate_all(na_if,"") %>% 
+    dplyr::select(-x) %>% 
+    fill(x_1) %>% 
+    filter(x_2 == "562") %>% 
+    dplyr::select(-x_2) %>% 
+    pivot_longer(-c(source, x_1), values_to = "absorbance_562") %>% 
+    mutate(name = str_remove(name, "x"),
+           well_position = paste0(x_1, name),
+           region = str_extract(source, regex("cb|wle", ignore_case = TRUE)),
+           region = toupper(region),
+           tray_number = str_extract(source, "tray|plate[1-9]+"),
+           tray_number = parse_number(tray_number),
+           absorbance_562 = as.numeric(absorbance_562)) %>% 
+    dplyr::select(region, tray_number, well_position, absorbance_562) %>% 
+    right_join(map_processed, by = c("region", "tray_number", "well_position")) %>% 
+    filter(!notes %in% "skip")
+  
+  calibrate_ferrozine_data = function(data_processed){
+    standards = 
+      data_processed %>% 
+      filter(grepl("standard", sample_label)) %>% 
+      dplyr::select(region, tray_number, absorbance_562, standard_ppm) %>% 
+      mutate(standard_ppm = as.numeric(standard_ppm))
+    
+    standards %>% 
+      ggplot(aes(x = standard_ppm, y = absorbance_562, color = as.character(tray_number)))+
+      geom_point()+
+      geom_smooth(method = "lm", se = F)+
+      facet_wrap(~region + tray_number)
+    
+    calibration_coef = 
+      standards %>% 
+      dplyr::group_by(region, tray_number) %>% 
+      dplyr::summarize(slope = lm(absorbance_562 ~ standard_ppm)$coefficients["standard_ppm"], 
+                       intercept = lm(absorbance_562 ~ standard_ppm)$coefficients["(Intercept)"])
+      
+      # y = mx + c
+      # abs = m*ppm + c
+      # ppm = abs-c/m
+      
+    # data_processed2 = 
+      data_processed %>% 
+      left_join(calibration_coef) %>% 
+      mutate(ppm_calculated = ((absorbance_562 - intercept) / slope))
+      
+    }
+
+    samples = 
+      calibrate_ferrozine_data(data_processed) %>% 
+      filter(grepl("COMPASS", sample_label)) %>% 
+      dplyr::select(region, sample_label, analysis, ppm_calculated) %>% 
+      mutate(analysis = recode(analysis, "Fe2 (water only)" = "Fe2", "total-Fe (ascorbic)" = "Fe_total")) %>% 
+      pivot_wider(names_from = "analysis", values_from = "ppm_calculated") %>% 
+      mutate(across(where(is.numeric), round, 2)) %>% 
+      mutate(Fe3 = Fe_total - Fe2)
+      
+    samples2 = 
+      samples %>% 
+      dplyr::select(sample_label, starts_with("Fe")) %>% 
+      pivot_longer(cols = starts_with("Fe"), names_to = "species", values_to = "ppm") %>% 
+      left_join(moisture_processed) %>% 
+      left_join(subsampling %>% dplyr::select(sample_label, iron_g)) %>% 
+      rename(fm_g = iron_g) %>% 
+      mutate(ppm = as.numeric(ppm),
+             od_g = fm_g/((gwc_perc/100)+1),
+             soilwater_g = fm_g - od_g,
+             ug_g = ppm * ((25 + soilwater_g)/od_g),
+             ug_g = round(ug_g, 2)) %>% 
+      dplyr::select(sample_label, species, ppm, ug_g) %>% 
+      arrange(sample_label) %>% 
+      pivot_longer(-c(sample_label, species)) %>% 
+      mutate(name = paste0(species, "_", name)) %>% 
+      dplyr::select(-species) %>% 
+      filter(!grepl("blank", sample_label)) %>% 
+      pivot_wider()
+    
+    samples2
+  }
