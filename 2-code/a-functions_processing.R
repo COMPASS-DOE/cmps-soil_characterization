@@ -199,12 +199,16 @@ process_din = function(din_data, analysis_key, moisture_processed, subsampling){
            NH4N_mgL = as.numeric(NH4N_mgL)) %>% 
     left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) %>%
     mutate(blank_NO3N_mgL = case_when(sample_label == "blank-filter" ~ NO3N_mgL),
-           blank_NH4N_mgL = case_when(sample_label == "blank-filter" ~ NH4N_mgL))
+           blank_NH4N_mgL = case_when(sample_label == "blank-filter" ~ NH4N_mgL)) %>% 
+    # some samples were below-detect (0.2 ppm)
+    # set these values to half-detect
+    mutate(no3_flag = case_when(is.na(NO3N_mgL) ~ "below dl"),
+           NO3N_mgL2 = case_when(is.na(NO3N_mgL) ~ 0.10, TRUE ~ NO3N_mgL))
   
   din_samples = 
     din_processed %>% 
     filter(grepl("COMPASS", sample_label)) %>% 
-    dplyr::select(sample_label, NO3N_mgL, NH4N_mgL) %>% 
+    dplyr::select(sample_label, NO3N_mgL, NH4N_mgL, no3_flag) %>% 
     
     # join gwc and subsampling weights to normalize data to soil weight
     left_join(moisture_processed) %>% 
@@ -216,7 +220,7 @@ process_din = function(din_data, analysis_key, moisture_processed, subsampling){
            no3n_ug_g = round(no3n_ug_g, 2),
            nh4n_ug_g = NH4N_mgL * ((25 + soilwater_g)/od_g),
            nh4n_ug_g = round(nh4n_ug_g, 2)) %>% 
-    dplyr::select(sample_label, NO3N_mgL, NH4N_mgL, no3n_ug_g, nh4n_ug_g) %>% 
+    dplyr::select(sample_label, NO3N_mgL, NH4N_mgL, no3n_ug_g, nh4n_ug_g, no3_flag) %>% 
     arrange(sample_label)
   
   din_samples
