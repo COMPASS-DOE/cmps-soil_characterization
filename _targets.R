@@ -54,6 +54,11 @@ list(
   tar_target(ferrozine_data, import_iron(FILEPATH = "1-data/iron-ferrozine")$ferrozine_data),
   tar_target(ferrozine_map, import_iron(FILEPATH = "1-data/iron-ferrozine")$ferrozine_map),
   tar_target(ferrozine_processed, process_iron(ferrozine_map, ferrozine_data, moisture_processed, subsampling)),
+  tar_target(icr_report= import_fticr_data(FILEPATH = "1-data/icr")),
+  tar_target(icr_meta= make_fticr_meta(icr_report)$meta2),
+  tar_target(icr_data_long= make_fticr_data(icr_report, analysis_key, sample_key)$data_long_blank_corrected),
+  tar_target(icr_data_trt= make_fticr_data(icr_report, analysis_key, sample_key)$data_long_trt),
+  
   
   # analysis - graphs
   tar_target(gg_moisture, plot_moisture(moisture_processed, sample_key)),
