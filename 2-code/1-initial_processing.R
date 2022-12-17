@@ -35,7 +35,7 @@ subsampling_weights = read_sheet("12mTWytgKryo5CkKVOba32XWhwzhvsADsaXp2A25wyA0",
 subsampling_weights_subset = 
   subsampling_weights %>% 
   filter(!is.na(site)) %>% 
-  dplyr::select(sample_label, ends_with("_g"), notes) %>% 
+  dplyr::select(sample_label, ends_with(c("_g", "mL")), notes) %>% 
   mutate_at(vars(ends_with("_g")), as.numeric)
 
 ## export
