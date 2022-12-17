@@ -444,3 +444,126 @@ process_wrc = function(wrc_data){
   
 }
 
+# Mehlich-P
+import_mehlich = function(FILEPATH){
+
+  mehlich_map = read_sheet("1qBXwZhjwc4ane7Wq8dfqu7ioVbnU4c_nEHwIAqRayPs", na = "") %>% mutate_all(as.character) 
+  mehlich_map[mehlich_map == "NULL"] <- NA
+  
+  filePaths_mehlich <- list.files(path = FILEPATH, pattern = "csv", full.names = TRUE, recursive = TRUE)
+  mehlich_data <- do.call(bind_rows, lapply(filePaths_mehlich, function(path) {
+    df <- read.csv(path, skip = 22, header = TRUE) %>% mutate_all(as.character) %>% janitor::clean_names()
+    df = df %>% mutate(source = basename(path))
+    df}))
+  
+  
+  list(mehlich_map = mehlich_map,
+       mehlich_data = mehlich_data)
+}
+#mehlich_map = import_mehlich(FILEPATH)$mehlich_map
+#mehlich_data = import_mehlich(FILEPATH)$mehlich_data
+
+process_mehlich = function(mehlich_map, mehlich_data, moisture_processed, subsampling){
+  
+  # clean the map
+  map_processed = 
+    mehlich_map %>% 
+    fill(date_run, plate) %>% 
+    mutate(plate = parse_number(plate)) %>% 
+    dplyr::select(-notes) %>% 
+    pivot_longer(-c(date_run, plate, letter), names_to = "number", values_to = "sample_label") %>% 
+    drop_na() %>% 
+    filter(letter != "letter") %>% 
+    mutate(sample_type = case_when(grepl("ppm", sample_label) ~ "standard",
+                                   grepl("blank", sample_label) ~ "blank",
+                                   TRUE ~ "sample"),
+           well_position = paste0(letter, number)) %>%
+    rename(tray_number = plate) %>% 
+    dplyr::select(tray_number, well_position, sample_label, sample_type)
+  
+  
+  # clean the data
+  data_processed = 
+    mehlich_data %>% 
+    dplyr::select(-x) %>% 
+    fill(x_1) %>% 
+    filter(x_2 == "880") %>% 
+    dplyr::select(-x_2) %>% 
+    pivot_longer(-c(source, x_1), values_to = "absorbance_880") %>% 
+    mutate(name = str_remove(name, "x"),
+           well_position = paste0(x_1, name),
+           tray_number = str_extract(source, "tray|plate[0-9]+"),
+           tray_number = parse_number(tray_number),
+           absorbance_880 = as.numeric(absorbance_880)) %>% 
+    dplyr::select(tray_number, well_position, absorbance_880) %>% 
+    right_join(map_processed, by = c("tray_number", "well_position")) 
+
+  calibrate_mehlich_data = function(data_processed){
+    standards = 
+      data_processed %>% 
+      filter(grepl("standard", sample_type)) %>% 
+      dplyr::select(tray_number, absorbance_880, sample_label) %>%
+      mutate(standard_ppm = parse_number(sample_label))
+    
+    standards %>% 
+      filter(standard_ppm < 2) %>% 
+      ggplot(aes(x = standard_ppm, y = absorbance_880, color = as.character(tray_number)))+
+      geom_point()+
+      geom_smooth(method = "lm", se = F)+
+      facet_wrap(~tray_number)
+    
+    calibration_coef123 = 
+      standards %>% 
+      dplyr::group_by(tray_number) %>% 
+      dplyr::summarize(slope = lm(absorbance_880 ~ standard_ppm)$coefficients["standard_ppm"], 
+                       intercept = lm(absorbance_880 ~ standard_ppm)$coefficients["(Intercept)"],
+                       rsquared = summary(lm(absorbance_880 ~ standard_ppm))$adj.r.squared)
+    
+    calibration_coef0 = 
+      standards %>% 
+      #dplyr::group_by(tray_number) %>% 
+      dplyr::summarize(slope = lm(absorbance_880 ~ standard_ppm)$coefficients["standard_ppm"], 
+                       intercept = lm(absorbance_880 ~ standard_ppm)$coefficients["(Intercept)"],
+                       rsquared = summary(lm(absorbance_880 ~ standard_ppm))$adj.r.squared) %>% 
+      mutate(tray_number = 0)
+    
+    calibration_coef = 
+      rbind(calibration_coef123, calibration_coef0)
+    
+    # y = mx + c
+    # abs = m*ppm + c
+    # ppm = abs-c/m
+    
+    # data_processed2 = 
+    data_processed %>% 
+      left_join(calibration_coef) %>% 
+      mutate(ppm_calculated = ((absorbance_880 - intercept) / slope))
+    
+  }
+  
+  samples = 
+    calibrate_mehlich_data(data_processed) %>% 
+    filter(grepl("COMPASS", sample_label)) %>% 
+    dplyr::select(sample_label, ppm_calculated) %>% 
+    force()
+  
+  samples2 = 
+    samples %>% 
+    left_join(moisture_processed) %>% 
+    left_join(subsampling %>% dplyr::select(sample_label, starts_with("mehlich"))) %>% 
+    rename(fm_g = mehlichp_g,
+           extractant_mL = mehlichp_mL) %>% 
+    mutate(ppm = as.numeric(ppm_calculated),
+           od_g = fm_g/((gwc_perc/100)+1),
+           soilwater_g = fm_g - od_g,
+           ug_g = ppm * ((extractant_mL + soilwater_g)/od_g),
+           ug_g = round(ug_g, 2)) %>% 
+    dplyr::select(sample_label, ppm, ug_g) %>% 
+    rename(mehlichp_ppm = ppm,
+           mehlichp_ugg = ug_g) %>% 
+    arrange(sample_label) %>% 
+   force()
+  
+  samples2
+  
+}
