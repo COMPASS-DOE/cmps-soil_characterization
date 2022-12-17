@@ -30,9 +30,12 @@ source("2-code/b-functions_analysis.R")
 list(
   
   # sample metadata
-  tar_target(sample_key, read.csv("1-data/sample_key.csv")),
-  tar_target(subsampling, read.csv("1-data/subsampling_weights.csv")),
-  tar_target(analysis_key, read.csv("1-data/analysis_key.csv")),
+  tar_target(sample_key_data, "1-data/sample_key.csv", format = "file"),
+  tar_target(sample_key, read.csv(sample_key_data)),
+  tar_target(subsampling_data, "1-data/subsampling_weights.csv", format = "file"),
+  tar_target(subsampling, read.csv(subsampling_data)),
+  tar_target(analysis_key_data, "1-data/analysis_key.csv", format = "file"),
+  tar_target(analysis_key, read.csv(analysis_key_data)),
   
   # data files
   tar_target(moisture_data, import_gsheet("1nYzExPmpv01IYalqo2L3pmDsBDvhjdvHYMJo31N5_MA")),
