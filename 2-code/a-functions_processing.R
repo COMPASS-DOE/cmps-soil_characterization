@@ -203,7 +203,7 @@ process_din = function(din_data, analysis_key, moisture_processed, subsampling){
     # some samples were below-detect (0.2 ppm)
     # set these values to half-detect
     mutate(no3_flag = case_when(is.na(NO3N_mgL) ~ "below dl"),
-           NO3N_mgL2 = case_when(is.na(NO3N_mgL) ~ 0.10, TRUE ~ NO3N_mgL))
+           NO3N_mgL = case_when(is.na(NO3N_mgL) ~ 0.10, TRUE ~ NO3N_mgL))
   
   din_samples = 
     din_processed %>% 
