@@ -385,3 +385,62 @@ process_iron = function(ferrozine_map, ferrozine_data, moisture_processed, subsa
     
     samples2
   }
+
+# Water retention curves
+import_wrc_data = function(FILEPATH){
+  
+  filePaths_wrc <- list.files(path = FILEPATH, pattern = "xlsx", full.names = TRUE, recursive = FALSE)
+  wrc_data <- do.call(bind_rows, lapply(filePaths_wrc, function(path) {
+    
+    # importing both, the evaluated values and the fitted values
+    df_eval <- readxl::read_excel(path, sheet = "Evaluation-Retention Θ(pF)") %>% mutate_all(as.character) %>% janitor::clean_names()
+    df_eval = df_eval %>% mutate(source = basename(path)) %>% dplyr::select(p_f, water_content_vol_percent, source) %>% rename(pf_eval = p_f)
+    
+    df_fit <- readxl::read_excel(path, sheet = "Fitting-Retention Θ(pF)") %>% mutate_all(as.character) %>% janitor::clean_names()
+    df_fit = df_fit %>% mutate(source = basename(path)) %>% dplyr::select(p_f, water_content_vol_percent, source) %>% rename(pf_fit = p_f)
+    
+    df <- full_join(df_eval, df_fit)
+    df
+  }
+  
+  ))
+
+}
+#wrc_data = import_wrc_data(FILEPATH)
+
+process_wrc = function(wrc_data){
+  
+  wrc_processed <- 
+    wrc_data %>% 
+    mutate(source = str_remove(source, ".xlsx")) %>% 
+    separate(source, sep = "_", into = c("EC", "kit", "site", "transect")) %>% 
+    dplyr::select(site, transect, water_content_vol_percent, starts_with("pf")) %>% 
+    mutate_at(vars(starts_with("pf")), as.numeric) %>% 
+    mutate_at(vars(starts_with("water")), as.numeric) %>% 
+    mutate(transect = tolower(transect),
+           kpa_eval = round((10^pf_eval)/10,2),
+           kpa_fit = round((10^pf_fit)/10,2))
+  
+  
+ wrc_processed %>% 
+    filter(pf_fit >= 0 | pf_eval >= 0) %>% 
+    ggplot(aes(y = water_content_vol_percent))+
+    geom_line(aes(x = pf_fit))+
+    geom_point(aes(x = pf_eval), shape = 1)+
+    facet_wrap(~site+transect)
+ 
+ 
+ wrc_processed %>% 
+   filter(pf_fit >= 0 | pf_eval >= 0) %>% 
+   ggplot(aes(y = water_content_vol_percent, color = transect))+
+   geom_line(aes(x = kpa_fit/1000))+
+   geom_point(aes(x = kpa_eval/1000), shape = 1)+
+   scale_x_log10(labels = scales::comma)+
+   facet_wrap(~site)
+  
+  
+  
+  
+  
+}
+
