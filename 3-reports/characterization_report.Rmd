@@ -93,6 +93,14 @@ tar_read(gg_ferrozine)
 ```
 
 
+**Mehlich-3 extractable P**
+
+Extracted using Mehlich-3 solution, analyzed with molybdate method
+
+```{r phosphorus-mehlich, fig.height=5, fig.width=7}
+tar_read(gg_mehlich)
+```
+
 
 ---
 

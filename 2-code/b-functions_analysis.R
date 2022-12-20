@@ -250,3 +250,212 @@ plot_ferrozine = function(ferrozine_processed, sample_key){
        gg_fe_total = gg_fe_total)
   
 }
+
+plot_mehlich = function(mehlich_processed, sample_key){
+  
+  mehlich = 
+    mehlich_processed %>% 
+    left_join(sample_key) %>% 
+    filter(!is.na(site)) %>% 
+    reorder_transect() %>% 
+    reorder_horizon()
+  
+  #gg_mehlich = 
+    mehlich %>% 
+    ggplot(aes(x = site, y = mehlichp_ugg, color = transect, shape = horizon)) +
+    geom_point(position = position_dodge(width = 0.3))+
+    facet_grid(. ~ region, scales = "free")+
+    scale_color_manual(values = pal_transect)+
+    labs(title = "Mehlich-3 extractable P")
+  
+}
+
+
+
+
+
+
+
+
+combine_data = function(){
+  
+  df_list = list(moisture_processed, pH_processed, tctnts_data_samples, weoc_processed, din_processed, icp_processed, ferrozine_processed)
+  all_combined = 
+    df_list %>% reduce(full_join) %>% 
+    dplyr::select(-notes, -ends_with(c("_ppm", "_mgL", "_flag")))
+  
+  all_combined
+ #   left_join(sample_key) %>% 
+ #   filter(!grepl("_vac|rep", sample_label)) %>% 
+ #   dplyr::select(-S_ug_g) %>% 
+ #   #rowwise() %>% 
+ #   #mutate(SUM = rowSums(across(where(is.numeric))))
+ #   #replace(.,is.na(.),0) %>% 
+ #   force()
+}
+
+#all_data_combined = combine_data()
+
+compute_analyte_matrix = function(all_data_combined, sample_key){
+  
+  analyte_completion_matrix = 
+    all_data_combined %>% 
+    distinct()
+  #  group_by(sample_label) %>% 
+  #  dplyr::summarise(n = n())
+  #  pivot_longer(-sample_label) %>% 
+    left_join(sample_key) %>% 
+    group_by(name, region, site, transect, horizon) %>% 
+    dplyr::summarise(n = n()) %>% 
+    pivot_wider(values_from = "n")
+  
+  
+}
+
+#analyte_completion_matrix = compute_analyte_matrix(all_data_combined, sample_key)
+
+
+
+
+compute_pca = function(){
+  library(ggbiplot)
+  
+
+  
+  
+  fit_pca_function = function(dat){
+
+    dat %>% 
+      drop_na()
+    
+    num = 
+      dat %>%       
+      dplyr::select(where(is.numeric)) %>%
+      dplyr::mutate(row = row_number()) %>% 
+     # filter(is.na(rowSums(.)))
+     drop_na()
+
+    num_row_numbers = num %>% dplyr::select(row)
+    
+    grp = 
+      dat %>% 
+      dplyr::select(where(is.character)) %>% 
+      dplyr::mutate(row = row_number()) %>% 
+      right_join(num_row_numbers)
+    
+    
+    num = num %>% dplyr::select(-row)
+    pca_int = prcomp(num, scale. = T)
+    
+    list(num = num,
+         grp = grp,
+         pca_int = pca_int)
+  }
+  
+  ## PCA input files ----
+  pca_combined = fit_pca_function(all_combined %>% filter(horizon == c("O", "A")))
+
+  pca_combined_wle = fit_pca_function(all_combined %>% 
+                                        filter(horizon == c("O", "A")) %>% 
+                                        filter(region == "WLE"))
+  
+  pca_combined_cb = fit_pca_function(all_combined2 %>% 
+                                        filter(horizon == c("O", "A")) %>% 
+                                        filter(region == "CB"))
+  
+  
+  
+  ## PCA plots overall ----
+  #gg_pca_overall1 = 
+    ggbiplot(pca_combined$pca_int, obs.scale = 1, var.scale = 1,
+             groups = as.character(pca_combined$grp$region), 
+             ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+    geom_point(size=3,stroke=1, alpha = 1,
+               aes(shape = pca_combined$grp$horizon,
+                   color = groups))+ 
+    scale_shape_manual(values = c(21, 19))+
+    #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
+    #xlim(-4,4)+
+    #ylim(-3.5,3.5)+
+    labs(shape="",
+         title = "O/A horizons",
+         subtitle = "all variables")+
+    theme_kp()+
+    NULL
+  
+  
+  
+  ggbiplot(pca_combined_wle$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_combined_wle$grp$transect), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+    geom_point(size=3,stroke=1, alpha = 1,
+               aes(shape = pca_combined_wle$grp$site,
+                   color = groups))+ 
+    #scale_shape_manual(values = c(21, 19))+
+    #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
+    #xlim(-4,4)+
+    #ylim(-3.5,3.5)+
+    labs(shape="",
+         title = "WLE: O/A horizons",
+         subtitle = "all variables")+
+    theme_kp()+
+    NULL
+  
+  
+  ggbiplot(pca_combined_cb$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_combined_cb$grp$transect), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+    geom_point(size=3,stroke=1, alpha = 1,
+               aes(shape = pca_combined_cb$grp$site,
+                   color = groups))+ 
+    #scale_shape_manual(values = c(21, 19))+
+    #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
+    #xlim(-4,4)+
+    #ylim(-3.5,3.5)+
+    labs(shape="",
+         title = "CB: O/A horizons",
+         subtitle = "all variables")+
+    theme_kp()+
+    NULL
+
+}
+
+compute_correlations = function(dat, TITLE){
+  
+
+  num = 
+    dat %>%       
+    dplyr::select(where(is.numeric)) %>%
+    drop_na()
+  
+  num_clean = 
+    num %>% 
+    rename(Fetotal = Fe_total_ug_g) %>% 
+    rownames_to_column("row") %>% 
+    pivot_longer(-row) %>% 
+    separate(name, sep = "_", into = c("name")) %>% 
+    pivot_wider() %>% 
+    dplyr::select(-row)
+  
+  
+  m = cor(num_clean)
+  corrplot(m, #method="color", 
+           type = "lower",
+           title = TITLE,
+           mar = c(0,0,1,0) 
+             #, order = "hclust"
+           )
+  
+  
+  
+  
+  
+  
+  library(corrplot)
+  compute_correlations(dat = all_combined %>% filter(region == "WLE" & horizon == c("O", "A")),
+                       TITLE = "WLE")
+  compute_correlations(dat = all_combined %>% filter(region == "CB" & horizon == c("O", "A")),
+                       TITLE = "CB")
+  
+}
+

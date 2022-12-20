@@ -76,6 +76,8 @@ list(
   tar_target(gg_din, plot_din(din_processed, sample_key)),
   tar_target(gg_icp, plot_icp(icp_processed, sample_key)),
   tar_target(gg_ferrozine, plot_ferrozine(ferrozine_processed, sample_key)),
+  tar_target(gg_mehlich, plot_mehlich(mehlich_processed, sample_key)),
+  
 
   # report  
   tar_render(report, path = "3-reports/characterization_report.Rmd")
