@@ -324,3 +324,162 @@ plot_vankrevelen_unique = function(icr_data_trt, icr_meta){
 }
 
 
+#
+## Relative Abundance -----------------------------------------------------
+
+
+compute_icr_relabund = function(icr_data_long, icr_meta){
+  
+  icr_data_long %>% 
+    # add the Class column to the data
+    left_join(dplyr::select(icr_meta, formula, Class), by = "formula") %>% 
+    # calculate abundance of each Class as the sum of all counts
+    group_by(sample_label, Class) %>%
+    dplyr::summarise(abund = sum(presence)) %>%
+    ungroup %>% 
+    # create a new column for total counts per core assignment
+    # and then calculate relative abundance  
+    group_by(sample_label) %>% 
+    dplyr::mutate(total = sum(abund),
+                  relabund  = ((abund/total)*100))
+}
+icr_relabund_samples = compute_icr_relabund(icr_data_long, icr_meta)
+
+
+fticr_relabund_per_sample %>%
+  left_join(sample_key) %>% 
+  ggplot(aes(x = sample_label, y = relabund, fill = Class))+
+  geom_bar(stat = "identity")+
+  facet_wrap(~region, scales = "free_x")
+
+fticr_relabund_per_sample %>%
+  left_join(sample_key) %>% 
+  filter(region == "CB" & horizon != "B") %>% 
+  ggplot(aes(x = sample_label, y = relabund, fill = Class))+
+  geom_bar(stat = "identity")+
+  facet_wrap(~site + transect, scales = "free_x")
+
+fticr_relabund_per_sample %>%
+  left_join(sample_key) %>% 
+  filter(region == "WLE" & horizon != "B") %>% 
+  ggplot(aes(x = sample_label, y = relabund, fill = Class))+
+  geom_bar(stat = "identity")+
+  facet_wrap(~site + transect, scales = "free_x")
+
+
+y = fticr_relabund_per_sample %>% 
+  group_by(sample_label) %>% 
+  dplyr::summarise(total2 = sum(relabund))
+
+
+
+## Statistics -------------------------------------------------------------
+
+# pca functions -----------------------------------------------------------
+library(ggbiplot)
+library(vegan)
+library(patchwork)
+
+
+fit_pca_function = function(icr_relabund_samples, sample_key){
+  relabund_pca =
+    icr_relabund_samples %>% 
+    left_join(sample_key) %>% 
+    drop_na() %>% 
+    ungroup %>% 
+    dplyr::select(-c(abund, total)) %>% 
+    spread(Class, relabund) %>% 
+    filter(!is.na(region)) %>% 
+    replace(.,is.na(.),0)
+  
+  num = 
+    relabund_pca %>% 
+    dplyr::select(where(is.numeric))
+  
+  grp = 
+    relabund_pca %>% 
+    dplyr::select(where(is.character)) %>% 
+    dplyr::mutate(row = row_number()) %>% 
+    reorder_horizon()
+  
+  pca_int = prcomp(num, scale. = T)
+  
+  list(num = num,
+       grp = grp,
+       pca_int = pca_int)
+}
+compute_icr_pca = function(icr_relabund_samples, sample_key){
+  
+  pca_overall = fit_pca_function(icr_relabund_samples, sample_key %>% filter(horizon != "B"))
+  pca_wle = fit_pca_function(icr_relabund_samples, sample_key %>% filter(horizon != "B" & region == "WLE"))
+  pca_cb = fit_pca_function(icr_relabund_samples, sample_key %>% filter(horizon != "B" & region == "CB"))
+  
+  
+  # PCA biplots
+  biplot_all = 
+    ggbiplot(pca_overall$pca_int, obs.scale = 1, var.scale = 1,
+             groups = pca_overall$grp$region, 
+             ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+    geom_point(size=3,stroke=1, alpha = 1,
+               aes(shape = pca_overall$grp$transect,
+                   color = groups))+
+    scale_shape_manual(breaks = c("upland", "transition", "wte", "wc"),
+                       values = c(1,2,3,4))+
+    xlim(-4,4)+
+    ylim(-3.5,3.5)
+  
+  biplot_wle = 
+    ggbiplot(pca_wle$pca_int, obs.scale = 1, var.scale = 1,
+             groups = pca_wle$grp$transect, 
+             ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+    geom_point(size=3,stroke=1, alpha = 1,
+               aes(shape = pca_wle$grp$site,
+                   color = groups))+
+    scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+                       values = pal_transect)+
+    labs(title = "FTICR: WLE")+
+    xlim(-4,4)+
+    ylim(-3.5,3.5)
+  
+  
+  biplot_cb = 
+    ggbiplot(pca_cb$pca_int, obs.scale = 1, var.scale = 1,
+             groups = pca_cb$grp$transect, 
+             ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+    geom_point(size=3,stroke=1, alpha = 1,
+               aes(shape = pca_cb$grp$site,
+                   color = groups))+
+    scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+                       values = pal_transect)+
+    labs(title = "FTICR: Chesapeake")+
+    xlim(-4,4)+
+    ylim(-3.5,3.5)
+  
+  biplot_regions = 
+    biplot_wle + biplot_cb 
+  
+  list(biplot_all = biplot_all,
+       biplot_regions = biplot_regions)
+}
+
+#
+# permanova -----------------------------------------------------------
+
+compute_permanova = function(icr_relabund_samples){
+  relabund_wide = 
+    icr_relabund_samples %>% 
+    left_join(sample_key) %>% 
+    ungroup %>% 
+    dplyr::select(-c(abund, total)) %>% 
+    spread(Class, relabund) %>% 
+    filter(!is.na(region)) %>% 
+    replace(.,is.na(.),0)
+  
+  permanova_fticr_all = 
+    adonis(relabund_wide %>% dplyr::select(where(is.numeric)) ~ (region + transect + site + horizon)^2, 
+           data = relabund_wide)
+  broom::tidy(permanova_fticr_all$aov.tab)
+}
+
+
+

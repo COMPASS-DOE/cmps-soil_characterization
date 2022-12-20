@@ -64,6 +64,7 @@ list(
   tar_target(icr_meta, make_fticr_meta(icr_report)$meta2),
   tar_target(icr_data_long, make_fticr_data(icr_report, analysis_key, sample_key)$data_long_blank_corrected),
   tar_target(icr_data_trt, make_fticr_data(icr_report, analysis_key, sample_key)$data_long_trt),
+  tar_target(icr_relabund_samples, compute_icr_relabund(icr_data_long, icr_meta)),
   
   
   # analysis - graphs
@@ -79,6 +80,7 @@ list(
   tar_target(gg_mehlich, plot_mehlich(mehlich_processed, sample_key)),
   tar_target(gg_icr_vankrevelen, plot_vankrevelen(icr_data_trt, icr_meta)),
   tar_target(gg_icr_unique, plot_vankrevelen_unique(icr_data_trt, icr_meta)),
+  tar_target(gg_icr_pca, compute_icr_pca(icr_relabund_samples, sample_key)),
   
 
   # report  
