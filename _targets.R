@@ -60,10 +60,10 @@ list(
   tar_target(mehlich_map, import_mehlich(FILEPATH = "1-data/phosphorus-mehlich")$mehlich_map),
   tar_target(mehlich_data, import_mehlich(FILEPATH = "1-data/phosphorus-mehlich")$mehlich_data),
   tar_target(mehlich_processed, process_mehlich(mehlich_map, mehlich_data, moisture_processed, subsampling)),
-  tar_target(icr_report= import_fticr_data(FILEPATH = "1-data/icr")),
-  tar_target(icr_meta= make_fticr_meta(icr_report)$meta2),
-  tar_target(icr_data_long= make_fticr_data(icr_report, analysis_key, sample_key)$data_long_blank_corrected),
-  tar_target(icr_data_trt= make_fticr_data(icr_report, analysis_key, sample_key)$data_long_trt),
+  tar_target(icr_report, import_fticr_data(FILEPATH = "1-data/icr")),
+  tar_target(icr_meta, make_fticr_meta(icr_report)$meta2),
+  tar_target(icr_data_long, make_fticr_data(icr_report, analysis_key, sample_key)$data_long_blank_corrected),
+  tar_target(icr_data_trt, make_fticr_data(icr_report, analysis_key, sample_key)$data_long_trt),
   
   
   # analysis - graphs
@@ -77,6 +77,8 @@ list(
   tar_target(gg_icp, plot_icp(icp_processed, sample_key)),
   tar_target(gg_ferrozine, plot_ferrozine(ferrozine_processed, sample_key)),
   tar_target(gg_mehlich, plot_mehlich(mehlich_processed, sample_key)),
+  tar_target(gg_icr_vankrevelen, plot_vankrevelen(icr_data_trt, icr_meta)),
+  tar_target(gg_icr_unique, plot_vankrevelen_unique(icr_data_trt, icr_meta)),
   
 
   # report  

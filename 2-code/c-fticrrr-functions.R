@@ -13,6 +13,19 @@
 ################################################## #
 ################################################## #
 
+import_fticr_data = function(FILEPATH){
+  
+  df <- 
+    list.files(path=FILEPATH, full.names = TRUE) %>% 
+    lapply(read_csv) %>% 
+    bind_rows
+  
+}
+
+
+
+
+
 # 1. PROCESSING FUNCTIONS -------------------------------------------------
 ## LEVEL I FUNCTIONS -------------------------------------------------------
 ## for metadata file
@@ -221,3 +234,93 @@ make_fticr_data = function(icr_report, analysis_key, sample_key){
        data_long_blank_corrected = data_long_blank_corrected)
   
 }
+
+#
+# 2.  ANALYSIS FUNCTIONS --------------------------------------------------
+
+## Van Krevelen -----------------------------------------------------------
+
+gg_vankrev <- function(data,mapping){
+  ggplot(data,mapping) +
+    # plot points
+    geom_point(size=0.5, alpha = 0.5) + # set size and transparency
+    # axis labels
+    ylab("H/C") +
+    xlab("O/C") +
+    # axis limits
+    xlim(0,1.25) +
+    ylim(0,2.5) +
+    # add boundary lines for Van Krevelen regions
+    geom_segment(x = 0.0, y = 1.5, xend = 1.2, yend = 1.5,color="black",linetype="longdash") +
+    geom_segment(x = 0.0, y = 0.7, xend = 1.2, yend = 0.4,color="black",linetype="longdash") +
+    geom_segment(x = 0.0, y = 1.06, xend = 1.2, yend = 0.51,color="black",linetype="longdash") +
+    guides(colour = guide_legend(override.aes = list(alpha=1, size = 1)))
+}
+
+plot_vankrevelen = function(icr_data_trt, icr_meta){
+  
+  vk_domains = 
+    icr_meta %>% 
+    dplyr::select(formula, HC, OC, Class_detailed, Class) %>% 
+    gg_vankrev(aes(x = OC, y = HC, color = Class))
+  
+  
+  data_hcoc = 
+    icr_data_trt %>% 
+    left_join(icr_meta %>% dplyr::select(formula, HC, OC))
+  
+  vk_wle = 
+    data_hcoc %>% 
+    filter(region == "WLE" & horizon != "B") %>% 
+    gg_vankrev(aes(x = OC, y = HC, color = transect))+
+    stat_ellipse(level = 0.90, show.legend = F)+
+    facet_wrap(~site+horizon)
+  
+  vk_cb = 
+    data_hcoc %>% 
+    filter(region == "CB" ) %>% 
+    gg_vankrev(aes(x = OC, y = HC, color = transect))+
+    stat_ellipse(level = 0.90, show.legend = F)+
+    facet_wrap(~site+horizon)
+  
+  
+  list(vk_domains = vk_domains,
+       vk_wle = vk_wle,
+       vk_cb = vk_cb)
+}
+
+plot_vankrevelen_unique = function(icr_data_trt, icr_meta){
+  
+  unique_hcoc = 
+    icr_data_trt %>% 
+    group_by(formula, region, site, horizon) %>% 
+    dplyr::mutate(n = n()) %>% 
+    filter(n == 1) %>% 
+    left_join(icr_meta %>% dplyr::select(formula, HC, OC))
+  
+  
+  vk_unique_wle = 
+    unique_hcoc %>% 
+    filter(region == "WLE") %>% 
+    gg_vankrev(aes(x = OC, y = HC, color = transect))+
+    stat_ellipse(level = 0.90, show.legend = F)+
+    facet_wrap(~site+horizon)+
+    labs(title = "FTICR Unique Peaks",
+         subtitle = "WLE sites")
+  
+  
+  vk_unique_cb = 
+    unique_hcoc %>% 
+    filter(region == "CB") %>% 
+    gg_vankrev(aes(x = OC, y = HC, color = transect))+
+    stat_ellipse(level = 0.90, show.legend = F)+
+    facet_wrap(~site+horizon)+
+    labs(title = "FTICR Unique Peaks",
+         subtitle = "CB sites")
+  
+  
+  list(vk_unique_wle = vk_unique_wle,
+       vk_unique_cb = vk_unique_cb)
+}
+
+
