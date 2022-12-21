@@ -39,7 +39,8 @@ process_moisture = function(moisture_dat){
     # ((wet-dry)/dry) * 100
     mutate(gwc_perc = 100 * (wt_tray_moist_soil_g - wt_tray_dry_soil_g)/(wt_tray_dry_soil_g - wt_tray_g),
            gwc_perc = round(gwc_perc, 2)) %>% 
-    dplyr::select(sample_label, gwc_perc)
+    dplyr::select(sample_label, gwc_perc) %>% 
+    mutate(analysis = "GWC")
   
   
   #
@@ -53,7 +54,8 @@ process_loi = function(loi_data){
   loi_data %>%
     mutate_at(vars(contains("wt_")), as.numeric) %>% 
   mutate(percent_om = ((wt_tray_drysoil_g - wt_tray_combustedsoil_g)/(wt_tray_drysoil_g - wt_tray_g))*100,
-         percent_om = round(percent_om, 2))  
+         percent_om = round(percent_om, 2))  %>% 
+    mutate(analysis = "LOI")
   
 }
 
@@ -64,7 +66,8 @@ process_pH = function(pH_data){
   dplyr::select(sample_label, pH, specific_conductance_ms_cm) %>% 
   mutate_at(vars(-sample_label), as.numeric)  %>% 
   filter(grepl("COMPASS", sample_label)) %>% 
-  filter(!is.na(pH) | !is.na(specific_conductance_ms_cm))
+  filter(!is.na(pH) | !is.na(specific_conductance_ms_cm))%>% 
+    mutate(analysis = "PH")
 }
 
 
@@ -124,7 +127,8 @@ process_tctnts = function(tctn_data, ts_data){
     tctn_samples %>% 
     left_join(ts_samples) %>% 
     rename(sample_label = Name) %>% 
-      arrange(sample_label)
+      arrange(sample_label) %>% 
+      mutate(analysis = "TCTNTS")
   
 }
 
@@ -170,7 +174,8 @@ process_weoc = function(weoc_data, analysis_key, moisture_processed, subsampling
   
   npoc_samples = 
     npoc_processed %>% 
-    filter(grepl("COMPASS", sample_label))
+    filter(grepl("COMPASS", sample_label))%>% 
+    mutate(analysis = "NPOC")
   
   npoc_samples
 }
@@ -221,7 +226,8 @@ process_din = function(din_data, analysis_key, moisture_processed, subsampling){
            nh4n_ug_g = NH4N_mgL * ((25 + soilwater_g)/od_g),
            nh4n_ug_g = round(nh4n_ug_g, 2)) %>% 
     dplyr::select(sample_label, NO3N_mgL, NH4N_mgL, no3n_ug_g, nh4n_ug_g, no3_flag) %>% 
-    arrange(sample_label)
+    arrange(sample_label)%>% 
+    mutate(analysis = "DIN")
   
   din_samples
 }
@@ -268,7 +274,8 @@ process_icp = function(icp_data, analysis_key, moisture_processed, subsampling){
     mutate(name = paste0(species, "_", name)) %>% 
     dplyr::select(-species) %>% 
     filter(!grepl("blank", sample_label)) %>% 
-    pivot_wider()
+    pivot_wider()%>% 
+    mutate(analysis = "ICP")
 
   icp_samples
 }
@@ -381,7 +388,8 @@ process_iron = function(ferrozine_map, ferrozine_data, moisture_processed, subsa
       mutate(name = paste0(species, "_", name)) %>% 
       dplyr::select(-species) %>% 
       filter(!grepl("blank", sample_label)) %>% 
-      pivot_wider()
+      pivot_wider()%>% 
+      mutate(analysis = "Ferrozine")
     
     samples2
   }
@@ -562,7 +570,8 @@ process_mehlich = function(mehlich_map, mehlich_data, moisture_processed, subsam
     rename(mehlichp_ppm = ppm,
            mehlichp_ugg = ug_g) %>% 
     arrange(sample_label) %>% 
-   force()
+   force() %>% 
+    mutate(analysis = "Mehlich3")
   
   samples2
   
@@ -656,8 +665,48 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     pivot_longer(-c(sample_label, ion)) %>% 
     mutate(ion = paste0(ion, "_", name)) %>% 
     dplyr::select(sample_label, ion, value) %>% 
-    pivot_wider(names_from = "ion")
+    pivot_wider(names_from = "ion") %>% 
+    mutate(analysis = "IC")
     
   samples2
   }
 
+# Combined data
+combine_data = function(moisture_processed, pH_processed, tctnts_data_samples, 
+                        weoc_processed, din_processed, icp_processed, 
+                        ferrozine_processed, mehlich_processed, ions_processed,
+                        sample_key){
+  
+  df_list = list(moisture_processed, pH_processed, tctnts_data_samples, 
+                 weoc_processed, din_processed, icp_processed, 
+                 ferrozine_processed, mehlich_processed, ions_processed)
+  
+  data_combined = 
+    df_list %>% reduce(full_join) %>% 
+    dplyr::select(-notes, -ends_with(c("_ppm", "_mgL", "_flag"))) %>% 
+    filter(!grepl("_vac|rep", sample_label)) 
+  
+  # keep surface horizons only
+  combined_surface = 
+    data_combined %>% 
+    left_join(sample_key) %>% 
+    filter(horizon != "B") %>% 
+    filter(!(site == "MSM" & horizon == "A")) %>% 
+    filter(!(site == "GWI" & horizon == "A")) %>% 
+    dplyr::select(-c(region, site, transect, horizon, tree_number)) %>% 
+    pivot_longer(-c(sample_label, analysis)) %>% 
+    drop_na() %>% 
+    separate(name, sep = "_", into = "variable", remove = F) %>% 
+    mutate(name = paste0(variable, " (", analysis, ")")) %>% 
+    dplyr::select(sample_label, name, value) %>% 
+    pivot_wider() %>% 
+    dplyr::select(-c("Ammonia (IC)","Bromide (IC)", "Nitrite (IC)", "Fluoride (IC)")) %>% 
+    left_join(sample_key) %>% 
+    mutate(`Phosphate (IC)` = case_when(is.na(`Phosphate (IC)`) & site != "GCREW" ~ 0,
+                                        TRUE ~ `Phosphate (IC)`))
+  
+  list(data_combined = data_combined,
+       combined_surface = combined_surface)
+  
+}
+#data_combined = combine_data()  
