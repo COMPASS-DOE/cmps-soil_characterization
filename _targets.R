@@ -69,7 +69,6 @@ list(
   tar_target(ions_data, import_ions(FILEPATH = "1-data/ions")),
   tar_target(ions_processed, process_ions(ions_data, analysis_key, sample_key, moisture_processed, subsampling)),
   
-  
   # analysis - graphs
   tar_target(gg_moisture, plot_moisture(moisture_processed, sample_key)),
   tar_target(gg_loi, plot_loi(loi_processed, sample_key)),
@@ -87,6 +86,20 @@ list(
   tar_target(gg_ions, plot_ions(ions_processed, sample_key)),
   
 
+  # combined data
+  tar_target(data_combined, combine_data(moisture_processed, pH_processed, tctnts_data_samples, 
+                                         weoc_processed, din_processed, icp_processed, 
+                                         ferrozine_processed, mehlich_processed, ions_processed, sample_key)$data_combined),
+  tar_target(data_combined_clean_surface, combine_data(moisture_processed, pH_processed, tctnts_data_samples, 
+                                                       weoc_processed, din_processed, icp_processed, 
+                                                       ferrozine_processed, mehlich_processed, ions_processed, sample_key)$combined_surface),
+  tar_target(analysis_completion_matrix, compute_analysis_matrix(data_combined, sample_key)),
+  tar_target(gg_pca_all, compute_overall_pca(data_combined_clean_surface, sample_key)),
+  tar_target(gg_correlations, compute_correlations(data_combined_clean_surface, sample_key)),
+  
+  
+  
+  
   # report  
   tar_render(report, path = "3-reports/characterization_report.Rmd")
   

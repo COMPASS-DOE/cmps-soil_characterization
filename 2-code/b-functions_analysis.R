@@ -312,55 +312,29 @@ plot_ions = function(ions_processed, sample_key){
 
 
 
+compute_analysis_matrix = function(data_combined, sample_key){
 
-combine_data = function(){
-  
-  df_list = list(moisture_processed, pH_processed, tctnts_data_samples, weoc_processed, din_processed, icp_processed, ferrozine_processed)
-  all_combined = 
-    df_list %>% reduce(full_join) %>% 
-    dplyr::select(-notes, -ends_with(c("_ppm", "_mgL", "_flag")))
-  
-  all_combined
- #   left_join(sample_key) %>% 
- #   filter(!grepl("_vac|rep", sample_label)) %>% 
- #   dplyr::select(-S_ug_g) %>% 
- #   #rowwise() %>% 
- #   #mutate(SUM = rowSums(across(where(is.numeric))))
- #   #replace(.,is.na(.),0) %>% 
- #   force()
-}
-
-#all_data_combined = combine_data()
-
-compute_analyte_matrix = function(all_data_combined, sample_key){
-  
-  analyte_completion_matrix = 
-    all_data_combined %>% 
-    distinct()
-  #  group_by(sample_label) %>% 
-  #  dplyr::summarise(n = n())
-  #  pivot_longer(-sample_label) %>% 
+  #data_combined2 = 
+  data_combined %>% 
+    distinct(sample_label, analysis) %>% 
+    filter(!is.na(analysis)) %>% 
     left_join(sample_key) %>% 
-    group_by(name, region, site, transect, horizon) %>% 
+    filter(!is.na(region)) %>% 
+    group_by(region, site, transect, horizon, analysis) %>% 
     dplyr::summarise(n = n()) %>% 
-    pivot_wider(values_from = "n")
-  
+    pivot_wider(values_from = "n", names_from = "analysis") %>% 
+    reorder_transect() %>% reorder_horizon() %>% 
+    arrange(desc(region), site, transect, horizon)
   
 }
 
-#analyte_completion_matrix = compute_analyte_matrix(all_data_combined, sample_key)
 
 
-
-
-compute_pca = function(){
+compute_overall_pca = function(data_combined_clean_surface, sample_key){
   library(ggbiplot)
   
-
-  
-  
   fit_pca_function = function(dat){
-
+    
     dat %>% 
       drop_na()
     
@@ -368,9 +342,8 @@ compute_pca = function(){
       dat %>%       
       dplyr::select(where(is.numeric)) %>%
       dplyr::mutate(row = row_number()) %>% 
-     # filter(is.na(rowSums(.)))
-     drop_na()
-
+      drop_na()
+    
     num_row_numbers = num %>% dplyr::select(row)
     
     grp = 
@@ -389,109 +362,111 @@ compute_pca = function(){
   }
   
   ## PCA input files ----
-  pca_combined = fit_pca_function(all_combined %>% filter(horizon == c("O", "A")))
-
-  pca_combined_wle = fit_pca_function(all_combined %>% 
-                                        filter(horizon == c("O", "A")) %>% 
-                                        filter(region == "WLE"))
-  
-  pca_combined_cb = fit_pca_function(all_combined2 %>% 
-                                        filter(horizon == c("O", "A")) %>% 
-                                        filter(region == "CB"))
-  
+  pca_overall = fit_pca_function(data_combined_clean_surface)
+  pca_overall_wle = fit_pca_function(data_combined_clean_surface %>% filter(region == "WLE"))
+  pca_overall_cb = fit_pca_function(data_combined_clean_surface %>% filter(region == "CB") %>% dplyr::select(-ends_with("(IC)"), -"S (ICP)"))
   
   
   ## PCA plots overall ----
-  #gg_pca_overall1 = 
-    ggbiplot(pca_combined$pca_int, obs.scale = 1, var.scale = 1,
-             groups = as.character(pca_combined$grp$region), 
+  gg_pca_overall = 
+    ggbiplot(pca_overall$pca_int, obs.scale = 1, var.scale = 1,
+             groups = as.character(pca_overall$grp$region), 
              ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
     geom_point(size=3,stroke=1, alpha = 1,
-               aes(shape = pca_combined$grp$horizon,
-                   color = groups))+ 
-    scale_shape_manual(values = c(21, 19))+
+               aes(#shape = pca_overall$grp$transect,
+                 color = groups))+ 
+    #scale_shape_manual(values = c(21, 19))+
     #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
     #xlim(-4,4)+
     #ylim(-3.5,3.5)+
     labs(shape="",
-         title = "O/A horizons",
-         subtitle = "all variables")+
+         title = "Overall PCA, both sites",
+         subtitle = "Surface horizons only")+
     theme_kp()+
     NULL
   
   
-  
-  ggbiplot(pca_combined_wle$pca_int, obs.scale = 1, var.scale = 1,
-           groups = as.character(pca_combined_wle$grp$transect), 
-           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  gg_pca_wle = 
+    ggbiplot(pca_overall_wle$pca_int, obs.scale = 1, var.scale = 1,
+             groups = as.character(pca_overall_wle$grp$transect), 
+             ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
     geom_point(size=3,stroke=1, alpha = 1,
-               aes(shape = pca_combined_wle$grp$site,
+               aes(shape = pca_overall_wle$grp$site,
                    color = groups))+ 
     #scale_shape_manual(values = c(21, 19))+
     #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
     #xlim(-4,4)+
     #ylim(-3.5,3.5)+
     labs(shape="",
-         title = "WLE: O/A horizons",
-         subtitle = "all variables")+
+         title = "PCA: WLE",
+         subtitle = "surface horizons")+
     theme_kp()+
     NULL
   
-  
-  ggbiplot(pca_combined_cb$pca_int, obs.scale = 1, var.scale = 1,
-           groups = as.character(pca_combined_cb$grp$transect), 
-           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  gg_pca_cb = 
+    ggbiplot(pca_overall_cb$pca_int, obs.scale = 1, var.scale = 1,
+             groups = as.character(pca_overall_cb$grp$transect), 
+             ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
     geom_point(size=3,stroke=1, alpha = 1,
-               aes(shape = pca_combined_cb$grp$site,
+               aes(shape = pca_overall_cb$grp$site,
                    color = groups))+ 
     #scale_shape_manual(values = c(21, 19))+
     #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
     #xlim(-4,4)+
     #ylim(-3.5,3.5)+
     labs(shape="",
-         title = "CB: O/A horizons",
-         subtitle = "all variables")+
+         title = "PCA: CB",
+         subtitle = "surface horizons")+
     theme_kp()+
     NULL
+  
+  list(gg_pca_overall = gg_pca_overall,
+       gg_pca_wle = gg_pca_wle,
+       gg_pca_cb = gg_pca_cb)
+  
+}
+
+compute_correlations = function(data_combined_clean_surface, TITLE){
+  #library(corrplot)
+  
+  fit_correlations_function = function(dat, TITLE){
+    num = 
+      dat %>%       
+      dplyr::select(where(is.numeric)) %>%
+      drop_na()
+    
+    num_clean = 
+      num %>% 
+      rownames_to_column("row") %>% 
+      pivot_longer(-row) %>% 
+      separate(name, sep = "_", into = c("name")) %>% 
+      pivot_wider() %>% 
+      dplyr::select(-row)
+    
+    
+    m = cor(num_clean)
+    corrplot::corrplot(m, #method="color", 
+                       type = "lower",
+                       title = TITLE,
+                       mar = c(0,0,1,0) 
+                       #, order = "hclust"
+    )
+    
+    
+    
+    
+    
+  }
+
+  corr_all = fit_correlations_function(dat = data_combined_clean_surface, TITLE = "all")
+  corr_wle = fit_correlations_function(dat = data_combined_clean_surface %>% filter(region == "WLE"), TITLE = "WLE")
+  corr_cb = fit_correlations_function(dat = data_combined_clean_surface %>% filter(region == "CB"), TITLE = "CB")
+  
+  list(corr_all = corr_all,
+       corr_wle = corr_wle,
+       corr_cb = corr_cb)
 
 }
 
-compute_correlations = function(dat, TITLE){
-  
 
-  num = 
-    dat %>%       
-    dplyr::select(where(is.numeric)) %>%
-    drop_na()
-  
-  num_clean = 
-    num %>% 
-    rename(Fetotal = Fe_total_ug_g) %>% 
-    rownames_to_column("row") %>% 
-    pivot_longer(-row) %>% 
-    separate(name, sep = "_", into = c("name")) %>% 
-    pivot_wider() %>% 
-    dplyr::select(-row)
-  
-  
-  m = cor(num_clean)
-  corrplot(m, #method="color", 
-           type = "lower",
-           title = TITLE,
-           mar = c(0,0,1,0) 
-             #, order = "hclust"
-           )
-  
-  
-  
-  
-  
-  
-  library(corrplot)
-  compute_correlations(dat = all_combined %>% filter(region == "WLE" & horizon == c("O", "A")),
-                       TITLE = "WLE")
-  compute_correlations(dat = all_combined %>% filter(region == "CB" & horizon == c("O", "A")),
-                       TITLE = "CB")
-  
-}
 
