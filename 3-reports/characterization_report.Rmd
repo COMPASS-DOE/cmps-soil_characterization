@@ -14,6 +14,28 @@ knitr::opts_chunk$set(echo = FALSE,
 
 ---
 
+## OVERALL SUMMARIES
+
+```{r analyte-completion}
+tar_read(analysis_completion_matrix) %>% knitr::kable()
+```
+
+```{r overall-pca}
+tar_read(gg_pca_all)
+```
+
+```{r correlations-all}
+tar_read(gg_correlations)
+```
+
+
+
+
+
+
+
+---
+
 **Gravimetric moisture**
 
 ```{r moisture}
@@ -104,18 +126,21 @@ tar_read(gg_mehlich)
 
 **FT-ICR-MS**
 
-```{r, icr-vk}
+```{r, icr-vk, fig.height=16, fig.width=16}
 tar_read(gg_icr_vankrevelen)
 ```
 
-```{r, icr-unique}
+```{r, icr-unique, fig.height=16, fig.width=16}
 tar_read(gg_icr_unique)
 ```
 
+```{r, icr-pca, fig.height=5, fig.width=5}
+tar_read(gg_icr_pca)$biplot_all
+```
 
 
-```{r, icr-pca}
-tar_read(gg_icr_pca)
+```{r, icr-pca-regions, fig.height=5, fig.width=10}
+tar_read(gg_icr_pca)$biplot_regions
 ```
 
 ```{r, ions, fig.height=16, fig.width=16}
