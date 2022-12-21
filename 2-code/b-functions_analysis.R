@@ -445,12 +445,16 @@ compute_correlations = function(data_combined_clean_surface, TITLE){
     
     
     m = cor(num_clean)
-    corrplot::corrplot(m, #method="color", 
-                       type = "lower",
-                       title = TITLE,
-                       mar = c(0,0,1,0) 
-                       #, order = "hclust"
-    )
+ #   x = corrplot::corrplot(m, #method="color", 
+ #                      type = "lower",
+ #                      title = TITLE,
+ #                      mar = c(0,0,1,0) 
+ #                      #, order = "hclust"
+ #                      )
+                       
+    ggcorrplot::ggcorrplot(m, type = "lower",
+                           title = TITLE)
+    
     
     
     
