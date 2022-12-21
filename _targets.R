@@ -24,6 +24,7 @@ source("2-code/0-packages.R")
 #source("2-code/1-initial_processing.R")
 source("2-code/a-functions_processing.R")
 source("2-code/b-functions_analysis.R")
+source("2-code/c-functions_fticrrr.R")
 # source("other_functions.R") # Source other scripts as needed. # nolint
 
 # Replace the target list below with your own:
@@ -65,6 +66,8 @@ list(
   tar_target(icr_data_long, make_fticr_data(icr_report, analysis_key, sample_key)$data_long_blank_corrected),
   tar_target(icr_data_trt, make_fticr_data(icr_report, analysis_key, sample_key)$data_long_trt),
   tar_target(icr_relabund_samples, compute_icr_relabund(icr_data_long, icr_meta)),
+  tar_target(ions_data, import_ions(FILEPATH = "1-data/ions")),
+  tar_target(ions_processed, process_ions(ions_data, analysis_key, sample_key, moisture_processed, subsampling)),
   
   
   # analysis - graphs

@@ -567,3 +567,97 @@ process_mehlich = function(mehlich_map, mehlich_data, moisture_processed, subsam
   samples2
   
 }
+
+# Ions (IC)
+import_ions = function(FILEPATH){
+  
+  anions <- 
+    list.files(path=FILEPATH, pattern = c("anion", ".csv"), full.names = TRUE) %>% 
+    lapply(read_csv, skip = 5, id = "source") %>% 
+    bind_rows %>% 
+    rename(analysis_ID = "...3")
+  
+  cations <- 
+    list.files(path=FILEPATH, pattern = c("cation", ".csv"), full.names = TRUE) %>% 
+    lapply(read_csv, skip = 5, id = "source") %>% 
+    bind_rows %>% 
+    rename(analysis_ID = "...3")
+  
+  ions <- 
+    full_join(cations, anions, by = "analysis_ID")
+  
+  ions
+}
+#ions_data = import_ions(FILEPATH = "1-data/ions")
+
+process_ions = function(ions_data, analysis_key, sample_key, moisture_processed, subsampling){
+  
+  ions = 
+    ions_data %>% 
+    mutate_all(as.character) %>% 
+    pivot_longer(-c(analysis_ID, source.x, source.y)) %>% 
+    mutate(date_run = str_extract(source.x, "[0-9]{8}"),
+           date_run = lubridate::ymd(date_run)) %>% 
+    dplyr::select(-starts_with("source")) %>% 
+    filter(!grepl("...[0-9]", name)) %>% 
+    filter(!name %in% c("Nitrate", "Nitrite")) %>% 
+    mutate(name = str_remove(name, " UV"),
+           value = as.numeric(value)) %>% 
+    filter(!is.na(value)) %>% 
+    rename(ppm = value,
+           ion = name)
+  
+  samples = 
+    ions %>% 
+    filter(grepl("DOC_CMPS", analysis_ID))
+  
+  standards = 
+    ions %>% 
+    filter(grepl("x", analysis_ID))
+  
+  standards_max = 
+    standards %>% 
+    group_by(ion) %>% 
+    dplyr::summarise(max = max(ppm))
+
+  high_samples = 
+    samples %>% 
+    left_join(standards_max) %>% 
+    mutate(HIGH = ppm > max) %>% 
+    filter(HIGH)
+    
+#  high_samples %>% write.csv("high.csv")
+
+  dilutions = 
+    read_sheet("1s82bKl85AmqWerNpvGQv-ddgFQpjyFoMeRW9QdZmRZw", sheet = "dilutions") %>% 
+    mutate_all(as.character) %>% 
+    dplyr::select(sample_label, dilution_factor) %>% 
+    mutate(dilution_factor = as.numeric(dilution_factor))
+  
+  samples2 = 
+    samples %>% 
+    left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) %>%
+    filter(grepl("COMPASS_", sample_label)) %>% 
+    # do blank/dilution correction
+    left_join(dilutions, by = "sample_label") %>% 
+    mutate(dilution_factor = replace_na(dilution_factor, 1),
+           ppm_dil_corrected = ppm * dilution_factor,
+           ppm_dil_corrected = round(ppm_dil_corrected, 2)) %>% 
+    # join gwc and subsampling weights to normalize data to soil weight
+    left_join(moisture_processed) %>% 
+    left_join(subsampling %>% dplyr::select(notes, sample_label, WSOC_g)) %>% 
+    rename(fm_g = WSOC_g) %>% 
+    mutate(od_g = fm_g/((gwc_perc/100)+1),
+           soilwater_g = fm_g - od_g,
+           ug_g = ppm_dil_corrected * ((40 + soilwater_g)/od_g),
+           ug_g = round(ug_g, 2)) %>% 
+    dplyr::select(sample_label, ion, ppm_dil_corrected, ug_g) %>% 
+    rename(ppm = ppm_dil_corrected) %>% 
+    pivot_longer(-c(sample_label, ion)) %>% 
+    mutate(ion = paste0(ion, "_", name)) %>% 
+    dplyr::select(sample_label, ion, value) %>% 
+    pivot_wider(names_from = "ion")
+    
+  samples2
+  }
+
