@@ -102,6 +102,24 @@ tar_read(gg_mehlich)
 ```
 
 
+**FT-ICR-MS**
+
+```{r, icr-vk}
+tar_read(gg_icr_vankrevelen)
+```
+
+```{r, icr-unique}
+tar_read(gg_icr_unique)
+```
+
+
+
+```{r, icr-pca}
+tar_read(gg_icr_pca)
+```
+
+
+
 ---
 
 <details>
