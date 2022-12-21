@@ -118,6 +118,12 @@ tar_read(gg_icr_unique)
 tar_read(gg_icr_pca)
 ```
 
+```{r, ions, fig.height=16, fig.width=16}
+tar_read(gg_ions)
+```
+
+
+
 
 
 ---

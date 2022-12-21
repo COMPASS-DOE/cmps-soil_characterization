@@ -84,6 +84,7 @@ list(
   tar_target(gg_icr_vankrevelen, plot_vankrevelen(icr_data_trt, icr_meta)),
   tar_target(gg_icr_unique, plot_vankrevelen_unique(icr_data_trt, icr_meta)),
   tar_target(gg_icr_pca, compute_icr_pca(icr_relabund_samples, sample_key)),
+  tar_target(gg_ions, plot_ions(ions_processed, sample_key)),
   
 
   # report  

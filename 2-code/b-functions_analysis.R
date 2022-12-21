@@ -270,7 +270,43 @@ plot_mehlich = function(mehlich_processed, sample_key){
   
 }
 
-
+plot_ions = function(ions_processed, sample_key){
+  
+  ions = 
+    ions_processed %>% 
+    dplyr::select(sample_label, ends_with("_ug_g")) %>% 
+    pivot_longer(-sample_label, names_to = "species", values_to = "ug_g") %>% 
+    left_join(sample_key) %>% 
+    filter(!is.na(site)) %>% 
+    reorder_transect() %>% 
+    reorder_horizon()
+  
+  #  icp_long_outliers = 
+  #    icp_long %>% 
+  #    group_by(region, site, transect, horizon, species) %>% 
+  #    mutate(sd = sd(ppm),
+  #           mean = mean(ppm),
+  #           outlier = ppm > mean + (3*sd) | ppm < mean - (3*sd),
+  #           outlier2 = case_when(outlier == TRUE ~ 1,
+  #                                outlier == FALSE ~ 0))
+  
+  
+  
+  ions_subset = 
+    ions %>% 
+    mutate(species = str_remove(species, "_ug_g")) %>% 
+    filter(species %in% c("Sodium", "Potassium", "Magnesium",
+                          "Calcium", "Chloride", "Sulfate", "Nitrate", "Phosphate"))
+  
+  ions_subset %>% 
+    ggplot(aes(x = site, y = ug_g, color = transect, shape = horizon)) +
+    geom_point(position = position_dodge(width = 0.3))+
+    facet_wrap(species ~ region, scales = "free")+
+    scale_color_manual(values = pal_transect)
+  
+  
+  
+}
 
 
 
