@@ -343,33 +343,33 @@ compute_icr_relabund = function(icr_data_long, icr_meta){
     dplyr::mutate(total = sum(abund),
                   relabund  = ((abund/total)*100))
 }
-icr_relabund_samples = compute_icr_relabund(icr_data_long, icr_meta)
+## #icr_relabund_samples = compute_icr_relabund(icr_data_long, icr_meta)
 
 
-fticr_relabund_per_sample %>%
-  left_join(sample_key) %>% 
-  ggplot(aes(x = sample_label, y = relabund, fill = Class))+
-  geom_bar(stat = "identity")+
-  facet_wrap(~region, scales = "free_x")
+## fticr_relabund_per_sample %>%
+##   left_join(sample_key) %>% 
+##   ggplot(aes(x = sample_label, y = relabund, fill = Class))+
+##   geom_bar(stat = "identity")+
+##   facet_wrap(~region, scales = "free_x")
 
-fticr_relabund_per_sample %>%
-  left_join(sample_key) %>% 
-  filter(region == "CB" & horizon != "B") %>% 
-  ggplot(aes(x = sample_label, y = relabund, fill = Class))+
-  geom_bar(stat = "identity")+
-  facet_wrap(~site + transect, scales = "free_x")
+## fticr_relabund_per_sample %>%
+##   left_join(sample_key) %>% 
+##   filter(region == "CB" & horizon != "B") %>% 
+##   ggplot(aes(x = sample_label, y = relabund, fill = Class))+
+##   geom_bar(stat = "identity")+
+##   facet_wrap(~site + transect, scales = "free_x")
 
-fticr_relabund_per_sample %>%
-  left_join(sample_key) %>% 
-  filter(region == "WLE" & horizon != "B") %>% 
-  ggplot(aes(x = sample_label, y = relabund, fill = Class))+
-  geom_bar(stat = "identity")+
-  facet_wrap(~site + transect, scales = "free_x")
+## fticr_relabund_per_sample %>%
+##   left_join(sample_key) %>% 
+##   filter(region == "WLE" & horizon != "B") %>% 
+##   ggplot(aes(x = sample_label, y = relabund, fill = Class))+
+##   geom_bar(stat = "identity")+
+##   facet_wrap(~site + transect, scales = "free_x")
 
 
-y = fticr_relabund_per_sample %>% 
-  group_by(sample_label) %>% 
-  dplyr::summarise(total2 = sum(relabund))
+## y = fticr_relabund_per_sample %>% 
+##   group_by(sample_label) %>% 
+##   dplyr::summarise(total2 = sum(relabund))## 
 
 
 
