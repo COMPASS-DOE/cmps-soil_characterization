@@ -365,7 +365,9 @@ process_iron = function(ferrozine_map, ferrozine_data, moisture_processed, subsa
       calibrate_ferrozine_data(data_processed) %>% 
       filter(grepl("COMPASS", sample_label)) %>% 
       dplyr::select(region, sample_label, analysis, ppm_calculated) %>% 
-      mutate(analysis = recode(analysis, "Fe2 (water only)" = "Fe2", "total-Fe (ascorbic)" = "Fe_total")) %>% 
+      mutate(analysis = recode(analysis, "Fe2 (water only)" = "Fe2", "total-Fe (ascorbic)" = "Fe_total"),
+             ppm_calculated = case_when(analysis == "Fe_total" ~ ppm_calculated * 2,
+                                        analysis == "Fe2" ~ ppm_calculated)) %>% 
       pivot_wider(names_from = "analysis", values_from = "ppm_calculated") %>% 
       mutate(across(where(is.numeric), round, 2)) %>% 
       mutate(Fe3 = Fe_total - Fe2)
@@ -619,7 +621,7 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     filter(!is.na(value)) %>% 
     rename(ppm = value,
            ion = name) %>% 
-    filter(!ion %in% "Lithium")
+    filter(!ion %in% c("Lithium", "Nitrite"))
   
   samples = 
     ions %>% 
@@ -715,9 +717,26 @@ combine_data = function(moisture_processed, pH_processed, tctnts_data_samples,
     left_join(sample_key) %>% 
     mutate(transect = recode(transect, "wc" = "wetland")) %>% 
     reorder_transect() %>% 
+    reorder_horizon() %>% 
     force() 
   
-  data_combined
+  data_combined_wide = 
+    data_combined %>% 
+    separate(name, sep = "_", into = "variable", remove = F) %>% 
+    mutate(name = paste0(variable, " (", analysis, ")")) %>% 
+    dplyr::select(sample_label, name, value) %>% 
+    pivot_wider() %>% 
+    #  dplyr::select(-c("Ammonia (IC)","Bromide (IC)", "Nitrite (IC)", "Fluoride (IC)")) %>% 
+    left_join(sample_key) %>% 
+    #  mutate(`Phosphate (IC)` = case_when(is.na(`Phosphate (IC)`) & site != "GCREW" ~ 0,
+    #                                      TRUE ~ `Phosphate (IC)`)) %>% 
+    force()
   
+  list(data_combined = data_combined,
+       data_combined_wide = data_combined_wide)
+
 }
 #data_combined = combine_data()  
+
+
+
