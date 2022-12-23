@@ -317,13 +317,12 @@ OLD_plots = function(){
 }
 
 
-compute_analysis_matrix = function(data_combined, sample_key){
+compute_analysis_matrix = function(data_combined){
 
   #data_combined2 = 
   data_combined %>% 
-    distinct(sample_label, analysis) %>% 
+    distinct(sample_label, analysis, region, site, transect, horizon) %>% 
     filter(!is.na(analysis)) %>% 
-    left_join(sample_key) %>% 
     filter(!is.na(region)) %>% 
     group_by(region, site, transect, horizon, analysis) %>% 
     dplyr::summarise(n = n()) %>% 
@@ -335,7 +334,7 @@ compute_analysis_matrix = function(data_combined, sample_key){
 
 
 
-compute_overall_pca = function(data_combined_clean_surface, sample_key){
+compute_overall_pca = function(data_combined_wide, sample_key){
   library(ggbiplot)
   
   fit_pca_function = function(dat){
@@ -366,14 +365,21 @@ compute_overall_pca = function(data_combined_clean_surface, sample_key){
          pca_int = pca_int)
   }
   
-  data_combined_clean_surface_no_ferrozine = 
-    data_combined_clean_surface %>% 
+  combined_surface = 
+    data_combined_wide %>% 
+    filter(horizon != "B") %>% 
+    dplyr::select(-"Bromide (IC)") %>% 
+    filter(sample_label != "COMPASS_Dec2021_016") %>% 
+    force() 
+  
+  combined_surface_no_ferrozine = 
+    combined_surface %>% 
     dplyr::select(-ends_with("(Ferrozine)"))
   
   ## PCA input files ----
-  pca_overall = fit_pca_function(data_combined_clean_surface_no_ferrozine)
-  pca_overall_wle = fit_pca_function(data_combined_clean_surface_no_ferrozine %>% filter(region == "WLE"))
-  pca_overall_cb = fit_pca_function(data_combined_clean_surface %>% filter(region == "CB") %>% dplyr::select(-ends_with("(IC)"), -"S (ICP)"))
+  pca_overall = fit_pca_function(combined_surface_no_ferrozine %>% dplyr::select(-ends_with("(IC)"), -"S (ICP)"))
+  pca_overall_wle = fit_pca_function(combined_surface_no_ferrozine %>% filter(region == "WLE"))
+  pca_overall_cb = fit_pca_function(combined_surface %>% filter(region == "CB") %>% dplyr::select(-ends_with("(IC)"), -"S (ICP)"))
   
   
   ## PCA plots overall ----
@@ -386,8 +392,8 @@ compute_overall_pca = function(data_combined_clean_surface, sample_key){
                  color = groups))+ 
     #scale_shape_manual(values = c(21, 19))+
     #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
-    xlim(-4,20)+
-    ylim(-8,8)+
+   # xlim(-4,20)+
+   # ylim(-8,8)+
     labs(shape="",
          title = "Overall PCA, both regions",
          subtitle = "Surface horizons only")+
@@ -440,7 +446,7 @@ compute_overall_pca = function(data_combined_clean_surface, sample_key){
   
 }
 
-compute_correlations = function(data_combined_clean_surface, TITLE){
+compute_correlations = function(data_combined_wide, TITLE){
   #library(corrplot)
   
   fit_correlations_function = function(dat, TITLE){
@@ -476,14 +482,20 @@ compute_correlations = function(data_combined_clean_surface, TITLE){
     
   }
 
-  data_combined_clean_surface_no_ferrozine = 
-    data_combined_clean_surface %>% 
+  combined_surface = 
+    data_combined_wide %>% 
+    filter(horizon != "B") %>% 
+    force() 
+  
+  combined_surface_no_ferrozine = 
+    combined_surface %>% 
     dplyr::select(-ends_with("(Ferrozine)"))
   
   
-  corr_all = fit_correlations_function(dat = data_combined_clean_surface_no_ferrozine, TITLE = "all")
-  corr_wle = fit_correlations_function(dat = data_combined_clean_surface_no_ferrozine %>% filter(region == "WLE"), TITLE = "WLE")
-  corr_cb = fit_correlations_function(dat = data_combined_clean_surface %>% filter(region == "CB"), TITLE = "CB")
+  
+  corr_all = fit_correlations_function(dat = combined_surface_no_ferrozine%>% dplyr::select(-"Bromide (IC)"), TITLE = "all")
+  corr_wle = fit_correlations_function(dat = combined_surface_no_ferrozine %>% filter(region == "WLE")%>% dplyr::select(-"Bromide (IC)"), TITLE = "WLE" )
+  corr_cb = fit_correlations_function(dat = combined_surface %>% filter(region == "CB"), TITLE = "CB")
   
   list(corr_all = corr_all,
        corr_regions = corr_wle + corr_cb)
