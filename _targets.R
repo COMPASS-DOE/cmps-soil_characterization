@@ -88,13 +88,15 @@ list(
   # combined data
   tar_target(data_combined, combine_data(moisture_processed, pH_processed, tctnts_data_samples, 
                                          weoc_processed, din_processed, icp_processed, 
-                                         ferrozine_processed, mehlich_processed, ions_processed, sample_key)),
-  tar_target(data_combined_clean_surface, combine_data(moisture_processed, pH_processed, tctnts_data_samples, 
-                                                       weoc_processed, din_processed, icp_processed, 
-                                                       ferrozine_processed, mehlich_processed, ions_processed, sample_key)$combined_surface),
-  tar_target(analysis_completion_matrix, compute_analysis_matrix(data_combined, sample_key)),
-  tar_target(gg_pca_all, compute_overall_pca(data_combined_clean_surface, sample_key)),
-  tar_target(gg_correlations, compute_correlations(data_combined_clean_surface, sample_key)),
+                                         ferrozine_processed, mehlich_processed, ions_processed, 
+                                         sample_key)$data_combined),
+  tar_target(data_combined_wide, combine_data(moisture_processed, pH_processed, tctnts_data_samples, 
+                                         weoc_processed, din_processed, icp_processed, 
+                                         ferrozine_processed, mehlich_processed, ions_processed, 
+                                         sample_key)$data_combined_wide),
+  tar_target(analysis_completion_matrix, compute_analysis_matrix(data_combined)),
+  tar_target(gg_pca_all, compute_overall_pca(data_combined_wide, sample_key)),
+  tar_target(gg_correlations, compute_correlations(data_combined_wide, sample_key)),
   
   
 tar_target(gg_by_transect, make_graphs_by_transect(data_combined)),
