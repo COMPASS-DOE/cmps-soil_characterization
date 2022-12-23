@@ -101,10 +101,10 @@ list(
   
 tar_target(gg_by_transect, make_graphs_by_transect(data_combined)),
 tar_target(gg_by_site_oa, make_graphs_by_site(data_combined %>% filter(horizon != "B"))),
-tar_target(gg_by_site_oab, make_graphs_by_site(data_combined))
+tar_target(gg_by_site_oab, make_graphs_by_site(data_combined)),
 
   
   # report  
-#  tar_render(report, path = "3-reports/characterization_report.Rmd")
+  tar_render(report, path = "3-reports/characterization_report.Rmd")
   
 )

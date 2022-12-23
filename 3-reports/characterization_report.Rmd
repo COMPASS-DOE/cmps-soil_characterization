@@ -16,119 +16,112 @@ knitr::opts_chunk$set(echo = FALSE,
 
 ## OVERALL SUMMARIES
 
+
+### Analysis completion matrix
+
+<details>
+  <summary>click to open</summary>
+
+
+Number of reps available per analysis. Most were 8-9 reps, but some (e.g. WLE B-horizons) had fewer reps.
+
 ```{r analyte-completion}
 tar_read(analysis_completion_matrix) %>% knitr::kable()
 ```
 
-```{r overall-pca}
-tar_read(gg_pca_all)
+</details>
+
+
+### Overall trends - PCAs and Correlations
+
+<details>
+  <summary>click to open</summary>
+
+
+**PCAs**
+
+```{r overall-pca, fig.height=6, fig.width=6}
+tar_read(gg_pca_all)$gg_pca_overall
 ```
 
-```{r correlations-all}
-tar_read(gg_correlations)
+```{r overall-pca-regions, fig.height=6, fig.width=12}
+tar_read(gg_pca_all)$gg_pca_regions
 ```
 
 
+**CORRELATIONS**
 
+```{r correlations-all, fig.height=7, fig.width=7}
+tar_read(gg_correlations)$corr_all
+```
 
+```{r correlations-regions, fig.height=8, fig.width=18}
+tar_read(gg_correlations)$corr_regions
+```
 
+</details>
 
 
 ---
 
-**Gravimetric moisture**
+## EACH ANALYSIS
 
-```{r moisture}
-tar_read(gg_moisture)
+### by transect
+
+<details>
+  <summary>click to open</summary>
+  
+```{r by_transect, fig.height=4, fig.width=10}
+tar_read(gg_by_transect)
 ```
 
+</details>
 
-**Loss on ignition (% organic matter)**
 
-```{r loi}
-tar_read(gg_loi)
+### by site - OA horizons
+
+<details>
+  <summary>click to open</summary>
+
+```{r by_site_oa, fig.height=4, fig.width=10}
+tar_read(gg_by_site_oa)
 ```
 
-**pH**
+</details>
 
-```{r pH}
-tar_read(gg_pH)
+
+### by site - OAB horizons
+
+<details>
+  <summary>click to open</summary>
+  
+  
+```{r by_site_oab, fig.height=4, fig.width=10}
+tar_read(gg_by_site_oab)
 ```
 
-**specific conductance**
+</details>
 
-```{r sp_cond}
-tar_read(gg_sp_cond)
+---
+
+
+## FT-ICR-MS
+
+
+<details>
+  <summary>click to open</summary>
+  
+  
+```{r, icr-vk-domains, fig.height=5, fig.width=5}
+tar_read(gg_icr_vankrevelen)$vk_domains
 ```
 
-**total CNS**
-```{r tctnts}
-tar_read(gg_tctnts)
+```{r, icr-vk-regions, fig.height=7, fig.width=16}
+tar_read(gg_icr_vankrevelen)$vk_wle
+tar_read(gg_icr_vankrevelen)$vk_cb
+
 ```
 
-**Water extractable organic C**
-
-```{r weoc}
-tar_read(gg_weoc)
-```
-
-**Extractable inorganic N**
-
-Inorganic N was extracted using 2M KCl
-
-```{r din}
-tar_read(gg_din)
-```
-
-**ICP results: base cations**
-
-Extracted using 1M NH4Cl
-
-```{r icp-base cations, fig.height=12, fig.width=7}
-tar_read(gg_icp)$gg_base_cations
-```
-
-
-**ICP results: other cations**
-
-Extracted using 1M NH4Cl
-
-```{r icp-other cations, fig.height=9, fig.width=7}
-tar_read(gg_icp)$gg_other_cations
-```
-
-
-**ICP results: others**
-
-Extracted using 1M NH4Cl
-
-```{r icp-others, fig.height=4, fig.width=7}
-tar_read(gg_icp)$gg_others
-```
-
-**HCl-extractable iron - ferrozine method**
-
-Extracted using 0.5 M HCl
-
-```{r iron-ferrozine, fig.height=5, fig.width=7}
-tar_read(gg_ferrozine)
-```
-
-
-**Mehlich-3 extractable P**
-
-Extracted using Mehlich-3 solution, analyzed with molybdate method
-
-```{r phosphorus-mehlich, fig.height=5, fig.width=7}
-tar_read(gg_mehlich)
-```
-
-
-**FT-ICR-MS**
-
-```{r, icr-vk, fig.height=16, fig.width=16}
-tar_read(gg_icr_vankrevelen)
-```
 
 ```{r, icr-unique, fig.height=16, fig.width=16}
 tar_read(gg_icr_unique)
@@ -143,15 +136,14 @@ tar_read(gg_icr_pca)$biplot_all
 tar_read(gg_icr_pca)$biplot_regions
 ```
 
-```{r, ions, fig.height=16, fig.width=16}
-tar_read(gg_ions)
-```
 
-
+</details>
 
 
 
 ---
+
+## Session Info 
 
 <details>
   <summary> Session Info </summary>
