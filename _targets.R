@@ -70,26 +70,25 @@ list(
   tar_target(ions_processed, process_ions(ions_data, analysis_key, sample_key, moisture_processed, subsampling)),
   
   # analysis - graphs
-  tar_target(gg_moisture, plot_moisture(moisture_processed, sample_key)),
-  tar_target(gg_loi, plot_loi(loi_processed, sample_key)),
-  tar_target(gg_pH, plot_pH(pH_processed, sample_key)),
-  tar_target(gg_sp_cond, plot_sp_cond(pH_processed, sample_key)),
-  tar_target(gg_tctnts, plot_tctnts(tctnts_data_samples, sample_key)),
-  tar_target(gg_weoc, plot_weoc(weoc_processed, sample_key)),
-  tar_target(gg_din, plot_din(din_processed, sample_key)),
-  tar_target(gg_icp, plot_icp(icp_processed, sample_key)),
-  tar_target(gg_ferrozine, plot_ferrozine(ferrozine_processed, sample_key)),
-  tar_target(gg_mehlich, plot_mehlich(mehlich_processed, sample_key)),
-  tar_target(gg_icr_vankrevelen, plot_vankrevelen(icr_data_trt, icr_meta)),
-  tar_target(gg_icr_unique, plot_vankrevelen_unique(icr_data_trt, icr_meta)),
-  tar_target(gg_icr_pca, compute_icr_pca(icr_relabund_samples, sample_key)),
-  tar_target(gg_ions, plot_ions(ions_processed, sample_key)),
+  ## tar_target(gg_moisture, plot_moisture(moisture_processed, sample_key)),
+  ## tar_target(gg_loi, plot_loi(loi_processed, sample_key)),
+  ## tar_target(gg_pH, plot_pH(pH_processed, sample_key)),
+  ## tar_target(gg_sp_cond, plot_sp_cond(pH_processed, sample_key)),
+  ## tar_target(gg_tctnts, plot_tctnts(tctnts_data_samples, sample_key)),
+  ## tar_target(gg_weoc, plot_weoc(weoc_processed, sample_key)),
+  ## tar_target(gg_din, plot_din(din_processed, sample_key)),
+  ## tar_target(gg_icp, plot_icp(icp_processed, sample_key)),
+  ## tar_target(gg_ferrozine, plot_ferrozine(ferrozine_processed, sample_key)),
+  ## tar_target(gg_mehlich, plot_mehlich(mehlich_processed, sample_key)),
+  ## tar_target(gg_icr_vankrevelen, plot_vankrevelen(icr_data_trt, icr_meta)),
+  ## tar_target(gg_icr_unique, plot_vankrevelen_unique(icr_data_trt, icr_meta)),
+  ## tar_target(gg_icr_pca, compute_icr_pca(icr_relabund_samples, sample_key)),
+  ## tar_target(gg_ions, plot_ions(ions_processed, sample_key)),
   
-
   # combined data
   tar_target(data_combined, combine_data(moisture_processed, pH_processed, tctnts_data_samples, 
                                          weoc_processed, din_processed, icp_processed, 
-                                         ferrozine_processed, mehlich_processed, ions_processed, sample_key)$data_combined),
+                                         ferrozine_processed, mehlich_processed, ions_processed, sample_key)),
   tar_target(data_combined_clean_surface, combine_data(moisture_processed, pH_processed, tctnts_data_samples, 
                                                        weoc_processed, din_processed, icp_processed, 
                                                        ferrozine_processed, mehlich_processed, ions_processed, sample_key)$combined_surface),
@@ -98,9 +97,12 @@ list(
   tar_target(gg_correlations, compute_correlations(data_combined_clean_surface, sample_key)),
   
   
-  
+tar_target(gg_by_transect, make_graphs_by_transect(data_combined)),
+tar_target(gg_by_site_oa, make_graphs_by_site(data_combined %>% filter(horizon != "B"))),
+tar_target(gg_by_site_oab, make_graphs_by_site(data_combined))
+
   
   # report  
-  tar_render(report, path = "3-reports/characterization_report.Rmd")
+#  tar_render(report, path = "3-reports/characterization_report.Rmd")
   
 )
