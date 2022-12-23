@@ -21,7 +21,7 @@ reorder_horizon = function(dat){
 
 reorder_transect = function(dat){
   dat %>% 
-    mutate(transect = factor(transect, levels = c("upland", "transition", "wte", "wc")))
+    mutate(transect = factor(transect, levels = c("upland", "transition", "wte", "wc", "wetland")))
 }
 
 
@@ -414,7 +414,7 @@ import_wrc_data = function(FILEPATH){
   ))
 
 }
-#wrc_data = import_wrc_data(FILEPATH)
+#wrc_data = import_wrc_data(FILEPATH = "1-data/wrc")
 
 process_wrc = function(wrc_data){
   
@@ -427,7 +427,9 @@ process_wrc = function(wrc_data){
     mutate_at(vars(starts_with("water")), as.numeric) %>% 
     mutate(transect = tolower(transect),
            kpa_eval = round((10^pf_eval)/10,2),
-           kpa_fit = round((10^pf_fit)/10,2))
+           kpa_fit = round((10^pf_fit)/10,2)) %>% 
+    mutate(transect = recode(transect, "wetland" = "wc")) %>% 
+    reorder_transect()
   
   
  wrc_processed %>% 
@@ -444,6 +446,7 @@ process_wrc = function(wrc_data){
    geom_line(aes(x = kpa_fit/1000))+
    geom_point(aes(x = kpa_eval/1000), shape = 1)+
    scale_x_log10(labels = scales::comma)+
+   scale_color_manual(values = rev(soilpalettes::soil_palette("redox2", 3)))+
    facet_wrap(~site)
   
   
@@ -610,11 +613,13 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     dplyr::select(-starts_with("source")) %>% 
     filter(!grepl("...[0-9]", name)) %>% 
     filter(!name %in% c("Nitrate", "Nitrite")) %>% 
-    mutate(name = str_remove(name, " UV"),
+    mutate(value = recode(value, "n.a." = "0"),
+           name = str_remove(name, " UV"),
            value = as.numeric(value)) %>% 
     filter(!is.na(value)) %>% 
     rename(ppm = value,
-           ion = name)
+           ion = name) %>% 
+    filter(!ion %in% "Lithium")
   
   samples = 
     ions %>% 
@@ -629,19 +634,37 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     group_by(ion) %>% 
     dplyr::summarise(max = max(ppm))
 
-  high_samples = 
-    samples %>% 
-    left_join(standards_max) %>% 
-    mutate(HIGH = ppm > max) %>% 
-    filter(HIGH)
-    
-#  high_samples %>% write.csv("high.csv")
-
+  
   dilutions = 
     read_sheet("1s82bKl85AmqWerNpvGQv-ddgFQpjyFoMeRW9QdZmRZw", sheet = "dilutions") %>% 
     mutate_all(as.character) %>% 
     dplyr::select(sample_label, dilution_factor) %>% 
     mutate(dilution_factor = as.numeric(dilution_factor))
+  
+  
+  high_samples = 
+    samples2 = 
+    samples %>% 
+    left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) %>%
+    filter(grepl("COMPASS_", sample_label)) %>% 
+    # do blank/dilution correction
+    left_join(dilutions, by = "sample_label") %>% 
+    mutate(dilution_factor = replace_na(dilution_factor, 1),
+           ppm_dil_corrected = ppm * dilution_factor,
+           ppm_dil_corrected = round(ppm_dil_corrected, 2)) %>% 
+    left_join(standards_max) %>% 
+    mutate(HIGH = ppm > max) %>% 
+    filter(HIGH)
+#  high_samples %>% distinct(sample_label) 
+#  high_samples %>% write.csv("high.csv")
+
+  
+  
+  
+  
+  
+  
+
   
   samples2 = 
     samples %>% 
@@ -666,7 +689,9 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     mutate(ion = paste0(ion, "_", name)) %>% 
     dplyr::select(sample_label, ion, value) %>% 
     pivot_wider(names_from = "ion") %>% 
-    mutate(analysis = "IC")
+    mutate(analysis = "IC") %>% 
+    mutate_all(as.character) %>% 
+    mutate_at(vars(ends_with(c("ppm", "ug_g"))), as.numeric)
     
   samples2
   }
@@ -684,29 +709,15 @@ combine_data = function(moisture_processed, pH_processed, tctnts_data_samples,
   data_combined = 
     df_list %>% reduce(full_join) %>% 
     dplyr::select(-notes, -ends_with(c("_ppm", "_mgL", "_flag"))) %>% 
-    filter(!grepl("_vac|rep", sample_label)) 
-  
-  # keep surface horizons only
-  combined_surface = 
-    data_combined %>% 
-    left_join(sample_key) %>% 
-    filter(horizon != "B") %>% 
-    filter(!(site == "MSM" & horizon == "A")) %>% 
-    filter(!(site == "GWI" & horizon == "A")) %>% 
-    dplyr::select(-c(region, site, transect, horizon, tree_number)) %>% 
+    filter(!grepl("_vac|rep", sample_label)) %>% 
     pivot_longer(-c(sample_label, analysis)) %>% 
     drop_na() %>% 
-    separate(name, sep = "_", into = "variable", remove = F) %>% 
-    mutate(name = paste0(variable, " (", analysis, ")")) %>% 
-    dplyr::select(sample_label, name, value) %>% 
-    pivot_wider() %>% 
-    dplyr::select(-c("Ammonia (IC)","Bromide (IC)", "Nitrite (IC)", "Fluoride (IC)")) %>% 
     left_join(sample_key) %>% 
-    mutate(`Phosphate (IC)` = case_when(is.na(`Phosphate (IC)`) & site != "GCREW" ~ 0,
-                                        TRUE ~ `Phosphate (IC)`))
+    mutate(transect = recode(transect, "wc" = "wetland")) %>% 
+    reorder_transect() %>% 
+    force() 
   
-  list(data_combined = data_combined,
-       combined_surface = combined_surface)
+  data_combined
   
 }
 #data_combined = combine_data()  
