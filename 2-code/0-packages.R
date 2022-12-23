@@ -9,7 +9,7 @@ theme_kp <- function() {  # this for all the elements common across plots
   theme_bw() %+replace%
     theme(legend.position = "top",
           legend.key=element_blank(),
-          legend.title = element_blank(),
+          legend.title = element_text(size = 14, hjust = 0),
           legend.text = element_text(size = 12),
           legend.key.size = unit(1.5, 'lines'),
           legend.background = element_rect(colour = NA),
