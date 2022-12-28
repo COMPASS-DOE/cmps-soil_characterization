@@ -116,15 +116,22 @@ tar_read(gg_by_site_oab)
 tar_read(gg_icr_vankrevelen)$vk_domains
 ```
 
-```{r, icr-vk-regions, fig.height=7, fig.width=16}
+```{r, icr-vk-wle, fig.height=5, fig.width=10}
 tar_read(gg_icr_vankrevelen)$vk_wle
+
+```
+
+```{r, icr-vk-cb, fig.height=10, fig.width=10}
 tar_read(gg_icr_vankrevelen)$vk_cb
 
 ```
 
+```{r, icr-unique-wle, fig.height=10, fig.width=4}
+tar_read(gg_icr_unique)$vk_unique_wle
+```
 
-```{r, icr-unique, fig.height=16, fig.width=16}
-tar_read(gg_icr_unique)
+```{r, icr-unique-cb, fig.height=10, fig.width=7}
+tar_read(gg_icr_unique)$vk_unique_cb
 ```
 
 ```{r, icr-pca, fig.height=5, fig.width=5}
