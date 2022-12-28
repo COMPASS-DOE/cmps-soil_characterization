@@ -267,13 +267,20 @@ plot_vankrevelen = function(icr_data_trt, icr_meta){
   
   data_hcoc = 
     icr_data_trt %>% 
-    left_join(icr_meta %>% dplyr::select(formula, HC, OC))
+    filter(horizon != "B") %>% 
+    left_join(icr_meta %>% dplyr::select(formula, HC, OC)) %>% 
+    mutate(transect = recode(transect, "wc" = "wetland")) %>% 
+    reorder_horizon() %>% reorder_transect()
   
   vk_wle = 
     data_hcoc %>% 
-    filter(region == "WLE" & horizon != "B") %>% 
+    filter(region == "WLE") %>% 
     gg_vankrev(aes(x = OC, y = HC, color = transect))+
     stat_ellipse(level = 0.90, show.legend = F)+
+    scale_color_manual(values = pal_transect)+
+    labs(color = "",
+         title = "FTICR: all peaks (blank corrected)",
+         subtitle = "WLE sites")+
     facet_wrap(~site+horizon)
   
   vk_cb = 
@@ -281,6 +288,11 @@ plot_vankrevelen = function(icr_data_trt, icr_meta){
     filter(region == "CB" ) %>% 
     gg_vankrev(aes(x = OC, y = HC, color = transect))+
     stat_ellipse(level = 0.90, show.legend = F)+
+    scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"),
+                       values = pal_transect)+
+    labs(color = "",
+         title = "FTICR: all peaks (blank corrected)",
+         subtitle = "CB sites")+
     facet_wrap(~site+horizon)
   
   
@@ -293,10 +305,14 @@ plot_vankrevelen_unique = function(icr_data_trt, icr_meta){
   
   unique_hcoc = 
     icr_data_trt %>% 
+    filter(horizon != "B") %>% 
+    filter(!(site == "MSM" & horizon == "A")) %>% 
     group_by(formula, region, site, horizon) %>% 
     dplyr::mutate(n = n()) %>% 
     filter(n == 1) %>% 
-    left_join(icr_meta %>% dplyr::select(formula, HC, OC))
+    left_join(icr_meta %>% dplyr::select(formula, HC, OC)) %>% 
+    mutate(transect = recode(transect, "wc" = "wetland")) %>% 
+    reorder_horizon() %>% reorder_transect()
   
   
   vk_unique_wle = 
@@ -304,7 +320,10 @@ plot_vankrevelen_unique = function(icr_data_trt, icr_meta){
     filter(region == "WLE") %>% 
     gg_vankrev(aes(x = OC, y = HC, color = transect))+
     stat_ellipse(level = 0.90, show.legend = F)+
-    facet_wrap(~site+horizon)+
+    scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"),
+                       values = pal_transect)+
+    labs(color = "")+
+    facet_grid(site ~ horizon)+
     labs(title = "FTICR Unique Peaks",
          subtitle = "WLE sites")
   
@@ -314,7 +333,10 @@ plot_vankrevelen_unique = function(icr_data_trt, icr_meta){
     filter(region == "CB") %>% 
     gg_vankrev(aes(x = OC, y = HC, color = transect))+
     stat_ellipse(level = 0.90, show.legend = F)+
-    facet_wrap(~site+horizon)+
+    scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"),
+                       values = pal_transect)+
+    labs(color = "")+
+    facet_grid(site ~ horizon)+
     labs(title = "FTICR Unique Peaks",
          subtitle = "CB sites")
   
@@ -331,6 +353,7 @@ plot_vankrevelen_unique = function(icr_data_trt, icr_meta){
 compute_icr_relabund = function(icr_data_long, icr_meta){
   
   icr_data_long %>% 
+    filter(horizon != "B") %>% 
     # add the Class column to the data
     left_join(dplyr::select(icr_meta, formula, Class), by = "formula") %>% 
     # calculate abundance of each Class as the sum of all counts
@@ -410,9 +433,13 @@ fit_pca_function = function(icr_relabund_samples, sample_key){
 }
 compute_icr_pca = function(icr_relabund_samples, sample_key){
   
-  pca_overall = fit_pca_function(icr_relabund_samples, sample_key %>% filter(horizon != "B"))
-  pca_wle = fit_pca_function(icr_relabund_samples, sample_key %>% filter(horizon != "B" & region == "WLE"))
-  pca_cb = fit_pca_function(icr_relabund_samples, sample_key %>% filter(horizon != "B" & region == "CB"))
+  sample_key = 
+    sample_key %>% 
+    mutate(transect = recode(transect, "wc" = "wetland"))
+  
+  pca_overall = fit_pca_function(icr_relabund_samples, sample_key)
+  pca_wle = fit_pca_function(icr_relabund_samples, sample_key %>% filter(region == "WLE"))
+  pca_cb = fit_pca_function(icr_relabund_samples, sample_key %>% filter(region == "CB"))
   
   
   # PCA biplots
@@ -423,10 +450,13 @@ compute_icr_pca = function(icr_relabund_samples, sample_key){
     geom_point(size=3,stroke=1, alpha = 1,
                aes(shape = pca_overall$grp$transect,
                    color = groups))+
-    scale_shape_manual(breaks = c("upland", "transition", "wte", "wc"),
+    scale_shape_manual(breaks = c("upland", "transition", "wte", "wetland"),
                        values = c(1,2,3,4))+
     xlim(-4,4)+
-    ylim(-3.5,3.5)
+    ylim(-3.5,3.5)+
+    labs(color = "", shape = "")+
+    theme(legend.position = "top", legend.box = "vertical")+
+    NULL
   
   biplot_wle = 
     ggbiplot(pca_wle$pca_int, obs.scale = 1, var.scale = 1,
@@ -435,11 +465,14 @@ compute_icr_pca = function(icr_relabund_samples, sample_key){
     geom_point(size=3,stroke=1, alpha = 1,
                aes(shape = pca_wle$grp$site,
                    color = groups))+
-    scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+    scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
                        values = pal_transect)+
-    labs(title = "FTICR: WLE")+
+    labs(title = "FTICR: WLE",
+         color = "", shape = "")+
     xlim(-4,4)+
-    ylim(-3.5,3.5)
+    ylim(-3.5,3.5)+
+    theme(legend.position = "top", legend.box = "vertical")+
+    NULL
   
   
   biplot_cb = 
@@ -449,11 +482,14 @@ compute_icr_pca = function(icr_relabund_samples, sample_key){
     geom_point(size=3,stroke=1, alpha = 1,
                aes(shape = pca_cb$grp$site,
                    color = groups))+
-    scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+    scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
                        values = pal_transect)+
-    labs(title = "FTICR: Chesapeake")+
+    labs(title = "FTICR: Chesapeake",
+         color = "", shape = "")+
     xlim(-4,4)+
-    ylim(-3.5,3.5)
+    ylim(-3.5,3.5)+
+    theme(legend.position = "top", legend.box = "vertical")+
+    NULL
   
   biplot_regions = 
     biplot_wle + biplot_cb 
@@ -469,6 +505,7 @@ compute_permanova = function(icr_relabund_samples){
   relabund_wide = 
     icr_relabund_samples %>% 
     left_join(sample_key) %>% 
+    filter(horizon != "B") %>% 
     ungroup %>% 
     dplyr::select(-c(abund, total)) %>% 
     spread(Class, relabund) %>% 
