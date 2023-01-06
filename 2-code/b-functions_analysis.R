@@ -465,6 +465,8 @@ compute_correlations = function(data_combined_wide, TITLE){
     
     
     m = cor(num_clean)
+    p.mat <- ggcorrplot::cor_pmat(num_clean)
+    
  #   x = corrplot::corrplot(m, #method="color", 
  #                      type = "lower",
  #                      title = TITLE,
@@ -473,13 +475,13 @@ compute_correlations = function(data_combined_wide, TITLE){
  #                      )
                        
     ggcorrplot::ggcorrplot(m, type = "lower",
+                           p.mat = p.mat,
+                           outline.color = "black",
+                           #   lab = TRUE, 
+                           insig = "blank",
+                           colors = c("#E46726", "white", "#6D9EC1"),
                            title = TITLE)
-    
-    
-    
-    
-    
-    
+
   }
 
   combined_surface = 
@@ -605,6 +607,12 @@ make_graphs_by_transect = function(data_combined){
   gg_tc <- plot_transect_as_x(data = tctnts %>% filter(name == "TC_perc"), YLAB = "Total C, %", TITLE = "Elemental Analysis")
   gg_tn <- plot_transect_as_x(data = tctnts %>% filter(name == "TN_perc"), YLAB = "Total N, %", TITLE = "Elemental Analysis")
   gg_ts <- plot_transect_as_x(data = tctnts %>% filter(name == "TS_perc"), YLAB = "Total S, %", TITLE = "Elemental Analysis")
+
+  tctn <- tctnts %>% 
+    filter(name == c("TC_perc", "TN_perc")) %>% 
+    pivot_wider(names_from = "name", values_from = "value") %>% 
+    mutate(value = TC_perc/TN_perc)
+  gg_cn <- plot_transect_as_x(data = tctn, YLAB = "C:N", TITLE = "Elemental Analysis")
   
   weoc <- combined_surface %>% filter(analysis == "NPOC")
   gg_weoc <- plot_transect_as_x(data = weoc %>% filter(name == "npoc_ug_g"), YLAB = "WEOC, μg/g", TITLE = "Water Extractable Organic Carbon")
@@ -653,6 +661,7 @@ make_graphs_by_transect = function(data_combined){
        gg_sp_conduc = gg_sp_conduc,
        gg_tc =  gg_tc,
        gg_tn = gg_tn,
+       gg_cn = gg_cn,
        gg_ts = gg_ts,
        gg_weoc = gg_weoc,
        gg_din_nh4n = gg_din_nh4n,
@@ -664,6 +673,7 @@ make_graphs_by_transect = function(data_combined){
        gg_icp_al = gg_icp_al, 
        gg_icp_fe = gg_icp_fe, 
        gg_icp_mn = gg_icp_mn, 
+       gg_p_mehlich = gg_p_mehlich,
        gg_ferr_fetotal = gg_ferr_fetotal, 
        gg_ions_ca = gg_ions_ca, 
        gg_ions_na = gg_ions_na, 
@@ -751,6 +761,7 @@ make_graphs_by_site = function(data_combined){
        gg_icp_al = gg_icp_al, 
        gg_icp_fe = gg_icp_fe, 
        gg_icp_mn = gg_icp_mn, 
+       gg_p_mehlich = gg_p_mehlich,
        gg_ferr_fetotal = gg_ferr_fetotal, 
        gg_ions_ca = gg_ions_ca, 
        gg_ions_na = gg_ions_na, 
