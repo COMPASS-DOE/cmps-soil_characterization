@@ -108,104 +108,114 @@ click to open
 ![](characterization_report_files/figure-gfm/by_transect-5.png)<!-- -->
 
     ## 
-    ## $gg_ts
+    ## $gg_cn
 
 ![](characterization_report_files/figure-gfm/by_transect-6.png)<!-- -->
 
     ## 
-    ## $gg_weoc
+    ## $gg_ts
 
 ![](characterization_report_files/figure-gfm/by_transect-7.png)<!-- -->
 
     ## 
-    ## $gg_din_nh4n
+    ## $gg_weoc
 
 ![](characterization_report_files/figure-gfm/by_transect-8.png)<!-- -->
 
     ## 
-    ## $gg_din_no3n
+    ## $gg_din_nh4n
 
 ![](characterization_report_files/figure-gfm/by_transect-9.png)<!-- -->
 
     ## 
-    ## $gg_icp_ca
+    ## $gg_din_no3n
 
 ![](characterization_report_files/figure-gfm/by_transect-10.png)<!-- -->
 
     ## 
-    ## $gg_icp_mg
+    ## $gg_icp_ca
 
 ![](characterization_report_files/figure-gfm/by_transect-11.png)<!-- -->
 
     ## 
-    ## $gg_icp_na
+    ## $gg_icp_mg
 
 ![](characterization_report_files/figure-gfm/by_transect-12.png)<!-- -->
 
     ## 
-    ## $gg_icp_k
+    ## $gg_icp_na
 
 ![](characterization_report_files/figure-gfm/by_transect-13.png)<!-- -->
 
     ## 
-    ## $gg_icp_al
+    ## $gg_icp_k
 
 ![](characterization_report_files/figure-gfm/by_transect-14.png)<!-- -->
 
     ## 
-    ## $gg_icp_fe
+    ## $gg_icp_al
 
 ![](characterization_report_files/figure-gfm/by_transect-15.png)<!-- -->
 
     ## 
-    ## $gg_icp_mn
+    ## $gg_icp_fe
 
 ![](characterization_report_files/figure-gfm/by_transect-16.png)<!-- -->
 
     ## 
-    ## $gg_ferr_fetotal
+    ## $gg_icp_mn
 
 ![](characterization_report_files/figure-gfm/by_transect-17.png)<!-- -->
 
     ## 
-    ## $gg_ions_ca
+    ## $gg_p_mehlich
 
 ![](characterization_report_files/figure-gfm/by_transect-18.png)<!-- -->
 
     ## 
-    ## $gg_ions_na
+    ## $gg_ferr_fetotal
 
 ![](characterization_report_files/figure-gfm/by_transect-19.png)<!-- -->
 
     ## 
-    ## $gg_ions_mg
+    ## $gg_ions_ca
 
 ![](characterization_report_files/figure-gfm/by_transect-20.png)<!-- -->
 
     ## 
-    ## $gg_ions_k
+    ## $gg_ions_na
 
 ![](characterization_report_files/figure-gfm/by_transect-21.png)<!-- -->
 
     ## 
-    ## $gg_ions_cl
+    ## $gg_ions_mg
 
 ![](characterization_report_files/figure-gfm/by_transect-22.png)<!-- -->
 
     ## 
-    ## $gg_ions_so4
+    ## $gg_ions_k
 
 ![](characterization_report_files/figure-gfm/by_transect-23.png)<!-- -->
 
     ## 
-    ## $gg_ions_no3
+    ## $gg_ions_cl
 
 ![](characterization_report_files/figure-gfm/by_transect-24.png)<!-- -->
 
     ## 
-    ## $gg_ions_po4
+    ## $gg_ions_so4
 
 ![](characterization_report_files/figure-gfm/by_transect-25.png)<!-- -->
+
+    ## 
+    ## $gg_ions_no3
+
+![](characterization_report_files/figure-gfm/by_transect-26.png)<!-- -->
+
+    ## 
+    ## $gg_ions_po4
+
+![](characterization_report_files/figure-gfm/by_transect-27.png)<!-- -->
 
 </details>
 
@@ -296,49 +306,54 @@ click to open
 ![](characterization_report_files/figure-gfm/by_site_oa-16.png)<!-- -->
 
     ## 
-    ## $gg_ferr_fetotal
+    ## $gg_p_mehlich
 
 ![](characterization_report_files/figure-gfm/by_site_oa-17.png)<!-- -->
 
     ## 
-    ## $gg_ions_ca
+    ## $gg_ferr_fetotal
 
 ![](characterization_report_files/figure-gfm/by_site_oa-18.png)<!-- -->
 
     ## 
-    ## $gg_ions_na
+    ## $gg_ions_ca
 
 ![](characterization_report_files/figure-gfm/by_site_oa-19.png)<!-- -->
 
     ## 
-    ## $gg_ions_mg
+    ## $gg_ions_na
 
 ![](characterization_report_files/figure-gfm/by_site_oa-20.png)<!-- -->
 
     ## 
-    ## $gg_ions_k
+    ## $gg_ions_mg
 
 ![](characterization_report_files/figure-gfm/by_site_oa-21.png)<!-- -->
 
     ## 
-    ## $gg_ions_cl
+    ## $gg_ions_k
 
 ![](characterization_report_files/figure-gfm/by_site_oa-22.png)<!-- -->
 
     ## 
-    ## $gg_ions_so4
+    ## $gg_ions_cl
 
 ![](characterization_report_files/figure-gfm/by_site_oa-23.png)<!-- -->
 
     ## 
-    ## $gg_ions_no3
+    ## $gg_ions_so4
 
 ![](characterization_report_files/figure-gfm/by_site_oa-24.png)<!-- -->
 
     ## 
-    ## $gg_ions_po4
+    ## $gg_ions_no3
 
 ![](characterization_report_files/figure-gfm/by_site_oa-25.png)<!-- -->
+
+    ## 
+    ## $gg_ions_po4
+
+![](characterization_report_files/figure-gfm/by_site_oa-26.png)<!-- -->
 
 </details>
 
@@ -429,49 +444,54 @@ click to open
 ![](characterization_report_files/figure-gfm/by_site_oab-16.png)<!-- -->
 
     ## 
-    ## $gg_ferr_fetotal
+    ## $gg_p_mehlich
 
 ![](characterization_report_files/figure-gfm/by_site_oab-17.png)<!-- -->
 
     ## 
-    ## $gg_ions_ca
+    ## $gg_ferr_fetotal
 
 ![](characterization_report_files/figure-gfm/by_site_oab-18.png)<!-- -->
 
     ## 
-    ## $gg_ions_na
+    ## $gg_ions_ca
 
 ![](characterization_report_files/figure-gfm/by_site_oab-19.png)<!-- -->
 
     ## 
-    ## $gg_ions_mg
+    ## $gg_ions_na
 
 ![](characterization_report_files/figure-gfm/by_site_oab-20.png)<!-- -->
 
     ## 
-    ## $gg_ions_k
+    ## $gg_ions_mg
 
 ![](characterization_report_files/figure-gfm/by_site_oab-21.png)<!-- -->
 
     ## 
-    ## $gg_ions_cl
+    ## $gg_ions_k
 
 ![](characterization_report_files/figure-gfm/by_site_oab-22.png)<!-- -->
 
     ## 
-    ## $gg_ions_so4
+    ## $gg_ions_cl
 
 ![](characterization_report_files/figure-gfm/by_site_oab-23.png)<!-- -->
 
     ## 
-    ## $gg_ions_no3
+    ## $gg_ions_so4
 
 ![](characterization_report_files/figure-gfm/by_site_oab-24.png)<!-- -->
 
     ## 
-    ## $gg_ions_po4
+    ## $gg_ions_no3
 
 ![](characterization_report_files/figure-gfm/by_site_oab-25.png)<!-- -->
+
+    ## 
+    ## $gg_ions_po4
+
+![](characterization_report_files/figure-gfm/by_site_oab-26.png)<!-- -->
 
 </details>
 
@@ -509,7 +529,7 @@ click to open
 Session Info
 </summary>
 
-Date run: 2022-12-28
+Date run: 2023-01-05
 
     ## R version 4.2.1 (2022-06-23)
     ## Platform: x86_64-apple-darwin17.0 (64-bit)
