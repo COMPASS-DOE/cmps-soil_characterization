@@ -637,9 +637,16 @@ make_graphs_by_transect = function(data_combined){
                                      SUBTITLE = "measured colorimetrically (molybdate/ascorbic acid method)")
   
   ferrozine <- combined_surface %>% filter(analysis == "Ferrozine")
+  ferrozine_23 <- ferrozine %>% 
+    filter(grepl("Fe2|Fe3", name)) %>% 
+    pivot_wider() %>% 
+    mutate(value = Fe2_ug_g/Fe3_ug_g)
   gg_ferr_fetotal <- plot_transect_as_x(data = ferrozine %>% filter(name == "Fe_total_ug_g"), YLAB = "Fe, μg/g", 
                                         TITLE = "Total Fe", 
                                         SUBTITLE = "extracted with 0.5M HCl, measured colorimetrically using ferrozine")
+  gg_ferr_fe23 <- plot_transect_as_x(data = ferrozine_23, YLAB = "Fe-II/Fe-III", 
+                                        TITLE = "Fe-II/III", 
+                                        SUBTITLE = "extracted with 0.5M HCl, measured colorimetrically using ferrozine")+ylim (0, 5)
   
   ions <- combined_surface %>% filter(analysis == "IC")
   gg_ions_ca <- plot_transect_as_x(data = ions %>% filter(name == "Calcium_ug_g"), YLAB = "Ca, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
@@ -675,6 +682,7 @@ make_graphs_by_transect = function(data_combined){
        gg_icp_mn = gg_icp_mn, 
        gg_p_mehlich = gg_p_mehlich,
        gg_ferr_fetotal = gg_ferr_fetotal, 
+       gg_ferr_fe23 = gg_ferr_fe23,
        gg_ions_ca = gg_ions_ca, 
        gg_ions_na = gg_ions_na, 
        gg_ions_mg = gg_ions_mg, 
