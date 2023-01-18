@@ -178,44 +178,49 @@ click to open
 ![](characterization_report_files/figure-gfm/by_transect-19.png)<!-- -->
 
     ## 
-    ## $gg_ions_ca
+    ## $gg_ferr_fe23
 
 ![](characterization_report_files/figure-gfm/by_transect-20.png)<!-- -->
 
     ## 
-    ## $gg_ions_na
+    ## $gg_ions_ca
 
 ![](characterization_report_files/figure-gfm/by_transect-21.png)<!-- -->
 
     ## 
-    ## $gg_ions_mg
+    ## $gg_ions_na
 
 ![](characterization_report_files/figure-gfm/by_transect-22.png)<!-- -->
 
     ## 
-    ## $gg_ions_k
+    ## $gg_ions_mg
 
 ![](characterization_report_files/figure-gfm/by_transect-23.png)<!-- -->
 
     ## 
-    ## $gg_ions_cl
+    ## $gg_ions_k
 
 ![](characterization_report_files/figure-gfm/by_transect-24.png)<!-- -->
 
     ## 
-    ## $gg_ions_so4
+    ## $gg_ions_cl
 
 ![](characterization_report_files/figure-gfm/by_transect-25.png)<!-- -->
 
     ## 
-    ## $gg_ions_no3
+    ## $gg_ions_so4
 
 ![](characterization_report_files/figure-gfm/by_transect-26.png)<!-- -->
 
     ## 
-    ## $gg_ions_po4
+    ## $gg_ions_no3
 
 ![](characterization_report_files/figure-gfm/by_transect-27.png)<!-- -->
+
+    ## 
+    ## $gg_ions_po4
+
+![](characterization_report_files/figure-gfm/by_transect-28.png)<!-- -->
 
 </details>
 
@@ -529,7 +534,7 @@ click to open
 Session Info
 </summary>
 
-Date run: 2023-01-05
+Date run: 2023-01-06
 
     ## R version 4.2.1 (2022-06-23)
     ## Platform: x86_64-apple-darwin17.0 (64-bit)
