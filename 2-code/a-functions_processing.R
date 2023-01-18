@@ -698,6 +698,47 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
   samples2
   }
 
+
+## XRD
+import_xrd = function(FILEPATH){
+  
+  filePaths_xrd <- list.files(path = FILEPATH, pattern = "csv", full.names = TRUE)
+  xrd_dat <- do.call(bind_rows, lapply(filePaths_xrd, function(path) {
+    df <- read_csv(path) 
+    df %>% filter(!grepl("-", File))
+    }))
+}
+xrd_data = import_xrd(FILEPATH = "1-data/xrd")
+
+
+process_xrd = function(xrd_data, sample_key){
+  
+  processed = 
+    xrd_data %>% 
+    pivot_longer(-c(File, Notes), names_to = "mineral", values_to = "percent") %>% 
+    filter(!grepl("\u00B1", percent)) %>% 
+    filter(!grepl("...17", mineral)) %>% 
+    mutate(percent = parse_number(percent),
+           percent = if_else(is.na(percent), 0, percent),
+           File = str_pad(File, 3, pad = "0"))
+
+  sample_key2 = 
+    sample_key %>% 
+    mutate(File = str_extract(sample_label, "_[0-9]{3}"),
+           File = str_remove(File, "_"))
+  
+  processed2 = 
+    processed %>% 
+    left_join(sample_key2) %>% 
+    pivot_wider(names_from = "mineral", values_from = "percent") %>% 
+    dplyr::select(-Notes, -Rwp) %>% 
+    replace(.,is.na(.),0)  
+
+ # processed2 %>% write.csv("XRD_processed_2023-01-06.csv", row.names = F)
+  }
+
+
+
 # Combined data
 combine_data = function(moisture_processed, pH_processed, tctnts_data_samples, 
                         weoc_processed, din_processed, icp_processed, 
