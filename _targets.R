@@ -99,10 +99,19 @@ list(
   tar_target(gg_correlations, compute_correlations(data_combined_wide, sample_key)),
   
   
-tar_target(gg_by_transect, make_graphs_by_transect(data_combined)),
-tar_target(gg_by_site_oa, make_graphs_by_site(data_combined %>% filter(horizon != "B"))),
-tar_target(gg_by_site_oab, make_graphs_by_site(data_combined)),
-
+  tar_target(gg_by_transect, make_graphs_by_transect(data_combined)),
+  tar_target(gg_by_site_oa, make_graphs_by_site(data_combined %>% filter(horizon != "B"))),
+  tar_target(gg_by_site_oab, make_graphs_by_site(data_combined)),
+  
+  # export
+  tar_target(export, {
+    write.csv(data_combined, "1-data/processed/chemistry_combined.csv", row.names = FALSE)
+    write.csv(icr_meta, "1-data/processed/icr_meta.csv", row.names = FALSE)
+    crunch::write.csv.gz(icr_data_long, "1-data/processed/icr_long_all_samples.csv.gz", row.names = FALSE)
+    crunch::write.csv.gz(icr_data_trt, "1-data/processed/icr_long_treatments.csv.gz", row.names = FALSE)
+    
+  }, format = "file"),
+  
   
   # report  
   tar_render(report, path = "3-reports/characterization_report.Rmd")
