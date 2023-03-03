@@ -168,59 +168,64 @@ click to open
 ![](characterization_report_files/figure-gfm/by_transect-17.png)<!-- -->
 
     ## 
-    ## $gg_p_mehlich
+    ## $gg_icp_cec
 
 ![](characterization_report_files/figure-gfm/by_transect-18.png)<!-- -->
 
     ## 
-    ## $gg_ferr_fetotal
+    ## $gg_p_mehlich
 
 ![](characterization_report_files/figure-gfm/by_transect-19.png)<!-- -->
 
     ## 
-    ## $gg_ferr_fe23
+    ## $gg_ferr_fetotal
 
 ![](characterization_report_files/figure-gfm/by_transect-20.png)<!-- -->
 
     ## 
-    ## $gg_ions_ca
+    ## $gg_ferr_fe23
 
 ![](characterization_report_files/figure-gfm/by_transect-21.png)<!-- -->
 
     ## 
-    ## $gg_ions_na
+    ## $gg_ions_ca
 
 ![](characterization_report_files/figure-gfm/by_transect-22.png)<!-- -->
 
     ## 
-    ## $gg_ions_mg
+    ## $gg_ions_na
 
 ![](characterization_report_files/figure-gfm/by_transect-23.png)<!-- -->
 
     ## 
-    ## $gg_ions_k
+    ## $gg_ions_mg
 
 ![](characterization_report_files/figure-gfm/by_transect-24.png)<!-- -->
 
     ## 
-    ## $gg_ions_cl
+    ## $gg_ions_k
 
 ![](characterization_report_files/figure-gfm/by_transect-25.png)<!-- -->
 
     ## 
-    ## $gg_ions_so4
+    ## $gg_ions_cl
 
 ![](characterization_report_files/figure-gfm/by_transect-26.png)<!-- -->
 
     ## 
-    ## $gg_ions_no3
+    ## $gg_ions_so4
 
 ![](characterization_report_files/figure-gfm/by_transect-27.png)<!-- -->
 
     ## 
-    ## $gg_ions_po4
+    ## $gg_ions_no3
 
 ![](characterization_report_files/figure-gfm/by_transect-28.png)<!-- -->
+
+    ## 
+    ## $gg_ions_po4
+
+![](characterization_report_files/figure-gfm/by_transect-29.png)<!-- -->
 
 </details>
 
@@ -311,54 +316,59 @@ click to open
 ![](characterization_report_files/figure-gfm/by_site_oa-16.png)<!-- -->
 
     ## 
-    ## $gg_p_mehlich
+    ## $gg_icp_cec
 
 ![](characterization_report_files/figure-gfm/by_site_oa-17.png)<!-- -->
 
     ## 
-    ## $gg_ferr_fetotal
+    ## $gg_p_mehlich
 
 ![](characterization_report_files/figure-gfm/by_site_oa-18.png)<!-- -->
 
     ## 
-    ## $gg_ions_ca
+    ## $gg_ferr_fetotal
 
 ![](characterization_report_files/figure-gfm/by_site_oa-19.png)<!-- -->
 
     ## 
-    ## $gg_ions_na
+    ## $gg_ions_ca
 
 ![](characterization_report_files/figure-gfm/by_site_oa-20.png)<!-- -->
 
     ## 
-    ## $gg_ions_mg
+    ## $gg_ions_na
 
 ![](characterization_report_files/figure-gfm/by_site_oa-21.png)<!-- -->
 
     ## 
-    ## $gg_ions_k
+    ## $gg_ions_mg
 
 ![](characterization_report_files/figure-gfm/by_site_oa-22.png)<!-- -->
 
     ## 
-    ## $gg_ions_cl
+    ## $gg_ions_k
 
 ![](characterization_report_files/figure-gfm/by_site_oa-23.png)<!-- -->
 
     ## 
-    ## $gg_ions_so4
+    ## $gg_ions_cl
 
 ![](characterization_report_files/figure-gfm/by_site_oa-24.png)<!-- -->
 
     ## 
-    ## $gg_ions_no3
+    ## $gg_ions_so4
 
 ![](characterization_report_files/figure-gfm/by_site_oa-25.png)<!-- -->
 
     ## 
-    ## $gg_ions_po4
+    ## $gg_ions_no3
 
 ![](characterization_report_files/figure-gfm/by_site_oa-26.png)<!-- -->
+
+    ## 
+    ## $gg_ions_po4
+
+![](characterization_report_files/figure-gfm/by_site_oa-27.png)<!-- -->
 
 </details>
 
@@ -449,54 +459,59 @@ click to open
 ![](characterization_report_files/figure-gfm/by_site_oab-16.png)<!-- -->
 
     ## 
-    ## $gg_p_mehlich
+    ## $gg_icp_cec
 
 ![](characterization_report_files/figure-gfm/by_site_oab-17.png)<!-- -->
 
     ## 
-    ## $gg_ferr_fetotal
+    ## $gg_p_mehlich
 
 ![](characterization_report_files/figure-gfm/by_site_oab-18.png)<!-- -->
 
     ## 
-    ## $gg_ions_ca
+    ## $gg_ferr_fetotal
 
 ![](characterization_report_files/figure-gfm/by_site_oab-19.png)<!-- -->
 
     ## 
-    ## $gg_ions_na
+    ## $gg_ions_ca
 
 ![](characterization_report_files/figure-gfm/by_site_oab-20.png)<!-- -->
 
     ## 
-    ## $gg_ions_mg
+    ## $gg_ions_na
 
 ![](characterization_report_files/figure-gfm/by_site_oab-21.png)<!-- -->
 
     ## 
-    ## $gg_ions_k
+    ## $gg_ions_mg
 
 ![](characterization_report_files/figure-gfm/by_site_oab-22.png)<!-- -->
 
     ## 
-    ## $gg_ions_cl
+    ## $gg_ions_k
 
 ![](characterization_report_files/figure-gfm/by_site_oab-23.png)<!-- -->
 
     ## 
-    ## $gg_ions_so4
+    ## $gg_ions_cl
 
 ![](characterization_report_files/figure-gfm/by_site_oab-24.png)<!-- -->
 
     ## 
-    ## $gg_ions_no3
+    ## $gg_ions_so4
 
 ![](characterization_report_files/figure-gfm/by_site_oab-25.png)<!-- -->
 
     ## 
-    ## $gg_ions_po4
+    ## $gg_ions_no3
 
 ![](characterization_report_files/figure-gfm/by_site_oab-26.png)<!-- -->
+
+    ## 
+    ## $gg_ions_po4
+
+![](characterization_report_files/figure-gfm/by_site_oab-27.png)<!-- -->
 
 </details>
 
@@ -534,7 +549,7 @@ click to open
 Session Info
 </summary>
 
-Date run: 2023-01-06
+Date run: 2023-03-03
 
     ## R version 4.2.1 (2022-06-23)
     ## Platform: x86_64-apple-darwin17.0 (64-bit)
@@ -553,30 +568,28 @@ Date run: 2023-01-06
     ## other attached packages:
     ##  [1] patchwork_1.1.2     vegan_2.6-4         lattice_0.20-45    
     ##  [4] permute_0.9-7       ggbiplot_0.55       googlesheets4_1.0.1
-    ##  [7] lubridate_1.8.0     soilpalettes_0.1.0  PNWColors_0.1.0    
-    ## [10] magrittr_2.0.3      forcats_0.5.2       stringr_1.4.1      
-    ## [13] dplyr_1.0.10        purrr_0.3.4         readr_2.1.3        
-    ## [16] tidyr_1.2.1         tibble_3.1.8        ggplot2_3.3.6      
-    ## [19] tidyverse_1.3.2     tarchetypes_0.7.2   targets_0.14.0     
+    ##  [7] soilpalettes_0.1.0  PNWColors_0.1.0     magrittr_2.0.3     
+    ## [10] lubridate_1.9.2     forcats_1.0.0       stringr_1.5.0      
+    ## [13] dplyr_1.1.0         purrr_1.0.1         readr_2.1.4        
+    ## [16] tidyr_1.3.0         tibble_3.1.8        ggplot2_3.4.1      
+    ## [19] tidyverse_2.0.0     tarchetypes_0.7.2   targets_0.14.0     
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] httr_1.4.4        jsonlite_1.8.0    splines_4.2.1     modelr_0.1.9     
-    ##  [5] assertthat_0.2.1  highr_0.9         base64url_1.4     cellranger_1.1.0 
-    ##  [9] yaml_2.3.5        pillar_1.8.1      backports_1.4.1   glue_1.6.2       
-    ## [13] digest_0.6.29     rvest_1.0.3       colorspace_2.0-3  htmltools_0.5.3  
-    ## [17] Matrix_1.5-1      plyr_1.8.7        pkgconfig_2.0.3   ggcorrplot_0.1.4 
-    ## [21] broom_1.0.0       haven_2.5.1       scales_1.2.1      processx_3.7.0   
-    ## [25] tzdb_0.3.0        googledrive_2.0.0 mgcv_1.8-40       farver_2.1.1     
-    ## [29] generics_0.1.3    ellipsis_0.3.2    withr_2.5.0       cli_3.3.0        
-    ## [33] crayon_1.5.1      readxl_1.4.1      evaluate_0.16     ps_1.7.1         
-    ## [37] fs_1.5.2          fansi_1.0.3       nlme_3.1-160      MASS_7.3-57      
-    ## [41] xml2_1.3.3        tools_4.2.1       data.table_1.14.4 hms_1.1.2        
-    ## [45] gargle_1.2.0      lifecycle_1.0.1   munsell_0.5.0     reprex_2.0.2     
-    ## [49] cluster_2.1.3     callr_3.7.2       compiler_4.2.1    rlang_1.0.5      
-    ## [53] grid_4.2.1        rstudioapi_0.14   igraph_1.3.4      labeling_0.4.2   
-    ## [57] rmarkdown_2.16    gtable_0.3.0      codetools_0.2-18  DBI_1.1.3        
-    ## [61] R6_2.5.1          knitr_1.40        fastmap_1.1.0     utf8_1.2.2       
-    ## [65] stringi_1.7.8     parallel_4.2.1    Rcpp_1.0.9        vctrs_0.4.1      
-    ## [69] dbplyr_2.2.1      tidyselect_1.1.2  xfun_0.32
+    ##  [1] Rcpp_1.0.9        ps_1.7.1          digest_0.6.29     utf8_1.2.2       
+    ##  [5] R6_2.5.1          cellranger_1.1.0  plyr_1.8.7        backports_1.4.1  
+    ##  [9] ggcorrplot_0.1.4  evaluate_0.16     highr_0.9         pillar_1.8.1     
+    ## [13] rlang_1.0.6       rstudioapi_0.14   data.table_1.14.4 callr_3.7.2      
+    ## [17] Matrix_1.5-1      rmarkdown_2.16    labeling_0.4.2    splines_4.2.1    
+    ## [21] googledrive_2.0.0 igraph_1.3.4      bit_4.0.4         munsell_0.5.0    
+    ## [25] compiler_4.2.1    xfun_0.32         pkgconfig_2.0.3   mgcv_1.8-40      
+    ## [29] htmltools_0.5.3   tidyselect_1.2.0  codetools_0.2-18  fansi_1.0.3      
+    ## [33] crayon_1.5.1      tzdb_0.3.0        withr_2.5.0       MASS_7.3-57      
+    ## [37] grid_4.2.1        nlme_3.1-160      gtable_0.3.0      lifecycle_1.0.3  
+    ## [41] scales_1.2.1      cli_3.6.0         stringi_1.7.8     vroom_1.6.0      
+    ## [45] farver_2.1.1      fs_1.5.2          ellipsis_0.3.2    generics_0.1.3   
+    ## [49] vctrs_0.5.2       tools_4.2.1       bit64_4.0.5       glue_1.6.2       
+    ## [53] hms_1.1.2         fastmap_1.1.0     processx_3.7.0    parallel_4.2.1   
+    ## [57] yaml_2.3.5        timechange_0.2.0  colorspace_2.0-3  gargle_1.2.0     
+    ## [61] cluster_2.1.3     base64url_1.4     knitr_1.40
 
 </details>
