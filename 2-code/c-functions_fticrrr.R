@@ -281,7 +281,8 @@ plot_vankrevelen = function(icr_data_trt, icr_meta){
     labs(color = "",
          title = "FTICR: all peaks (blank corrected)",
          subtitle = "WLE sites")+
-    facet_wrap(~site+horizon)
+    facet_wrap(~site+horizon)+
+    NULL
   
   vk_cb = 
     data_hcoc %>% 
@@ -293,7 +294,8 @@ plot_vankrevelen = function(icr_data_trt, icr_meta){
     labs(color = "",
          title = "FTICR: all peaks (blank corrected)",
          subtitle = "CB sites")+
-    facet_wrap(~site+horizon)
+    facet_wrap(~site+horizon)+
+    NULL
   
   
   list(vk_domains = vk_domains,
