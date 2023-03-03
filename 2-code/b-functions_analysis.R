@@ -786,3 +786,24 @@ make_graphs_by_site = function(data_combined){
        gg_ions_po4 = gg_ions_po4
   )
 }
+
+# xrd ----
+
+plot_xrd = function(xrd_processed){
+  
+  xrd_summary = 
+    xrd_processed %>% 
+    dplyr::select(-c(tree_number, File)) %>% 
+    pivot_longer(-c(sample_label, region, site, transect, horizon),
+                 names_to = "mineral",
+                 values_to = "percentage") %>% 
+    reorder_horizon() %>% 
+    reorder_transect()
+  
+  xrd_summary %>% 
+    ggplot(aes(x = sample_label, y = percentage, fill = mineral))+
+    geom_bar(stat = "identity")+
+    facet_grid(horizon ~ region + site + transect, scales = "free_x")
+    
+  
+}

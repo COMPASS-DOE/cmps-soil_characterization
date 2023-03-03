@@ -733,7 +733,7 @@ import_xrd = function(FILEPATH){
     df %>% filter(!grepl("-", File))
     }))
 }
-xrd_data = import_xrd(FILEPATH = "1-data/xrd")
+#xrd_data = import_xrd(FILEPATH = "1-data/xrd")
 
 
 process_xrd = function(xrd_data, sample_key){

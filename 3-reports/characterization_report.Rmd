@@ -150,6 +150,14 @@ tar_read(gg_icr_pca)$biplot_regions
 
 ---
 
+## XRD
+```{r xrd, fig.height=4, fig.width=15}
+tar_read(gg_xrd)
+```
+
+
+---
+
 ## Session Info 
 
 <details>
