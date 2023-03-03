@@ -279,7 +279,32 @@ process_icp = function(icp_data, analysis_key, moisture_processed, subsampling){
 
   icp_samples
 }
-
+compute_cec = function(icp_processed){
+  
+  charges = 
+    tribble(
+      ~ion, ~charge, ~atomic_wt,
+      "Na", 1, 23,
+      "K", 1, 39,
+      "Ca", 2, 40,
+      "Mg", 2, 24,
+      "Al", 3, 27
+    )
+  
+  icp_meq = 
+    icp_processed %>% 
+    dplyr::select(sample_label, analysis, ends_with("ug_g")) %>% 
+    pivot_longer(cols = ends_with("ug_g"), values_to = "ug_g") %>% 
+    separate(name, sep = "_", into = "ion", remove = FALSE) %>% 
+    left_join(charges) %>% 
+    mutate(meq_100g = ug_g * charge/atomic_wt * 100/1000) %>% 
+    filter(!is.na(meq_100g))
+  
+  icp_meq %>% 
+    group_by(sample_label, analysis) %>% 
+    dplyr::summarise(cec_meq100g = sum(meq_100g))
+  
+}
 
 # Iron - ferrozine
 import_iron = function(FILEPATH){
@@ -741,12 +766,12 @@ process_xrd = function(xrd_data, sample_key){
 
 # Combined data
 combine_data = function(moisture_processed, pH_processed, tctnts_data_samples, 
-                        weoc_processed, din_processed, icp_processed, 
+                        weoc_processed, din_processed, icp_processed, cec_processed,
                         ferrozine_processed, mehlich_processed, ions_processed,
                         sample_key){
   
   df_list = list(moisture_processed, pH_processed, tctnts_data_samples, 
-                 weoc_processed, din_processed, icp_processed, 
+                 weoc_processed, din_processed, icp_processed, cec_processed,
                  ferrozine_processed, mehlich_processed, ions_processed)
   
   data_combined = 
@@ -762,16 +787,16 @@ combine_data = function(moisture_processed, pH_processed, tctnts_data_samples,
     force() 
   
   data_combined_wide = 
-    data_combined %>% 
-    separate(name, sep = "_", into = "variable", remove = F) %>% 
-    mutate(name = paste0(variable, " (", analysis, ")")) %>% 
-    dplyr::select(sample_label, name, value) %>% 
-    pivot_wider() %>% 
-    #  dplyr::select(-c("Ammonia (IC)","Bromide (IC)", "Nitrite (IC)", "Fluoride (IC)")) %>% 
-    left_join(sample_key) %>% 
-    #  mutate(`Phosphate (IC)` = case_when(is.na(`Phosphate (IC)`) & site != "GCREW" ~ 0,
-    #                                      TRUE ~ `Phosphate (IC)`)) %>% 
-    force()
+   data_combined %>% 
+   separate(name, sep = "_", into = "variable", remove = F) %>% 
+   mutate(name = paste0(variable, " (", analysis, ")")) %>% 
+   dplyr::select(sample_label, name, value) %>% 
+   pivot_wider() %>% 
+   #  dplyr::select(-c("Ammonia (IC)","Bromide (IC)", "Nitrite (IC)", "Fluoride (IC)")) %>% 
+   left_join(sample_key) %>% 
+   #  mutate(`Phosphate (IC)` = case_when(is.na(`Phosphate (IC)`) & site != "GCREW" ~ 0,
+   #                                      TRUE ~ `Phosphate (IC)`)) %>% 
+   force()
   
   list(data_combined = data_combined,
        data_combined_wide = data_combined_wide)

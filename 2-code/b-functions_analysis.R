@@ -633,6 +633,8 @@ make_graphs_by_transect = function(data_combined){
   gg_icp_fe <- plot_transect_as_x(data = icp %>% filter(name == "Fe_ug_g"), YLAB = "Fe, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
   gg_icp_mn <- plot_transect_as_x(data = icp %>% filter(name == "Mn_ug_g"), YLAB = "Mn, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
   
+  gg_icp_cec <- plot_transect_as_x(data = icp %>% filter(name == "cec_meq100g"), YLAB = "CEC, meq/100g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
+  
   gg_p_mehlich <- plot_transect_as_x(data = combined_surface %>% filter(name == "mehlichp_ugg"), YLAB = "P, μg/g", TITLE = "Mehlich-3 extractable P", 
                                      SUBTITLE = "measured colorimetrically (molybdate/ascorbic acid method)")
   
@@ -680,6 +682,7 @@ make_graphs_by_transect = function(data_combined){
        gg_icp_al = gg_icp_al, 
        gg_icp_fe = gg_icp_fe, 
        gg_icp_mn = gg_icp_mn, 
+       gg_icp_cec = gg_icp_cec,
        gg_p_mehlich = gg_p_mehlich,
        gg_ferr_fetotal = gg_ferr_fetotal, 
        gg_ferr_fe23 = gg_ferr_fe23,
@@ -733,6 +736,7 @@ make_graphs_by_site = function(data_combined){
   gg_icp_al <- plot_site_as_x(data = icp %>% filter(name == "Al_ug_g"), YLAB = "Al, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
   gg_icp_fe <- plot_site_as_x(data = icp %>% filter(name == "Fe_ug_g"), YLAB = "Fe, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
   gg_icp_mn <- plot_site_as_x(data = icp %>% filter(name == "Mn_ug_g"), YLAB = "Fe, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
+  gg_icp_cec <- plot_site_as_x(data = icp %>% filter(name == "cec_meq100g"), YLAB = "CEC, meq/100g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
   
   gg_p_mehlich <- plot_site_as_x(data = combined_surface %>% filter(name == "mehlichp_ugg"), YLAB = "P, μg/g", TITLE = "Mehlich-3 extractable P", 
                                      SUBTITLE = "measured colorimetrically (molybdate/ascorbic acid method)")
@@ -769,6 +773,7 @@ make_graphs_by_site = function(data_combined){
        gg_icp_al = gg_icp_al, 
        gg_icp_fe = gg_icp_fe, 
        gg_icp_mn = gg_icp_mn, 
+       gg_icp_cec = gg_icp_cec,
        gg_p_mehlich = gg_p_mehlich,
        gg_ferr_fetotal = gg_ferr_fetotal, 
        gg_ions_ca = gg_ions_ca, 

@@ -55,6 +55,7 @@ list(
   tar_target(din_processed, process_din(din_data, analysis_key, moisture_processed, subsampling)),
   tar_target(icp_data, import_icp_data(FILEPATH = "1-data/icp")),
   tar_target(icp_processed, process_icp(icp_data, analysis_key, moisture_processed, subsampling)),
+  tar_target(cec_processed, compute_cec(icp_processed)),
   tar_target(ferrozine_data, import_iron(FILEPATH = "1-data/iron-ferrozine")$ferrozine_data),
   tar_target(ferrozine_map, import_iron(FILEPATH = "1-data/iron-ferrozine")$ferrozine_map),
   tar_target(ferrozine_processed, process_iron(ferrozine_map, ferrozine_data, moisture_processed, subsampling)),
@@ -87,11 +88,11 @@ list(
   
   # combined data
   tar_target(data_combined, combine_data(moisture_processed, pH_processed, tctnts_data_samples, 
-                                         weoc_processed, din_processed, icp_processed, 
+                                         weoc_processed, din_processed, icp_processed, cec_processed,
                                          ferrozine_processed, mehlich_processed, ions_processed, 
                                          sample_key)$data_combined),
   tar_target(data_combined_wide, combine_data(moisture_processed, pH_processed, tctnts_data_samples, 
-                                         weoc_processed, din_processed, icp_processed, 
+                                         weoc_processed, din_processed, icp_processed, cec_processed,
                                          ferrozine_processed, mehlich_processed, ions_processed, 
                                          sample_key)$data_combined_wide),
   tar_target(analysis_completion_matrix, compute_analysis_matrix(data_combined)),
