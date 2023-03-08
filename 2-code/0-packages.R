@@ -13,7 +13,7 @@ theme_kp <- function() {  # this for all the elements common across plots
           legend.text = element_text(size = 12),
           legend.key.size = unit(1.5, 'lines'),
           legend.background = element_rect(colour = NA),
-          panel.border = element_rect(color="black",size=1, fill = NA),
+          panel.border = element_rect(color="black",linewidth=1, fill = NA),
           
           plot.title = element_text(hjust = 0, size = 14),
           axis.text = element_text(size = 12, color = "black"),
