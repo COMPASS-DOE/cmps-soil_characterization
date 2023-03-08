@@ -445,7 +445,7 @@ import_wrc_data = function(FILEPATH){
 
 process_wrc = function(wrc_data){
   
-  wrc_processed <- 
+  #wrc_processed <- 
     wrc_data %>% 
     mutate(source = str_remove(source, ".xlsx")) %>% 
     separate(source, sep = "_", into = c("EC", "kit", "site", "transect")) %>% 
@@ -455,32 +455,75 @@ process_wrc = function(wrc_data){
     mutate(transect = tolower(transect),
            kpa_eval = round((10^pf_eval)/10,2),
            kpa_fit = round((10^pf_fit)/10,2)) %>% 
-    mutate(transect = recode(transect, "wetland" = "wc")) %>% 
+    mutate(transect = recode(transect, "wetland" = "wc"),
+           region = case_when(site %in% c("CC", "OWC", "PR") ~ "WLE",
+                              site %in% c("MSM", "GWI", "GCREW") ~ "CB")) %>% 
     reorder_transect()
   
+}
+
+
+# soil texture
+compute_texture = function(hydrometer_df){
   
- wrc_processed %>% 
-    filter(pf_fit >= 0 | pf_eval >= 0) %>% 
-    ggplot(aes(y = water_content_vol_percent))+
-    geom_line(aes(x = pf_fit))+
-    geom_point(aes(x = pf_eval), shape = 1)+
-    facet_wrap(~site+transect)
- 
- 
- wrc_processed %>% 
-   filter(pf_fit >= 0 | pf_eval >= 0) %>% 
-   ggplot(aes(y = water_content_vol_percent, color = transect))+
-   geom_line(aes(x = kpa_fit/1000))+
-   geom_point(aes(x = kpa_eval/1000), shape = 1)+
-   scale_x_log10(labels = scales::comma)+
-   scale_color_manual(values = rev(soilpalettes::soil_palette("redox2", 3)))+
-   facet_wrap(~site)
+  hydrometer_data_processed = 
+    hydrometer_df %>% 
+    mutate_at(vars(-c(site, sample_id, date_started, notes)), as.numeric) %>% 
+    mutate(wt_dry_soil_g = (wt_jar_soil_g - wt_half_gallon_jar_g) + (wt_sieve_soil_53um_g - wt_sieve_g))
   
+  #
+  # II. COMPUTING PERCENT SAND-SILT-CLAY -----------------------------------
   
+  ## This function will use the equations provided in Gee & Bauder
+  ## to compute % sand, clay, silt
   
+  ## % sand = fraction weight of material collected on the 53 μm sieve.
+  ## % clay = computed using 90 and 1440 minute hydrometer readings
+  ## % silt = 100 - (% sand + % clay)
   
+  compute_soil_texture = function(dat){
+    
+    dat %>% 
+      mutate(
+        B = (30 * 0.0091) / (9.98 * (2.65 - 1)), # constant
+        
+        #h = 16.3 - (0.164 * R),
+        h_90min = 16.3 - (0.164 * reading_90min),
+        h_1440min = 16.3 - (0.164 * reading_1440min),
+        
+        theta_90min = 1000 * (B * h_90min)^0.5,
+        theta_1440min = 1000 * (B * h_1440min)^0.5,
+        
+        # P = summation %
+        P_90min = ((reading_90min - blank_90min)/wt_dry_soil_g) * 100, 
+        P_1440min = ((reading_1440min - blank_1440min)/wt_dry_soil_g) * 100,
+        
+        # X = mean diameter
+        X_90min = theta_90min * (90)^-0.5, 
+        X_1440min = theta_1440min * (1440)^-0.5,
+        
+        m = (P_90min - P_1440min)/log(X_90min/X_1440min),
+        
+        # percent sand-silt-clay
+        percent_clay = (m * log(2/X_1440min)) + P_1440min,
+        percent_sand = ((wt_sieve_soil_53um_g - wt_sieve_g)/wt_dry_soil_g) * 100,
+        percent_silt = 100 - (percent_sand + percent_clay)
+      ) %>% 
+      dplyr::select(site, sample_id, starts_with("percent_"))
+    
+  }
+  soil_texture = compute_soil_texture(dat = hydrometer_data_processed)
+  
+  # process/clean up the data
+  soil_texture %>% 
+    separate(sample_id, sep = "_", into = c("kit_id", "transect")) %>% 
+    mutate(transect = recode(transect, 
+                             "U" = "upland", "T" = "transition", "W" = "wetland"))
   
 }
+
+
+
 
 # Mehlich-P
 import_mehlich = function(FILEPATH){

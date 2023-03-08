@@ -156,6 +156,25 @@ tar_read(gg_xrd)
 ```
 
 
+
+--
+
+## Soil Physics
+
+### WRC
+
+```{r wrc}
+tar_read(gg_wrc)
+
+```
+
+
+### Texture
+```{r texture}
+tar_read(gg_texture)
+```
+
+
 ---
 
 ## Session Info 

@@ -70,7 +70,14 @@ list(
   tar_target(ions_data, import_ions(FILEPATH = "1-data/ions")),
   tar_target(ions_processed, process_ions(ions_data, analysis_key, sample_key, moisture_processed, subsampling)),
   tar_target(xrd_data, import_xrd(FILEPATH = "1-data/xrd")),
-  tar_target(xrd_processed= process_xrd(xrd_data, sample_key)),
+  tar_target(xrd_processed, process_xrd(xrd_data, sample_key)),
+  tar_target(wrc_data, import_wrc_data(FILEPATH = "1-data/wrc")),
+  tar_target(wrc_processed, process_wrc(wrc_data)),
+  tar_target(hydrometer_data, "1-data/particle_size.csv", format = "file"),
+  tar_target(hydrometer_df, read.csv(hydrometer_data)),
+  tar_target(texture_processed, compute_texture(hydrometer_df)),
+  tar_target(gg_wrc, plot_wrc(wrc_processed)),
+  tar_target(gg_texture, plot_texture(texture_processed)),
   
   # analysis - graphs
   ## tar_target(gg_moisture, plot_moisture(moisture_processed, sample_key)),

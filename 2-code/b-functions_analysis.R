@@ -807,3 +807,57 @@ plot_xrd = function(xrd_processed){
     
   
 }
+
+
+
+# soil physics ----
+## water retention curves
+
+plot_wrc = function(wrc_processed){
+  
+  wrc_processed %>% 
+    filter(kpa_fit >= 0 | kpa_eval >= 0) %>% 
+    mutate(region = factor(region, levels = c("WLE", "CB"))) %>% 
+    ggplot(aes(y = water_content_vol_percent, color = transect))+
+    geom_line(aes(x = kpa_fit))+
+    geom_point(aes(x = kpa_eval), shape = 1)+
+    scale_x_log10(labels = scales::comma)+
+    scale_color_manual(values = rev(soilpalettes::soil_palette("redox2", 3)))+
+    labs(color = "")+
+    facet_wrap(~region + site)
+  
+}
+
+## texture
+
+plot_texture = function(texture_processed){
+
+  # plot the soil texture triangle
+  library(ggtern) 
+  data(USDA)
+  
+  gg_texture = 
+    ggtern(data = texture_processed,
+           aes(x = percent_sand, y = percent_clay, z = percent_silt)) +
+    geom_polygon(data = USDA, 
+                 aes(x = Sand, y = Clay, z = Silt, group = Label),
+                 fill = NA, size = 0.3, alpha = 0.5, color = "grey30")+
+    geom_point(aes(color = site, shape = transect),
+               size = 3)+
+    theme_bw()+
+    theme_showarrows()+
+    theme_hidetitles()+
+    theme_clockwise() 
+  
+  USDA_text <- 
+    USDA  %>% 
+    group_by(Label) %>%
+    summarise_if(is.numeric, mean, na.rm = TRUE) %>%
+    ungroup()
+  
+  #textures_names<-
+  gg_texture +
+    geom_text(data = USDA_text,
+              aes(x = Sand, y = Clay, z = Silt, label = Label),
+              size = 3, color = "grey30")
+}
