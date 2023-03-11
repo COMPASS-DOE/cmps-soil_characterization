@@ -41,7 +41,7 @@ list(
   # data files
   tar_target(moisture_data, import_gsheet("1nYzExPmpv01IYalqo2L3pmDsBDvhjdvHYMJo31N5_MA")),
   tar_target(moisture_processed, process_moisture(moisture_data)),
-  tar_target(loi_data, import_gsheet("1vvNKOtewhjR0PVYCLfvpRxY9QiOWzUvRV0WX5ou2qT4")),
+  tar_target(loi_data, import_loi(FILEPATH = "1-data/loi")),
   tar_target(loi_processed, process_loi(loi_data)),
   tar_target(pH_data, import_gsheet("177ZR7O9JpsgVmFfLh72LfJ72oM-oTc6k_r1qE0XHL64")),
   tar_target(pH_processed, process_pH(pH_data)),
@@ -96,11 +96,11 @@ list(
   ## tar_target(gg_ions, plot_ions(ions_processed, sample_key)),
   
   # combined data
-  tar_target(data_combined, combine_data(moisture_processed, pH_processed, tctnts_data_samples, 
+  tar_target(data_combined, combine_data(moisture_processed, pH_processed, tctnts_data_samples, loi_processed,
                                          weoc_processed, din_processed, icp_processed, cec_processed,
                                          ferrozine_processed, mehlich_processed, ions_processed, 
                                          sample_key)$data_combined),
-  tar_target(data_combined_wide, combine_data(moisture_processed, pH_processed, tctnts_data_samples, 
+  tar_target(data_combined_wide, combine_data(moisture_processed, pH_processed, tctnts_data_samples, loi_processed,
                                          weoc_processed, din_processed, icp_processed, cec_processed,
                                          ferrozine_processed, mehlich_processed, ions_processed, 
                                          sample_key)$data_combined_wide),

@@ -47,15 +47,32 @@ process_moisture = function(moisture_dat){
 }
 
 
-# loss on ignition
+## Loss on Ignition
+import_loi = function(FILEPATH){
+  
+  df <- 
+    list.files(path=FILEPATH, pattern = ".csv", full.names = TRUE) %>% 
+    lapply(read_csv, id = "source") %>% 
+    bind_rows
+  
+  df
+}
 process_loi = function(loi_data){
   
-  #loi = 
   loi_data %>%
-    mutate_at(vars(contains("wt_")), as.numeric) %>% 
-  mutate(percent_om = ((wt_tray_drysoil_g - wt_tray_combustedsoil_g)/(wt_tray_drysoil_g - wt_tray_g))*100,
-         percent_om = round(percent_om, 2))  %>% 
-    mutate(analysis = "LOI")
+    janitor::clean_names() %>% 
+    mutate(region = case_when(grepl("WLE", source) ~ "WLE",
+                              grepl("CB", source) ~ "CB")) %>% 
+    mutate(label = case_when((customer_id >= 129 & customer_id <= 214) ~ paste0("COMPASS_May22_", customer_id),
+                             customer_id >= 215 ~ paste0("COMPASS_Aug22_", customer_id)),
+           sample_label = case_when(region == "WLE" ~ sample_label,
+                                    region == "CB" ~ label)) %>% 
+    mutate(percent_om = case_when(region == "CB" ~ percent_om,
+                                  region == "WLE" ~ 100*(wt_tray_drysoil_g - wt_tray_combustedsoil_g)/(wt_tray_drysoil_g - wt_tray_g)),
+           percent_om = round(percent_om, 2)) %>%
+    dplyr::select(sample_label, percent_om) %>% 
+    mutate(analysis = "LOI") %>% 
+    force()
   
 }
 
@@ -808,12 +825,12 @@ process_xrd = function(xrd_data, sample_key){
 
 
 # Combined data
-combine_data = function(moisture_processed, pH_processed, tctnts_data_samples, 
+combine_data = function(moisture_processed, pH_processed, tctnts_data_samples, loi_processed, 
                         weoc_processed, din_processed, icp_processed, cec_processed,
                         ferrozine_processed, mehlich_processed, ions_processed,
                         sample_key){
   
-  df_list = list(moisture_processed, pH_processed, tctnts_data_samples, 
+  df_list = list(moisture_processed, pH_processed, tctnts_data_samples, loi_processed,
                  weoc_processed, din_processed, icp_processed, cec_processed,
                  ferrozine_processed, mehlich_processed, ions_processed)
   
@@ -831,18 +848,20 @@ combine_data = function(moisture_processed, pH_processed, tctnts_data_samples,
   
   data_combined_wide = 
    data_combined %>% 
-   separate(name, sep = "_", into = "variable", remove = F) %>% 
-   mutate(name = paste0(variable, " (", analysis, ")")) %>% 
-   dplyr::select(sample_label, name, value) %>% 
-   pivot_wider() %>% 
-   #  dplyr::select(-c("Ammonia (IC)","Bromide (IC)", "Nitrite (IC)", "Fluoride (IC)")) %>% 
-   left_join(sample_key) %>% 
+   dplyr::select(sample_label, analysis, name, value) %>% 
+    separate(name, sep = "_", into = "variable", remove = F) %>% 
+    mutate(name = paste0(variable, " (", analysis, ")")) %>% 
+    dplyr::select(sample_label, name, value) %>% 
+    pivot_wider() %>% 
+    #  dplyr::select(-c("Ammonia (IC)","Bromide (IC)", "Nitrite (IC)", "Fluoride (IC)")) %>% 
+    left_join(sample_key) %>% 
    #  mutate(`Phosphate (IC)` = case_when(is.na(`Phosphate (IC)`) & site != "GCREW" ~ 0,
    #                                      TRUE ~ `Phosphate (IC)`)) %>% 
    force()
   
   list(data_combined = data_combined,
-       data_combined_wide = data_combined_wide)
+       data_combined_wide = data_combined_wide
+       )
 
 }
 #data_combined = combine_data()  
