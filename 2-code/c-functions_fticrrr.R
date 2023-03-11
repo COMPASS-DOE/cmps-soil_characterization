@@ -493,6 +493,7 @@ compute_icr_pca = function(icr_relabund_samples, sample_key){
     theme(legend.position = "top", legend.box = "vertical")+
     NULL
   
+  library(patchwork)
   biplot_regions = 
     biplot_wle + biplot_cb 
   
