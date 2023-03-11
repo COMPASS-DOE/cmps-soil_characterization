@@ -619,6 +619,9 @@ make_graphs_by_transect = function(data_combined){
     mutate(value = TC_perc/TN_perc)
   gg_cn <- plot_transect_as_x(data = tctn, YLAB = "C:N", TITLE = "Elemental Analysis")
   
+  loi <- combined_surface %>% filter(analysis == "LOI")
+  gg_loi <- plot_transect_as_x(data = loi, YLAB = "% OM", TITLE = "Loss on ignition")
+  
   weoc <- combined_surface %>% filter(analysis == "NPOC")
   gg_weoc <- plot_transect_as_x(data = weoc %>% filter(name == "npoc_ug_g"), YLAB = "WEOC, μg/g", TITLE = "Water Extractable Organic Carbon")
   
@@ -677,6 +680,7 @@ make_graphs_by_transect = function(data_combined){
        gg_tn = gg_tn,
        gg_cn = gg_cn,
        gg_ts = gg_ts,
+       gg_loi = gg_loi,
        gg_weoc = gg_weoc,
        gg_din_nh4n = gg_din_nh4n,
        gg_din_no3n = gg_din_no3n,
@@ -725,6 +729,9 @@ make_graphs_by_site = function(data_combined){
   gg_tn <- plot_site_as_x(data = tctnts %>% filter(name == "TN_perc"), YLAB = "Total N, %", TITLE = "Elemental Analysis")
   gg_ts <- plot_site_as_x(data = tctnts %>% filter(name == "TS_perc"), YLAB = "Total S, %", TITLE = "Elemental Analysis")
   
+  loi <- combined_surface %>% filter(analysis == "LOI")
+  gg_loi <- plot_site_as_x(data = loi, YLAB = "% OM", TITLE = "Loss on ignition")
+  
   weoc <- combined_surface %>% filter(analysis == "NPOC")
   gg_weoc <- plot_site_as_x(data = weoc %>% filter(name == "npoc_ug_g"), YLAB = "WEOC, μg/g", TITLE = "Water Extractable Organic Carbon")
   
@@ -768,6 +775,7 @@ make_graphs_by_site = function(data_combined){
        gg_tc =  gg_tc,
        gg_tn = gg_tn,
        gg_ts = gg_ts,
+       gg_loi = gg_loi,
        gg_weoc = gg_weoc,
        gg_din_nh4n = gg_din_nh4n,
        gg_din_no3n = gg_din_no3n,
