@@ -813,6 +813,221 @@ plot_xrd = function(xrd_processed){
   
 }
 
+plot_ions_piper = function(ions_processed){
+  
+  tic = read_tsv("1-data/tic_owc.txt", skip = 10) %>% janitor::clean_names()
+
+  tic_processed = 
+    tic %>% 
+    dplyr::select(sample_name, result_ic) %>% 
+    rename(analysis_ID = sample_name,
+           tic_mgL = result_ic) %>% 
+    # keep only sampple rows 
+    filter(grepl("DOC_", analysis_ID)) %>% 
+    # join the analysis key to get the sample_label
+    left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) %>% 
+    mutate(Bicarbonate_ppm = tic_mgL * 5) %>% 
+    dplyr::select(sample_label, Bicarbonate_ppm) %>% 
+    left_join(sample_key)
+  
+  
+  
+  
+  
+  
+  ions_long = 
+    ions_processed %>% 
+    dplyr::select(sample_label, ends_with("ppm")) %>% 
+    left_join(tic_processed) %>% 
+    pivot_longer(-sample_label,
+                 names_to = "ion", 
+                 values_to = "ppm") %>% 
+    mutate(group = case_when(grepl("Calcium", ion) ~ "Calcium",
+                             grepl("Magnesium", ion) ~ "Magnesium",
+                             grepl("Sodium|Potassium|Ammoni", ion) ~ "Sodium",
+                             grepl("Chloride|Nitrate|Phosphate", ion) ~ "Chloride",
+                             grepl("Carbonate|Bicarbonate", ion) ~ "Bicarbonate",
+                             grepl("Sulfate", ion) ~ "Sulfate")) %>% 
+    mutate(cation_anion = case_when(grepl("Calcium|Magnesium|Sodium", group) ~ "cation",
+                                    grepl("Chloride|Bicarbonate|Sulfate", group) ~ "anion")) %>% 
+    filter(!is.na(group)) %>% 
+    group_by(sample_label, cation_anion, group) %>% 
+    dplyr::summarise(ppm = sum(ppm)) %>% 
+    group_by(sample_label, cation_anion) %>% 
+    dplyr::mutate(total = sum(ppm),
+                     percent = (ppm/total) * 100)
+
+  ions_wide = ions_long %>% 
+    ungroup() %>% 
+    dplyr::select(-c(cation_anion, ppm, total)) %>% 
+    pivot_wider(names_from = "group", values_from = "percent") 
+  
+  ions_wide2 = 
+    ions_wide %>% 
+    rename(Ca = Calcium,
+           Mg = Magnesium,
+           Cl = Chloride,
+           SO4 = Sulfate)
+  
+  
+  #remotes::install_github("https://github.com/USGS-R/smwrBase")
+  #remotes::install_github("USGS-R/smwrGraphs")
+  
+# smwrGraphs::piperPlot(xCat = ions_wide$Calcium, yCat = ions_wide$Magnesium, zCat = ions_wide$Sodium, 
+#           xAn = ions_wide$Chloride, yAn = ions_wide$Bicarbonate, zAn = ions_wide$Sulfate, 
+#           Plot = list(name = "", what =
+#                         "points", type = "solid", width = "standard", symbol = "circle", filled =
+#                         TRUE, size = 0.09, color = "black"), axis.range = c(0, 100),
+#           num.labels = 6, ticks = FALSE, grids = !ticks,
+#           xCat.title = "Calcium", yCat.title = "Magnesium",
+#           zCat.title = "Sodium plus Potassium",
+#           xAn.title = "Chloride, Fluoride, Nitrite plus Nitrate",
+#           yAn.title = "Carbonate plus Bicarbonate", zAn.title = "Sulfate",
+#           x.yCat.title = "Calcium plus Magnesium",
+#           x.zAn.title = "Sulfate plus Chloride", units.title = "Percent",
+#           caption = "", margin = c(NA, NA, NA, NA))
+
+  
+  ggplot_piper <- function() {
+    library(ggplot2)
+    grid1p1 <<- data.frame(x1 = c(20,40,60,80), x2= c(10,20,30,40),y1 = c(0,0,0,0), y2 = c(17.3206,34.6412,51.9618, 69.2824))
+    grid1p2 <<- data.frame(x1 = c(20,40,60,80), x2= c(60,70,80,90),y1 = c(0,0,0,0), y2 = c(69.2824, 51.9618,34.6412,17.3206))
+    grid1p3 <<- data.frame(x1 = c(10,20,30,40), x2= c(90,80,70,60),y1 = c(17.3206,34.6412,51.9618, 69.2824), y2 = c(17.3206,34.6412,51.9618, 69.2824))
+    grid2p1 <<- grid1p1
+    grid2p1$x1 <- grid2p1$x1+120
+    grid2p1$x2 <- grid2p1$x2+120
+    grid2p2 <<- grid1p2
+    grid2p2$x1 <- grid2p2$x1+120
+    grid2p2$x2 <- grid2p2$x2+120
+    grid2p3 <<- grid1p3
+    grid2p3$x1 <- grid2p3$x1+120
+    grid2p3$x2 <- grid2p3$x2+120
+    grid3p1 <<- data.frame(x1=c(100,90, 80, 70),y1=c(34.6412, 51.9618, 69.2824, 86.603), 
+                           x2=c(150, 140, 130, 120), y2=c(121.2442,138.5648,155.8854,173.2060))
+    grid3p2 <<- data.frame(x1=c(70, 80, 90, 100),y1=c(121.2442,138.5648,155.8854,173.2060), 
+                           x2=c(120, 130, 140, 150), y2=c(34.6412, 51.9618, 69.2824, 86.603))
+    
+    p <- ggplot() +
+      ## left hand ternary plot
+      geom_segment(aes(x=0,y=0, xend=100, yend=0)) +
+      geom_segment(aes(x=0,y=0, xend=50, yend=86.603)) +
+      geom_segment(aes(x=50,y=86.603, xend=100, yend=0)) +
+      ## right hand ternary plot
+      geom_segment(aes(x=120,y=0, xend=220, yend=0)) +
+      geom_segment(aes(x=120,y=0, xend=170, yend=86.603)) +
+      geom_segment(aes(x=170,y=86.603, xend=220, yend=0)) +
+      ## Upper diamond
+      geom_segment(aes(x=110,y=190.5266, xend=60, yend=103.9236)) +
+      geom_segment(aes(x=110,y=190.5266, xend=160, yend=103.9236)) +
+      geom_segment(aes(x=110,y=17.3206, xend=160, yend=103.9236)) +
+      geom_segment(aes(x=110,y=17.3206, xend=60, yend=103.9236)) +
+      ## Add grid lines to the plots
+      geom_segment(aes(x=x1, y=y1, yend=y2, xend=x2), data=grid1p1, linetype = "dashed", size = 0.25, colour = "grey50") +
+      geom_segment(aes(x=x1, y=y1, yend=y2, xend=x2), data=grid1p2, linetype = "dashed", size = 0.25, colour = "grey50") +
+      geom_segment(aes(x=x1, y=y1, yend=y2, xend=x2), data=grid1p3, linetype = "dashed", size = 0.25, colour = "grey50") +
+      geom_segment(aes(x=x1, y=y1, yend=y2, xend=x2), data=grid2p1, linetype = "dashed", size = 0.25, colour = "grey50") +
+      geom_segment(aes(x=x1, y=y1, yend=y2, xend=x2), data=grid2p2, linetype = "dashed", size = 0.25, colour = "grey50") +
+      geom_segment(aes(x=x1, y=y1, yend=y2, xend=x2), data=grid2p3, linetype = "dashed", size = 0.25, colour = "grey50") +
+      geom_segment(aes(x=x1, y=y1, yend=y2, xend=x2), data=grid3p1, linetype = "dashed", size = 0.25, colour = "grey50") +
+      geom_segment(aes(x=x1, y=y1, yend=y2, xend=x2), data=grid3p2, linetype = "dashed", size = 0.25, colour = "grey50") +
+      ### Labels and grid values
+      #geom_text(aes(50,-10, label="Ca^2"), parse=T, size=4) + # Commented out, as parse=TRUE can cause issues
+      
+      geom_text(aes(c(20,40,60,80),c(-5,-5,-5,-5), label=c(80, 60, 40, 20)), size=3) +
+      geom_text(aes(c(35,25,15,5),grid1p2$y2, label=c(80, 60, 40, 20)), size=3) +
+      geom_text(aes(c(95,85,75,65),grid1p3$y2, label=c(80, 60, 40, 20)), size=3) +
+      # geom_text(aes(17,50, label="Mg^2"), parse=T, angle=60, size=4) +
+      coord_equal(ratio=1)+  
+      geom_text(aes(17,50, label="Mg^2"), angle=60, size=4, parse=TRUE) +  
+      geom_text(aes(82.5,50, label="Na + K"), angle=-60, size=4) +
+      geom_text(aes(50,-10, label="Ca^2"), size=4, parse=TRUE) +
+      
+      
+      geom_text(aes(170,-10, label="Cl^-phantom()"), size=4, parse=TRUE) +
+      geom_text(aes(205,50, label="SO^4"), angle=-60, size=4, parse=TRUE) +
+      geom_text(aes(137.5,50, label="Alkalinity~as~HCO^3"), angle=60, size=4, parse=TRUE) +
+      geom_text(aes(72.5,150, label="SO^4~+~Cl^-phantom()"), angle=60, size=4, parse=TRUE) +
+      geom_text(aes(147.5,150, label="Ca^2~+~Mg^2"), angle=-60, size=4, parse=TRUE) + 
+      
+      geom_text(aes(c(155,145,135,125),grid2p2$y2, label=c(20, 40, 60, 80)), size=3) +
+      geom_text(aes(c(215,205,195,185),grid2p3$y2, label=c(20, 40, 60, 80)), size=3) +
+      geom_text(aes(c(140,160,180,200),c(-5,-5,-5,-5), label=c(20, 40, 60, 80)), size=3) +
+      geom_text(aes(grid3p1$x1-5,grid3p1$y1, label=c(80, 60, 40, 20)), size=3) +
+      geom_text(aes(grid3p1$x2+5,grid3p1$y2, label=c(20, 40, 60, 80)), size=3) +
+      geom_text(aes(grid3p2$x1-5,grid3p2$y1, label=c(20, 40, 60, 80)), size=3) +
+      geom_text(aes(grid3p2$x2+5,grid3p2$y2, label=c(80, 60, 40, 20)), size=3) +
+      theme_bw() +
+      theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+            panel.border = element_blank(), axis.ticks = element_blank(),
+            axis.text.x = element_blank(), axis.text.y = element_blank(),
+            axis.title.x = element_blank(), axis.title.y = element_blank())
+    return(p)
+  }
+  
+  
+  transform_piper_data <- function(Mg, Ca, Cl, SO4, name=NULL){
+    if(is.null(name)){
+      name = rep(1:length(Mg),3)
+    } else {
+      name = rep(name,3)
+    }
+    y1 <- Mg * 0.86603
+    x1 <- 100*(1-(Ca/100) - (Mg/200))
+    y2 <- SO4 * 0.86603
+    x2 <-120+(100*Cl/100 + 0.5 * 100*SO4/100)
+    new_point <- function(x1, x2, y1, y2, grad=1.73206){
+      b1 <- y1-(grad*x1)
+      b2 <- y2-(-grad*x2)
+      M <- matrix(c(grad, -grad, -1,-1), ncol=2)
+      intercepts <- as.matrix(c(b1,b2))
+      t_mat <- -solve(M) %*% intercepts
+      data.frame(x=t_mat[1,1], y=t_mat[2,1])
+    }
+    np_list <- lapply(1:length(x1), function(i) new_point(x1[i], x2[i], y1[i], y2[i]))
+    npoints <- do.call("rbind",np_list)
+    data.frame(observation=name,x=c(x1, x2, npoints$x), y=c(y=y1, y2, npoints$y))
+  }
+  
+  data=as.data.frame(list("Ca"=c(43,10,73,26,32),"Mg"=c(30,50,3,14,12),Cl=c(24,10,12,30,43),"SO4"=c(24,10,12,30,43),"WaterType"=c(2,2,1,2,3)),row.names=c("A","B","C","D","E"))
+  piper_data <- transform_piper_data(Ca=data$Ca, Mg = data$Mg, Cl=data$Cl, SO4= data$SO4, name=data$WaterType)
+  
+  
+  piper_data2 = transform_piper_data(Ca = ions_wide$Calcium, Mg = ions_wide$Magnesium, SO4 = ions_wide$Sulfate, Cl = ions_wide$Chloride,
+                                     name = ions_wide$sample_label) %>% 
+    rename(sample_label = observation) %>% 
+    left_join(sample_key)
+  
+  ggplot_piper() + geom_point(aes(x,y), data=piper_data)
+  ggplot_piper() + 
+    geom_point(aes(x,y, 
+                   color = transect, shape = region), 
+               size = 5, stroke = 1,
+               data=piper_data2 %>% filter(region == "WLE"))
+    scale_shape_manual(values = c(21,22,23))
+  
+
+    
+  # pca ----
+  # 
+  ions_pca = fit_pca_function(ions_processed %>% dplyr::select(sample_label, ends_with("ppm"), -Bromide_ppm) %>% left_join(sample_key) %>% filter(region == "WLE"))
+
+  ggbiplot(ions_pca$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(ions_pca$grp$transect), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+    geom_point(size=3,stroke=1, alpha = 1,
+               aes(shape = ions_pca$grp$region,
+                   color = groups))+ 
+    scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+                       values = pal_transect)+
+    labs(shape="",
+         title = "PCA: CB",
+         subtitle = "surface horizons")+
+    theme_kp()+
+    theme(legend.position = "top", legend.box = "vertical")+
+    NULL
+  
+  }
+
 
 
 
