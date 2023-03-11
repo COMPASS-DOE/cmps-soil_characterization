@@ -816,7 +816,8 @@ plot_xrd = function(xrd_processed){
   xrd_summary %>% 
     ggplot(aes(x = sample_label, y = percentage, fill = mineral))+
     geom_bar(stat = "identity")+
-    facet_grid(horizon ~ region + site + transect, scales = "free_x")
+    facet_grid(horizon ~ region + site + transect, scales = "free_x")+
+    theme_kp()
     
   
 }
@@ -1053,7 +1054,8 @@ plot_wrc = function(wrc_processed){
     scale_x_log10(labels = scales::comma)+
     scale_color_manual(values = rev(soilpalettes::soil_palette("redox2", 3)))+
     labs(color = "")+
-    facet_wrap(~region + site)
+    facet_wrap(~region + site)+
+    theme_kp()
   
 }
 
