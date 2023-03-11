@@ -157,13 +157,13 @@ tar_read(gg_xrd)
 
 
 
---
+---
 
 ## Soil Physics
 
 ### WRC
 
-```{r wrc}
+```{r wrc, fig.height=7, fig.width=8}
 tar_read(gg_wrc)
 
 ```
