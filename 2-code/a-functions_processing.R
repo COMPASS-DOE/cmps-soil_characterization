@@ -18,15 +18,15 @@ reorder_horizon = function(dat){
   dat %>% 
     mutate(horizon = factor(horizon, levels = c("O", "A", "B")))
 }
-
 reorder_transect = function(dat){
   dat %>% 
     mutate(transect = factor(transect, levels = c("upland", "transition", "wte", "wc", "wetland")))
 }
 
 
-# process data ------------------------------------------------------------
-# Moisture
+# Chemistry data ----------------------------------------------------------
+
+## Moisture
 process_moisture = function(moisture_dat){
 #  moisture_processed = 
     moisture_dat %>% 
@@ -75,6 +75,7 @@ process_loi = function(loi_data){
     force()
   
 }
+
 
 # pH
 process_pH = function(pH_data){
@@ -342,8 +343,6 @@ import_iron = function(FILEPATH){
        ferrozine_data = ferrozine_data)
   
 }
-
-
 process_iron = function(ferrozine_map, ferrozine_data, moisture_processed, subsampling){
   
   # clean the map
@@ -438,109 +437,6 @@ process_iron = function(ferrozine_map, ferrozine_data, moisture_processed, subsa
     samples2
   }
 
-# Water retention curves
-import_wrc_data = function(FILEPATH){
-  
-  filePaths_wrc <- list.files(path = FILEPATH, pattern = "xlsx", full.names = TRUE, recursive = FALSE)
-  wrc_data <- do.call(bind_rows, lapply(filePaths_wrc, function(path) {
-    
-    # importing both, the evaluated values and the fitted values
-    df_eval <- readxl::read_excel(path, sheet = "Evaluation-Retention Θ(pF)") %>% mutate_all(as.character) %>% janitor::clean_names()
-    df_eval = df_eval %>% mutate(source = basename(path)) %>% dplyr::select(p_f, water_content_vol_percent, source) %>% rename(pf_eval = p_f)
-    
-    df_fit <- readxl::read_excel(path, sheet = "Fitting-Retention Θ(pF)") %>% mutate_all(as.character) %>% janitor::clean_names()
-    df_fit = df_fit %>% mutate(source = basename(path)) %>% dplyr::select(p_f, water_content_vol_percent, source) %>% rename(pf_fit = p_f)
-    
-    df <- full_join(df_eval, df_fit)
-    df
-  }
-  
-  ))
-
-}
-#wrc_data = import_wrc_data(FILEPATH = "1-data/wrc")
-
-process_wrc = function(wrc_data){
-  
-  #wrc_processed <- 
-    wrc_data %>% 
-    mutate(source = str_remove(source, ".xlsx")) %>% 
-    separate(source, sep = "_", into = c("EC", "kit", "site", "transect")) %>% 
-    dplyr::select(site, transect, water_content_vol_percent, starts_with("pf")) %>% 
-    mutate_at(vars(starts_with("pf")), as.numeric) %>% 
-    mutate_at(vars(starts_with("water")), as.numeric) %>% 
-    mutate(transect = tolower(transect),
-           kpa_eval = round((10^pf_eval)/10,2),
-           kpa_fit = round((10^pf_fit)/10,2)) %>% 
-    mutate(transect = recode(transect, "wetland" = "wc"),
-           region = case_when(site %in% c("CC", "OWC", "PR") ~ "WLE",
-                              site %in% c("MSM", "GWI", "GCREW") ~ "CB")) %>% 
-    reorder_transect()
-  
-}
-
-
-# soil texture
-compute_texture = function(hydrometer_df){
-  
-  hydrometer_data_processed = 
-    hydrometer_df %>% 
-    mutate_at(vars(-c(site, sample_id, date_started, notes)), as.numeric) %>% 
-    mutate(wt_dry_soil_g = (wt_jar_soil_g - wt_half_gallon_jar_g) + (wt_sieve_soil_53um_g - wt_sieve_g))
-  
-  #
-  # II. COMPUTING PERCENT SAND-SILT-CLAY -----------------------------------
-  
-  ## This function will use the equations provided in Gee & Bauder
-  ## to compute % sand, clay, silt
-  
-  ## % sand = fraction weight of material collected on the 53 μm sieve.
-  ## % clay = computed using 90 and 1440 minute hydrometer readings
-  ## % silt = 100 - (% sand + % clay)
-  
-  compute_soil_texture = function(dat){
-    
-    dat %>% 
-      mutate(
-        B = (30 * 0.0091) / (9.98 * (2.65 - 1)), # constant
-        
-        #h = 16.3 - (0.164 * R),
-        h_90min = 16.3 - (0.164 * reading_90min),
-        h_1440min = 16.3 - (0.164 * reading_1440min),
-        
-        theta_90min = 1000 * (B * h_90min)^0.5,
-        theta_1440min = 1000 * (B * h_1440min)^0.5,
-        
-        # P = summation %
-        P_90min = ((reading_90min - blank_90min)/wt_dry_soil_g) * 100, 
-        P_1440min = ((reading_1440min - blank_1440min)/wt_dry_soil_g) * 100,
-        
-        # X = mean diameter
-        X_90min = theta_90min * (90)^-0.5, 
-        X_1440min = theta_1440min * (1440)^-0.5,
-        
-        m = (P_90min - P_1440min)/log(X_90min/X_1440min),
-        
-        # percent sand-silt-clay
-        percent_clay = (m * log(2/X_1440min)) + P_1440min,
-        percent_sand = ((wt_sieve_soil_53um_g - wt_sieve_g)/wt_dry_soil_g) * 100,
-        percent_silt = 100 - (percent_sand + percent_clay)
-      ) %>% 
-      dplyr::select(site, sample_id, starts_with("percent_"))
-    
-  }
-  soil_texture = compute_soil_texture(dat = hydrometer_data_processed)
-  
-  # process/clean up the data
-  soil_texture %>% 
-    separate(sample_id, sep = "_", into = c("kit_id", "transect")) %>% 
-    mutate(transect = recode(transect, 
-                             "U" = "upland", "T" = "transition", "W" = "wetland"))
-  
-}
-
-
-
 
 # Mehlich-P
 import_mehlich = function(FILEPATH){
@@ -560,7 +456,6 @@ import_mehlich = function(FILEPATH){
 }
 #mehlich_map = import_mehlich(FILEPATH)$mehlich_map
 #mehlich_data = import_mehlich(FILEPATH)$mehlich_data
-
 process_mehlich = function(mehlich_map, mehlich_data, moisture_processed, subsampling){
   
   # clean the map
@@ -688,7 +583,6 @@ import_ions = function(FILEPATH){
   ions
 }
 #ions_data = import_ions(FILEPATH = "1-data/ions")
-
 process_ions = function(ions_data, analysis_key, sample_key, moisture_processed, subsampling){
   
   ions = 
@@ -784,6 +678,110 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
   }
 
 
+#
+# Physics and mineralogy --------------------------------------------------
+
+# Water retention curves
+import_wrc_data = function(FILEPATH){
+  
+  filePaths_wrc <- list.files(path = FILEPATH, pattern = "xlsx", full.names = TRUE, recursive = FALSE)
+  wrc_data <- do.call(bind_rows, lapply(filePaths_wrc, function(path) {
+    
+    # importing both, the evaluated values and the fitted values
+    df_eval <- readxl::read_excel(path, sheet = "Evaluation-Retention Θ(pF)") %>% mutate_all(as.character) %>% janitor::clean_names()
+    df_eval = df_eval %>% mutate(source = basename(path)) %>% dplyr::select(p_f, water_content_vol_percent, source) %>% rename(pf_eval = p_f)
+    
+    df_fit <- readxl::read_excel(path, sheet = "Fitting-Retention Θ(pF)") %>% mutate_all(as.character) %>% janitor::clean_names()
+    df_fit = df_fit %>% mutate(source = basename(path)) %>% dplyr::select(p_f, water_content_vol_percent, source) %>% rename(pf_fit = p_f)
+    
+    df <- full_join(df_eval, df_fit)
+    df
+  }
+  
+  ))
+  
+}
+#wrc_data = import_wrc_data(FILEPATH = "1-data/wrc")
+process_wrc = function(wrc_data){
+  
+  #wrc_processed <- 
+  wrc_data %>% 
+    mutate(source = str_remove(source, ".xlsx")) %>% 
+    separate(source, sep = "_", into = c("EC", "kit", "site", "transect")) %>% 
+    dplyr::select(site, transect, water_content_vol_percent, starts_with("pf")) %>% 
+    mutate_at(vars(starts_with("pf")), as.numeric) %>% 
+    mutate_at(vars(starts_with("water")), as.numeric) %>% 
+    mutate(transect = tolower(transect),
+           kpa_eval = round((10^pf_eval)/10,2),
+           kpa_fit = round((10^pf_fit)/10,2)) %>% 
+    mutate(transect = recode(transect, "wetland" = "wc"),
+           region = case_when(site %in% c("CC", "OWC", "PR") ~ "WLE",
+                              site %in% c("MSM", "GWI", "GCREW") ~ "CB")) %>% 
+    reorder_transect()
+  
+}
+
+
+# soil texture
+compute_texture = function(hydrometer_df){
+  
+  hydrometer_data_processed = 
+    hydrometer_df %>% 
+    mutate_at(vars(-c(site, sample_id, date_started, notes)), as.numeric) %>% 
+    mutate(wt_dry_soil_g = (wt_jar_soil_g - wt_half_gallon_jar_g) + (wt_sieve_soil_53um_g - wt_sieve_g))
+  
+  #
+  # II. COMPUTING PERCENT SAND-SILT-CLAY -----------------------------------
+  
+  ## This function will use the equations provided in Gee & Bauder
+  ## to compute % sand, clay, silt
+  
+  ## % sand = fraction weight of material collected on the 53 μm sieve.
+  ## % clay = computed using 90 and 1440 minute hydrometer readings
+  ## % silt = 100 - (% sand + % clay)
+  
+  compute_soil_texture = function(dat){
+    
+    dat %>% 
+      mutate(
+        B = (30 * 0.0091) / (9.98 * (2.65 - 1)), # constant
+        
+        #h = 16.3 - (0.164 * R),
+        h_90min = 16.3 - (0.164 * reading_90min),
+        h_1440min = 16.3 - (0.164 * reading_1440min),
+        
+        theta_90min = 1000 * (B * h_90min)^0.5,
+        theta_1440min = 1000 * (B * h_1440min)^0.5,
+        
+        # P = summation %
+        P_90min = ((reading_90min - blank_90min)/wt_dry_soil_g) * 100, 
+        P_1440min = ((reading_1440min - blank_1440min)/wt_dry_soil_g) * 100,
+        
+        # X = mean diameter
+        X_90min = theta_90min * (90)^-0.5, 
+        X_1440min = theta_1440min * (1440)^-0.5,
+        
+        m = (P_90min - P_1440min)/log(X_90min/X_1440min),
+        
+        # percent sand-silt-clay
+        percent_clay = (m * log(2/X_1440min)) + P_1440min,
+        percent_sand = ((wt_sieve_soil_53um_g - wt_sieve_g)/wt_dry_soil_g) * 100,
+        percent_silt = 100 - (percent_sand + percent_clay)
+      ) %>% 
+      dplyr::select(site, sample_id, starts_with("percent_"))
+    
+  }
+  soil_texture = compute_soil_texture(dat = hydrometer_data_processed)
+  
+  # process/clean up the data
+  soil_texture %>% 
+    separate(sample_id, sep = "_", into = c("kit_id", "transect")) %>% 
+    mutate(transect = recode(transect, 
+                             "U" = "upland", "T" = "transition", "W" = "wetland"))
+  
+}
+
+
 ## XRD
 import_xrd = function(FILEPATH){
   
@@ -794,8 +792,6 @@ import_xrd = function(FILEPATH){
     }))
 }
 #xrd_data = import_xrd(FILEPATH = "1-data/xrd")
-
-
 process_xrd = function(xrd_data, sample_key){
   
   processed = 
@@ -823,8 +819,8 @@ process_xrd = function(xrd_data, sample_key){
   }
 
 
-
-# Combined data
+#
+# Combined chemistry data -------------------------------------------------
 combine_data = function(moisture_processed, pH_processed, tctnts_data_samples, loi_processed, 
                         weoc_processed, din_processed, icp_processed, cec_processed,
                         ferrozine_processed, mehlich_processed, ions_processed,
