@@ -406,7 +406,7 @@ library(vegan)
 library(patchwork)
 
 
-fit_pca_function = function(icr_relabund_samples, sample_key){
+fit_pca_function_icr = function(icr_relabund_samples, sample_key){
   relabund_pca =
     icr_relabund_samples %>% 
     left_join(sample_key) %>% 
@@ -439,9 +439,9 @@ compute_icr_pca = function(icr_relabund_samples, sample_key){
     sample_key %>% 
     mutate(transect = recode(transect, "wc" = "wetland"))
   
-  pca_overall = fit_pca_function(icr_relabund_samples, sample_key)
-  pca_wle = fit_pca_function(icr_relabund_samples, sample_key %>% filter(region == "WLE"))
-  pca_cb = fit_pca_function(icr_relabund_samples, sample_key %>% filter(region == "CB"))
+  pca_overall = fit_pca_function_icr(icr_relabund_samples, sample_key)
+  pca_wle = fit_pca_function_icr(icr_relabund_samples, sample_key %>% filter(region == "WLE"))
+  pca_cb = fit_pca_function_icr(icr_relabund_samples, sample_key %>% filter(region == "CB"))
   
   
   # PCA biplots
