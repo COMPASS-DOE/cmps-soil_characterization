@@ -262,7 +262,8 @@ plot_vankrevelen = function(icr_data_trt, icr_meta){
   vk_domains = 
     icr_meta %>% 
     dplyr::select(formula, HC, OC, Class_detailed, Class) %>% 
-    gg_vankrev(aes(x = OC, y = HC, color = Class))
+    gg_vankrev(aes(x = OC, y = HC, color = Class))+
+    theme_kp()
   
   
   data_hcoc = 
@@ -282,6 +283,7 @@ plot_vankrevelen = function(icr_data_trt, icr_meta){
          title = "FTICR: all peaks (blank corrected)",
          subtitle = "WLE sites")+
     facet_wrap(~site+horizon)+
+    theme_kp()+
     NULL
   
   vk_cb = 
@@ -295,6 +297,7 @@ plot_vankrevelen = function(icr_data_trt, icr_meta){
          title = "FTICR: all peaks (blank corrected)",
          subtitle = "CB sites")+
     facet_wrap(~site+horizon)+
+    theme_kp()+
     NULL
   
   
@@ -327,7 +330,8 @@ plot_vankrevelen_unique = function(icr_data_trt, icr_meta){
     labs(color = "")+
     facet_grid(site ~ horizon)+
     labs(title = "FTICR Unique Peaks",
-         subtitle = "WLE sites")
+         subtitle = "WLE sites")+
+    theme_kp()
   
   
   vk_unique_cb = 
@@ -340,7 +344,8 @@ plot_vankrevelen_unique = function(icr_data_trt, icr_meta){
     labs(color = "")+
     facet_grid(site ~ horizon)+
     labs(title = "FTICR Unique Peaks",
-         subtitle = "CB sites")
+         subtitle = "CB sites")+
+    theme_kp()
   
   
   list(vk_unique_wle = vk_unique_wle,
@@ -457,6 +462,7 @@ compute_icr_pca = function(icr_relabund_samples, sample_key){
     xlim(-4,4)+
     ylim(-3.5,3.5)+
     labs(color = "", shape = "")+
+    theme_kp()+
     theme(legend.position = "top", legend.box = "vertical")+
     NULL
   
@@ -473,6 +479,7 @@ compute_icr_pca = function(icr_relabund_samples, sample_key){
          color = "", shape = "")+
     xlim(-4,4)+
     ylim(-3.5,3.5)+
+    theme_kp()+
     theme(legend.position = "top", legend.box = "vertical")+
     NULL
   
@@ -490,6 +497,7 @@ compute_icr_pca = function(icr_relabund_samples, sample_key){
          color = "", shape = "")+
     xlim(-4,4)+
     ylim(-3.5,3.5)+
+    theme_kp()+
     theme(legend.position = "top", legend.box = "vertical")+
     NULL
   
