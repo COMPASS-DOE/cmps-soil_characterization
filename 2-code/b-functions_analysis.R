@@ -370,6 +370,7 @@ compute_overall_pca = function(data_combined_wide, sample_key){
     filter(horizon != "B") %>% 
     dplyr::select(-"Bromide (IC)") %>% 
     filter(sample_label != "COMPASS_Dec2021_016") %>% 
+    dplyr::select(-ends_with("(IC)"), -"S (ICP)", -"Fe (ICP)", -"P (ICP)") %>% 
     force() 
   
   combined_surface_no_ferrozine = 
@@ -377,9 +378,9 @@ compute_overall_pca = function(data_combined_wide, sample_key){
     dplyr::select(-ends_with("(Ferrozine)"))
   
   ## PCA input files ----
-  pca_overall = fit_pca_function(combined_surface_no_ferrozine %>% dplyr::select(-ends_with("(IC)"), -"S (ICP)"))
-  pca_overall_wle = fit_pca_function(combined_surface_no_ferrozine %>% filter(region == "WLE"))
-  pca_overall_cb = fit_pca_function(combined_surface %>% filter(region == "CB") %>% dplyr::select(-ends_with("(IC)"), -"S (ICP)"))
+  pca_overall = fit_pca_function(combined_surface_no_ferrozine)
+  pca_overall_wle = fit_pca_function(combined_surface_no_ferrozine %>% filter(region == "WLE") %>% dplyr::select(-ends_with("(IC)")))
+  pca_overall_cb = fit_pca_function(combined_surface %>% filter(region == "CB") %>% dplyr::select(-ends_with("(IC)")))
   
   
   ## PCA plots overall ----
@@ -441,8 +442,11 @@ compute_overall_pca = function(data_combined_wide, sample_key){
     theme(legend.position = "top", legend.box = "vertical")+
     NULL
   
+  library(patchwork)
+  gg_pca_regions = gg_pca_wle + gg_pca_cb
+  
   list(gg_pca_overall = gg_pca_overall,
-       gg_pca_regions = gg_pca_wle + gg_pca_cb)
+       gg_pca_regions = gg_pca_regions)
   
 }
 
@@ -578,6 +582,7 @@ plot_site_as_x = function(data, YLAB, TITLE = "", SUBTITLE = ""){
     geom_point(position = position_dodge(width = 0.4),
                size = 2, stroke = 1)+
     facet_wrap(region ~ ., scales = "free_x")+
+    theme_kp()+
     labs(y = YLAB,
          x = "",
          title = TITLE,
@@ -702,10 +707,10 @@ make_graphs_by_site = function(data_combined){
     data_combined 
   
   
-  combined_surface = 
-    data_combined %>% 
-    filter(horizon != "B") %>% 
-    force() 
+ # combined_surface = 
+ #   data_combined %>% 
+ #   filter(horizon != "B") %>% 
+ #   force() 
   
   gwc <- combined_surface %>% filter(analysis == "GWC")
   gg_gwc <- plot_site_as_x(data = gwc, YLAB = "Gravimetric water, %", TITLE = "Gravimetric Water Content")
@@ -807,6 +812,7 @@ plot_xrd = function(xrd_processed){
     
   
 }
+
 
 
 
