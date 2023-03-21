@@ -1116,3 +1116,26 @@ plot_texture = function(texture_processed){
               size = 3, color = "grey30")
 }
 
+########################
+
+# make summary tables
+make_summary_tables <- function(data_combined){
+  
+  data_combined_summary <- 
+    data_combined %>% 
+    filter(horizon != "B") %>% 
+    group_by(analysis, name, region, transect, horizon) %>% 
+    dplyr::summarise(mean = mean(value),
+                     mean = round(mean, 2),
+                     sd = sd(value),
+                     se = sd/sqrt(n()),
+                     se = round(se, 2)) %>% 
+    mutate(region_transect = paste0(region, "_", transect),
+           mean_se = paste(mean, "\u00b1", se)) %>% 
+    ungroup() %>% 
+    dplyr::select(-c(region, transect, mean, sd, se)) %>% 
+    pivot_wider(names_from = region_transect, values_from = mean_se)
+  
+  
+  
+}
