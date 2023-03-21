@@ -198,6 +198,59 @@ process_weoc = function(weoc_data, analysis_key, moisture_processed, subsampling
   npoc_samples
 }
 
+# TIC
+import_dic_data = function(FILEPATH){
+  
+  filePaths_dic <- list.files(path = FILEPATH, pattern = ".txt", full.names = TRUE)
+  dic_dat <- do.call(bind_rows, lapply(filePaths_dic, function(path) {
+    df <- read_tsv(path, skip = 10)
+    df}))
+  
+  
+}
+#dic_data = import_dic_data(FILEPATH = "1-data/dic")
+process_dic = function(dic_data, analysis_key, moisture_processed, subsampling){
+  
+  dic_processed = 
+    dic_data %>% 
+    janitor::clean_names() %>% 
+    dplyr::select(sample_name, result_ic) %>% 
+    rename(analysis_ID = sample_name,
+           tic_mgL = result_ic) %>% 
+    # keep only sampple rows 
+    filter(grepl("DOC_", analysis_ID)) %>% 
+    # join the analysis key to get the sample_label
+    left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) 
+  
+  BLANK = 
+    dic_processed %>% 
+    filter(sample_label == "blank-filter") %>% 
+    pull(tic_mgL) %>% mean()
+  
+  dic_samples = 
+    dic_processed %>% 
+    filter(grepl("COMPASS_", sample_label)) %>% 
+    mutate(dic_mgL_corr = tic_mgL - BLANK,
+           dic_flag = case_when(dic_mgL_corr < 0 ~ "below_detect"),
+           dic_mgL_corr = case_when(dic_mgL_corr < 0 ~ 0,
+                                    TRUE ~ dic_mgL_corr)) %>% 
+    # join gwc and subsampling weights to normalize data to soil weight
+    left_join(moisture_processed) %>% 
+    left_join(subsampling %>% dplyr::select(notes, sample_label, WSOC_g)) %>% 
+    rename(fm_g = WSOC_g) %>% 
+    mutate(od_g = fm_g/((gwc_perc/100)+1),
+           soilwater_g = fm_g - od_g,
+           dic_ug_g = dic_mgL_corr * ((40 + soilwater_g)/od_g),
+           dic_ug_g = round(dic_ug_g, 2)) %>% 
+    dplyr::select(sample_label, dic_mgL_corr, dic_ug_g, dic_flag)
+  
+  dic_samples
+  
+  ##    mutate(Bicarbonate_ppm = tic_mgL * 5) %>% 
+  ##    dplyr::select(sample_label, Bicarbonate_ppm) %>% 
+  ##    left_join(sample_key)
+  
+}
 
 # DIN
 import_din_data = function(FILEPATH){
@@ -674,7 +727,39 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     mutate_all(as.character) %>% 
     mutate_at(vars(ends_with(c("ppm", "ug_g"))), as.numeric)
     
-  samples2
+  
+  # convert to meq
+  charges = 
+    tribble(
+      ~ion, ~charge, ~atomic_wt,
+      "Sodium", 1, 23,
+      "Potassium", 1, 39,
+      "Calcium", 2, 40,
+      "Magnesium", 2, 24,
+      "Chloride", 1, 35.5,
+      "Nitrate", 1, 62,
+      "Phosphate", 3, 95,
+      "Sulfate", 2, 96,
+      "Fluoride", 1, 19,
+      "Bromide", 1, 80,
+      "Ammonia", 1, 18
+    )
+  
+  samples_meq = 
+    samples2 %>%
+    dplyr::select(sample_label, analysis, ends_with("ug_g")) %>% 
+    pivot_longer(-c(sample_label, analysis), values_to = "ug_g") %>% 
+    separate(name, sep = "_", into = "ion", remove = F) %>% 
+    left_join(charges) %>% 
+    mutate(meq_100g = ug_g * charge/atomic_wt * 100/1000) %>% 
+    filter(!is.na(meq_100g)) %>% 
+    mutate(ion = paste0(ion, "_meq100g")) %>% 
+    dplyr::select(sample_label, analysis, ion, meq_100g) %>% 
+    pivot_wider(names_from = "ion", values_from = "meq_100g") %>% 
+    force()
+    
+  list(samples2 = samples2,
+       samples_meq = samples_meq)
   }
 
 
