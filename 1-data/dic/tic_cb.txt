@@ -1,0 +1,119 @@
+[Header]	
+System	salt-9mL	
+S/W Version	1.00	
+User		
+Date/Time	3/20/2023 6:48:43 PM	
+
+[System]	
+Instrument Options	TOC/ASI/IC Unit/TN/Sparge Kit/	
+
+[Data]	
+Type	Anal.	Sample Name	Sample ID	Result(TOC)	Result(TC)	Result(IC)	Result(POC)	Result(NPOC)	Result(TN)	Unit	Vial	Date / Time	
+Standard	IC	Untitled	Untitled			100.0				mg/L	88, 89, 90, 91, 92, 93	3/14/2023 3:03:58 PM	
+Unknown	IC	chkstd-10ppm	Untitled			11.17				mg/L	80	3/14/2023 3:12:14 PM	
+Unknown	IC	DIW	Untitled			-0.3159				mg/L	81	3/14/2023 3:19:48 PM	
+Unknown	IC	DOC_CMPS_KFP_0271	Untitled			0.01352				mg/L	1	3/14/2023 3:29:35 PM	
+Unknown	IC	DOC_CMPS_KFP_0272	Untitled			-0.1068				mg/L	2	3/14/2023 3:37:02 PM	
+Unknown	IC	DOC_CMPS_KFP_0273	Untitled			-0.07953				mg/L	3	3/14/2023 3:44:31 PM	
+Unknown	IC	DOC_CMPS_KFP_0274	Untitled			-0.1795				mg/L	4	3/14/2023 3:54:18 PM	
+Unknown	IC	DOC_CMPS_KFP_0275	Untitled			-0.1831				mg/L	5	3/14/2023 4:01:42 PM	
+Unknown	IC	DOC_CMPS_KFP_0276	Untitled			-0.07274				mg/L	6	3/14/2023 4:09:13 PM	
+Unknown	IC	DOC_CMPS_KFP_0277	Untitled			-0.1354				mg/L	7	3/14/2023 4:16:44 PM	
+Unknown	IC	DOC_CMPS_KFP_0278	Untitled			-0.04231				mg/L	8	3/14/2023 4:24:16 PM	
+Unknown	IC	DOC_CMPS_KFP_0279	Untitled			1.142				mg/L	9	3/14/2023 4:31:52 PM	
+Unknown	IC	DOC_CMPS_KFP_0280	Untitled			0.02862				mg/L	10	3/14/2023 4:39:24 PM	
+Unknown	IC	DOC_CMPS_KFP_0281	Untitled			0.04477				mg/L	11	3/14/2023 4:46:55 PM	
+Unknown	IC	DOC_CMPS_KFP_0282	Untitled			0.08749				mg/L	12	3/14/2023 4:54:26 PM	
+Unknown	IC	DOC_CMPS_KFP_0283	Untitled			-0.1432				mg/L	13	3/14/2023 5:04:05 PM	
+Unknown	IC	DOC_CMPS_KFP_0284	Untitled			0.04126				mg/L	14	3/14/2023 5:11:45 PM	
+Unknown	IC	DOC_CMPS_KFP_0285	Untitled			0.4271				mg/L	15	3/14/2023 5:21:43 PM	
+Unknown	IC	DOC_CMPS_KFP_0286	Untitled			0.01610				mg/L	16	3/14/2023 5:31:21 PM	
+Unknown	IC	DOC_CMPS_KFP_0287	Untitled			1.720				mg/L	17	3/14/2023 5:38:53 PM	
+Unknown	IC	DOC_CMPS_KFP_0288	Untitled			0.01399				mg/L	18	3/14/2023 5:46:24 PM	
+Unknown	IC	DOC_CMPS_KFP_0289	Untitled			0.00872				mg/L	19	3/14/2023 5:53:55 PM	
+Unknown	IC	DOC_CMPS_KFP_0290	Untitled			0.2783				mg/L	20	3/14/2023 6:03:34 PM	
+Unknown	IC	DOC_CMPS_KFP_0291	Untitled			-0.1447				mg/L	21	3/14/2023 6:11:00 PM	
+Unknown	IC	chkstd-10ppm	Untitled			11.28				mg/L	82	3/14/2023 6:19:02 PM	
+Unknown	IC	DIW	Untitled			0.06408				mg/L	83	3/14/2023 6:29:29 PM	
+Unknown	IC	DOC_CMPS_KFP_0292	Untitled			-0.1679				mg/L	22	3/14/2023 6:39:21 PM	
+Unknown	IC	DOC_CMPS_KFP_0293	Untitled			0.3741				mg/L	23	3/14/2023 6:48:56 PM	
+Unknown	IC	DOC_CMPS_KFP_0294	Untitled			-0.05951				mg/L	24	3/14/2023 6:58:30 PM	
+Unknown	IC	DOC_CMPS_KFP_0295	Untitled			0.2751				mg/L	25	3/14/2023 7:05:56 PM	
+Unknown	IC	DOC_CMPS_KFP_0296	Untitled			0.1564				mg/L	26	3/14/2023 7:13:27 PM	
+Unknown	IC	DOC_CMPS_KFP_0297	Untitled			0.06443				mg/L	27	3/14/2023 7:23:06 PM	
+Unknown	IC	DOC_CMPS_KFP_0298	Untitled			0.5372				mg/L	28	3/14/2023 7:32:40 PM	
+Unknown	IC	DOC_CMPS_KFP_0299	Untitled			-0.1083				mg/L	29	3/14/2023 7:40:06 PM	
+Unknown	IC	DOC_CMPS_KFP_0300	Untitled			-0.1240				mg/L	30	3/14/2023 7:49:46 PM	
+Unknown	IC	DOC_CMPS_KFP_0301	Untitled			-0.1993				mg/L	31	3/14/2023 7:57:12 PM	
+Unknown	IC	DOC_CMPS_KFP_0302	Untitled			-0.1444				mg/L	32	3/14/2023 8:04:44 PM	
+Unknown	IC	DOC_CMPS_KFP_0303	Untitled			-0.2044				mg/L	33	3/14/2023 8:14:24 PM	
+Unknown	IC	DOC_CMPS_KFP_0304	Untitled			-0.1553				mg/L	34	3/14/2023 8:23:59 PM	
+Unknown	IC	DOC_CMPS_KFP_0305	Untitled			-0.1582				mg/L	35	3/14/2023 8:33:34 PM	
+Unknown	IC	DOC_CMPS_KFP_0306	Untitled			-0.1924				mg/L	36	3/14/2023 8:41:01 PM	
+Unknown	IC	DOC_CMPS_KFP_0307	Untitled			-0.1047				mg/L	37	3/14/2023 8:48:33 PM	
+Unknown	IC	DOC_CMPS_KFP_0308	Untitled			-0.1397				mg/L	38	3/14/2023 8:56:05 PM	
+Unknown	IC	DOC_CMPS_KFP_0309	Untitled			0.2620				mg/L	39	3/14/2023 9:05:47 PM	
+Unknown	IC	DOC_CMPS_KFP_0311	Untitled			0.06385				mg/L	41	3/14/2023 9:13:14 PM	
+Unknown	IC	chkstd-10ppm	Untitled			10.47				mg/L	84	3/14/2023 9:21:29 PM	
+Unknown	IC	DIW	Untitled			-0.2788				mg/L	85	3/14/2023 9:29:15 PM	
+Unknown	IC	DOC_CMPS_KFP_0312	Untitled			-0.00602				mg/L	42	3/14/2023 9:36:56 PM	
+Unknown	IC	DOC_CMPS_KFP_0314	Untitled			0.3035				mg/L	44	3/14/2023 9:49:27 PM	
+Unknown	IC	DOC_CMPS_KFP_0315	Untitled			0.2948				mg/L	45	3/14/2023 9:59:12 PM	
+Unknown	IC	DOC_CMPS_KFP_0316	Untitled			0.1303				mg/L	46	3/14/2023 10:08:45 PM	
+Unknown	IC	DOC_CMPS_KFP_0317	Untitled			-0.1091				mg/L	47	3/14/2023 10:16:13 PM	
+Unknown	IC	DOC_CMPS_KFP_0318	Untitled			0.4245				mg/L	48	3/14/2023 10:25:58 PM	
+Unknown	IC	DOC_CMPS_KFP_0319	Untitled			0.1798				mg/L	49	3/14/2023 10:33:24 PM	
+Unknown	IC	DOC_CMPS_KFP_0320	Untitled			-0.2207				mg/L	50	3/14/2023 10:43:01 PM	
+Unknown	IC	DOC_CMPS_KFP_0321	Untitled			-0.09697				mg/L	51	3/14/2023 10:50:26 PM	
+Unknown	IC	DOC_CMPS_KFP_0322	Untitled			0.2396				mg/L	52	3/14/2023 10:58:02 PM	
+Unknown	IC	DOC_CMPS_KFP_0323	Untitled			-0.2152				mg/L	53	3/14/2023 11:05:33 PM	
+Unknown	IC	DOC_CMPS_KFP_0324	Untitled			-0.07227				mg/L	54	3/14/2023 11:13:04 PM	
+Unknown	IC	DOC_CMPS_KFP_0325	Untitled			0.04512				mg/L	55	3/14/2023 11:20:35 PM	
+Unknown	IC	DOC_CMPS_KFP_0326	Untitled			-0.2200				mg/L	56	3/14/2023 11:30:13 PM	
+Unknown	IC	DOC_CMPS_KFP_0327	Untitled			-0.1013				mg/L	57	3/14/2023 11:37:39 PM	
+Unknown	IC	DOC_CMPS_KFP_0328	Untitled			2.621				mg/L	58	3/14/2023 11:45:24 PM	
+Unknown	IC	DOC_CMPS_KFP_0329	Untitled			4.185				mg/L	59	3/14/2023 11:53:39 PM	
+Unknown	IC	DOC_CMPS_KFP_0330	Untitled			4.999				mg/L	60	3/15/2023 12:01:39 AM	
+Unknown	IC	DOC_CMPS_KFP_0331	Untitled			1.365				mg/L	61	3/15/2023 12:11:35 AM	
+Unknown	IC	DOC_CMPS_KFP_0332	Untitled			1.273				mg/L	62	3/15/2023 12:40:39 AM	
+Unknown	IC	DOC_CMPS_KFP_0333	Untitled			3.224				mg/L	63	3/15/2023 12:48:11 AM	
+Unknown	IC	DOC_CMPS_KFP_0334	Untitled			1.249				mg/L	64	3/15/2023 12:55:47 AM	
+Unknown	IC	DOC_CMPS_KFP_0335	Untitled			3.867				mg/L	65	3/15/2023 1:03:37 AM	
+Unknown	IC	DOC_CMPS_KFP_0336	Untitled			0.4367				mg/L	66	3/15/2023 1:13:27 AM	
+Unknown	IC	DOC_CMPS_KFP_0337	Untitled			1.089				mg/L	67	3/15/2023 1:23:03 AM	
+Unknown	IC	DOC_CMPS_KFP_0338	Untitled			1.870				mg/L	68	3/15/2023 1:32:58 AM	
+Unknown	IC	DOC_CMPS_KFP_0339	Untitled			1.813				mg/L	69	3/15/2023 1:42:54 AM	
+Unknown	IC	DOC_CMPS_KFP_0340	Untitled			1.022				mg/L	70	3/15/2023 1:50:40 AM	
+Unknown	IC	DOC_CMPS_KFP_0341	Untitled			-0.02428				mg/L	71	3/15/2023 2:00:18 AM	
+Unknown	IC	DOC_CMPS_KFP_0342	Untitled			0.2679				mg/L	72	3/15/2023 2:09:53 AM	
+Unknown	IC	DOC_CMPS_KFP_0343	Untitled			0.07825				mg/L	73	3/15/2023 2:19:28 AM	
+Unknown	IC	DOC_CMPS_KFP_0344	Untitled			0.1439				mg/L	74	3/15/2023 2:26:56 AM	
+Unknown	IC	DOC_CMPS_KFP_0345	Untitled			1.093				mg/L	75	3/15/2023 2:36:42 AM	
+Unknown	IC	DOC_CMPS_KFP_0346	Untitled			1.376				mg/L	76	3/15/2023 2:44:22 AM	
+Unknown	IC	DOC_CMPS_KFP_0347	Untitled			-0.02545				mg/L	77	3/15/2023 2:51:54 AM	
+Unknown	IC	chkstd-10ppm	Untitled			11.13				mg/L	86	3/15/2023 3:00:14 AM	
+Unknown	IC	DIW	Untitled			-0.1801				mg/L	87	3/15/2023 3:09:57 AM	
+Standard	IC	Untitled	Untitled			100.0				mg/L	88, 89, 90, 91, 92, 93	3/15/2023 3:22:24 PM	
+Unknown	IC	chkstd-10ppm	Untitled			10.58				mg/L	84	3/15/2023 3:30:53 PM	
+Unknown	IC	DIW	Untitled			-2.047				mg/L	85	3/15/2023 3:40:33 PM	
+Unknown	IC	DOC_CMPS_KFP_0348	Untitled			-1.781				mg/L	1	3/15/2023 3:48:00 PM	
+Unknown	IC	DOC_CMPS_KFP_0349	Untitled			-1.910				mg/L	2	3/15/2023 3:57:37 PM	
+Unknown	IC	DOC_CMPS_KFP_0350	Untitled			-1.757				mg/L	3	3/15/2023 4:07:10 PM	
+Unknown	IC	DOC_CMPS_KFP_0351	Untitled			-1.873				mg/L	4	3/15/2023 4:16:43 PM	
+Unknown	IC	DOC_CMPS_KFP_0352	Untitled			-1.853				mg/L	5	3/15/2023 4:24:07 PM	
+Unknown	IC	DOC_CMPS_KFP_0353	Untitled			-1.949				mg/L	6	3/15/2023 4:31:38 PM	
+Unknown	IC	DOC_CMPS_KFP_0354	Untitled			-1.803				mg/L	7	3/15/2023 4:39:09 PM	
+Unknown	IC	DOC_CMPS_KFP_0355	Untitled			-1.360				mg/L	8	3/15/2023 4:46:53 PM	
+Unknown	IC	DOC_CMPS_KFP_0356	Untitled			-1.317				mg/L	9	3/15/2023 4:54:26 PM	
+Unknown	IC	DOC_CMPS_KFP_0357	Untitled			-1.125				mg/L	10	3/15/2023 5:01:57 PM	
+Unknown	IC	DOC_CMPS_KFP_0358	Untitled			-1.641				mg/L	11	3/15/2023 5:11:36 PM	
+Unknown	IC	DOC_CMPS_KFP_0359	Untitled			-1.785				mg/L	12	3/15/2023 5:19:03 PM	
+Unknown	IC	DOC_CMPS_KFP_0360	Untitled			-1.240				mg/L	13	3/15/2023 5:28:42 PM	
+Unknown	IC	DOC_CMPS_KFP_0361	Untitled			-1.396				mg/L	14	3/15/2023 5:36:12 PM	
+Unknown	IC	DOC_CMPS_KFP_0362	Untitled			-1.881				mg/L	15	3/15/2023 5:45:51 PM	
+Unknown	IC	DOC_CMPS_KFP_0363	Untitled			-1.917				mg/L	16	3/15/2023 5:55:25 PM	
+Unknown	IC	DOC_CMPS_KFP_0364	Untitled			-1.904				mg/L	17	3/15/2023 6:02:51 PM	
+Unknown	IC	DOC_CMPS_KFP_0365	Untitled			-1.394				mg/L	18	3/15/2023 6:10:22 PM	
+Unknown	IC	DOC_CMPS_KFP_0366	Untitled			-1.681				mg/L	19	3/15/2023 6:17:54 PM	
+Unknown	IC	chkstd-10ppm	Untitled			11.02				mg/L	86	3/15/2023 6:26:09 PM	
+Unknown	IC	DIW	Untitled			-2.113				mg/L	87	3/15/2023 6:35:51 PM	
