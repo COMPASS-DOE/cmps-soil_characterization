@@ -822,9 +822,9 @@ plot_xrd = function(xrd_processed){
   
 }
 
-plot_ions_piper = function(ions_processed){
+plot_ions_piper = function(dic_processed, ions_processed){
   
-  tic = read_tsv("1-data/tic_owc.txt", skip = 10) %>% janitor::clean_names()
+  #tic = read_tsv("1-data/tic_owc.txt", skip = 10) %>% janitor::clean_names()
 
   tic_processed = 
     tic %>% 
@@ -839,18 +839,24 @@ plot_ions_piper = function(ions_processed){
     dplyr::select(sample_label, Bicarbonate_ppm) %>% 
     left_join(sample_key)
   
+  carbonate = 
+    dic_processed %>% 
+    dplyr::select(sample_label, dic_ug_g) %>% 
+    filter(!is.na(dic_ug_g)) %>% 
+    mutate(Carbonate_ugg = dic_ug_g * 5,
+           Carbonate_meq100g =  Carbonate_ugg * 2/60 * 100/1000) %>% 
+    dplyr::select(sample_label, Carbonate_meq100g)
   
-  
-  
+    
   
   
   ions_long = 
-    ions_processed %>% 
-    dplyr::select(sample_label, ends_with("ppm")) %>% 
-    left_join(tic_processed) %>% 
+    ions_processed_meq %>% 
+    dplyr::select(sample_label, ends_with("meq100g")) %>% 
+    left_join(carbonate) %>% 
     pivot_longer(-sample_label,
                  names_to = "ion", 
-                 values_to = "ppm") %>% 
+                 values_to = "meq_100g") %>% 
     mutate(group = case_when(grepl("Calcium", ion) ~ "Calcium",
                              grepl("Magnesium", ion) ~ "Magnesium",
                              grepl("Sodium|Potassium|Ammoni", ion) ~ "Sodium",
@@ -861,14 +867,14 @@ plot_ions_piper = function(ions_processed){
                                     grepl("Chloride|Bicarbonate|Sulfate", group) ~ "anion")) %>% 
     filter(!is.na(group)) %>% 
     group_by(sample_label, cation_anion, group) %>% 
-    dplyr::summarise(ppm = sum(ppm)) %>% 
+    dplyr::summarise(meq_100g = sum(meq_100g)) %>% 
     group_by(sample_label, cation_anion) %>% 
-    dplyr::mutate(total = sum(ppm),
-                     percent = (ppm/total) * 100)
+    dplyr::mutate(total = sum(meq_100g),
+                     percent = (meq_100g/total) * 100)
 
   ions_wide = ions_long %>% 
     ungroup() %>% 
-    dplyr::select(-c(cation_anion, ppm, total)) %>% 
+    dplyr::select(-c(cation_anion, meq_100g, total)) %>% 
     pivot_wider(names_from = "group", values_from = "percent") 
   
   ions_wide2 = 
@@ -953,9 +959,9 @@ plot_ions_piper = function(ions_processed){
       
       
       geom_text(aes(170,-10, label="Cl^-phantom()"), size=4, parse=TRUE) +
-      geom_text(aes(205,50, label="SO^4"), angle=-60, size=4, parse=TRUE) +
-      geom_text(aes(137.5,50, label="Alkalinity~as~HCO^3"), angle=60, size=4, parse=TRUE) +
-      geom_text(aes(72.5,150, label="SO^4~+~Cl^-phantom()"), angle=60, size=4, parse=TRUE) +
+      geom_text(aes(205,50, label="SO4"), angle=-60, size=4, parse=TRUE) +
+      geom_text(aes(137.5,50, label="Alkalinity~as~CO3"), angle=60, size=4, parse=TRUE) +
+      geom_text(aes(72.5,150, label="SO4~+~Cl^-phantom()"), angle=60, size=4, parse=TRUE) +
       geom_text(aes(147.5,150, label="Ca^2~+~Mg^2"), angle=-60, size=4, parse=TRUE) + 
       
       geom_text(aes(c(155,145,135,125),grid2p2$y2, label=c(20, 40, 60, 80)), size=3) +
@@ -1001,19 +1007,36 @@ plot_ions_piper = function(ions_processed){
   piper_data <- transform_piper_data(Ca=data$Ca, Mg = data$Mg, Cl=data$Cl, SO4= data$SO4, name=data$WaterType)
   
   
-  piper_data2 = transform_piper_data(Ca = ions_wide$Calcium, Mg = ions_wide$Magnesium, SO4 = ions_wide$Sulfate, Cl = ions_wide$Chloride,
+  piper_data2 = 
+    transform_piper_data(Ca = ions_wide$Calcium, Mg = ions_wide$Magnesium, 
+                         SO4 = ions_wide$Sulfate, Cl = ions_wide$Chloride,
                                      name = ions_wide$sample_label) %>% 
     rename(sample_label = observation) %>% 
-    left_join(sample_key)
+    left_join(sample_key) %>% 
+    filter(horizon != "B") %>% 
+    reorder_horizon() %>% 
+    reorder_transect()
   
-  ggplot_piper() + geom_point(aes(x,y), data=piper_data)
+  #ggplot_piper() + geom_point(aes(x,y), data=piper_data)
   ggplot_piper() + 
     geom_point(aes(x,y, 
-                   color = transect, shape = region), 
-               size = 5, stroke = 1,
-               data=piper_data2 %>% filter(region == "WLE"))
-    scale_shape_manual(values = c(21,22,23))
+                   color = transect, shape = site), 
+               size = 3, stroke = 1,
+               data=piper_data2 %>% filter(region == "WLE"))+
+    scale_color_manual(values = pal_transect)+
+    scale_shape_manual(breaks = c("CC", "PR", "OWC", "MSM", "GWI", "GCREW"), values = c(1,2,3,4,5,6))+
+    labs(title = "Piper Plot using water-extractable ions",
+         subtitle = "WLE region")
   
+  ggplot_piper() + 
+    geom_point(aes(x,y, 
+                   color = transect, shape = site), 
+               size = 3, stroke = 1,
+               data=piper_data2 %>% filter(region == "CB"))+
+    scale_color_manual(values = rev(soilpalettes::soil_palette("redox2", 3)))+
+    scale_shape_manual(breaks = c("CC", "PR", "OWC", "MSM", "GWI", "GCREW"), values = c(1,2,3,4,5,6))+
+    labs(title = "Piper Plot using water-extractable ions",
+         subtitle = "CB region")
 
     
   # pca ----
@@ -1092,3 +1115,4 @@ plot_texture = function(texture_processed){
               aes(x = Sand, y = Clay, z = Silt, label = Label),
               size = 3, color = "grey30")
 }
+
