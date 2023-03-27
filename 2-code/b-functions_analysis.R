@@ -630,16 +630,16 @@ make_graphs_by_transect = function(data_combined){
   gg_din_no3n <- plot_transect_as_x(data = din %>% filter(name == "no3n_ug_g"), YLAB = "NO3-N, μg/g", TITLE = "Extractable Inorganic N", SUBTITLE = "extracted with 2M KCl")
 
   icp <- combined_surface %>% filter(analysis == "ICP")
-  gg_icp_ca <- plot_transect_as_x(data = icp %>% filter(name == "Ca_ug_g"), YLAB = "Ca, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
-  gg_icp_mg <- plot_transect_as_x(data = icp %>% filter(name == "Mg_ug_g"), YLAB = "Mg, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
-  gg_icp_na <- plot_transect_as_x(data = icp %>% filter(name == "Na_ug_g"), YLAB = "Na, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl",
+  gg_icp_ca <- plot_transect_as_x(data = icp %>% filter(name == "Ca_meq100g"), YLAB = "Ca, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
+  gg_icp_mg <- plot_transect_as_x(data = icp %>% filter(name == "Mg_meq100g"), YLAB = "Mg, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
+  gg_icp_na <- plot_transect_as_x(data = icp %>% filter(name == "Na_meq100g"), YLAB = "Na, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl",
                                   SCALES = "free")
-  gg_icp_k <- plot_transect_as_x(data = icp %>% filter(name == "K_ug_g"), YLAB = "K, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
+  gg_icp_k <- plot_transect_as_x(data = icp %>% filter(name == "K_meq100g"), YLAB = "K, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
   
-  gg_icp_al <- plot_transect_as_x(data = icp %>% filter(name == "Al_ug_g"), YLAB = "Al, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl",
+  gg_icp_al <- plot_transect_as_x(data = icp %>% filter(name == "Al_meq100g"), YLAB = "Al, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl",
                                   SCALES = "free")
-  gg_icp_fe <- plot_transect_as_x(data = icp %>% filter(name == "Fe_ug_g"), YLAB = "Fe, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
-  gg_icp_mn <- plot_transect_as_x(data = icp %>% filter(name == "Mn_ug_g"), YLAB = "Mn, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
+ # gg_icp_fe <- plot_transect_as_x(data = icp %>% filter(name == "Fe_ug_g"), YLAB = "Fe, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
+#  gg_icp_mn <- plot_transect_as_x(data = icp %>% filter(name == "Mn_ug_g"), YLAB = "Mn, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
   
   gg_icp_cec <- plot_transect_as_x(data = icp %>% filter(name == "cec_meq100g"), YLAB = "CEC, meq/100g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
   
@@ -647,30 +647,30 @@ make_graphs_by_transect = function(data_combined){
                                      SUBTITLE = "measured colorimetrically (molybdate/ascorbic acid method)")
   
   ferrozine <- combined_surface %>% filter(analysis == "Ferrozine")
-  ferrozine_23 <- ferrozine %>% 
-    filter(grepl("Fe2|Fe3", name)) %>% 
-    pivot_wider() %>% 
-    mutate(value = Fe2_ug_g/Fe3_ug_g)
-  gg_ferr_fetotal <- plot_transect_as_x(data = ferrozine %>% filter(name == "Fe_total_ug_g"), YLAB = "Fe, μg/g", 
+ # ferrozine_23 <- ferrozine %>% 
+ #   filter(grepl("Fe2|Fe3", name)) %>% 
+ #   pivot_wider() %>% 
+ #   mutate(value = Fe2_ug_g/Fe3_ug_g)
+  gg_ferr_fetotal <- plot_transect_as_x(data = ferrozine %>% filter(name == "Fe_ugg"), YLAB = "Fe, μg/g", 
                                         TITLE = "Total Fe", 
                                         SUBTITLE = "extracted with 0.5M HCl, measured colorimetrically using ferrozine")
-  gg_ferr_fe23 <- plot_transect_as_x(data = ferrozine_23, YLAB = "Fe-II/Fe-III", 
-                                        TITLE = "Fe-II/III", 
-                                        SUBTITLE = "extracted with 0.5M HCl, measured colorimetrically using ferrozine")+ylim (0, 5)
+ # gg_ferr_fe23 <- plot_transect_as_x(data = ferrozine_23, YLAB = "Fe-II/Fe-III", 
+ #                                       TITLE = "Fe-II/III", 
+ #                                       SUBTITLE = "extracted with 0.5M HCl, measured colorimetrically using ferrozine")+ylim (0, 5)
   
   ions <- combined_surface %>% filter(analysis == "IC")
-  gg_ions_ca <- plot_transect_as_x(data = ions %>% filter(name == "Calcium_ug_g"), YLAB = "Ca, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
-  gg_ions_na <- plot_transect_as_x(data = ions %>% filter(name == "Sodium_ug_g"), YLAB = "Na, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water",
+  gg_ions_ca <- plot_transect_as_x(data = ions %>% filter(name == "Calcium_meq100g"), YLAB = "Ca, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
+  gg_ions_na <- plot_transect_as_x(data = ions %>% filter(name == "Sodium_meq100g"), YLAB = "Na, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water",
                                    SCALES = "free")
-  gg_ions_mg <- plot_transect_as_x(data = ions %>% filter(name == "Magnesium_ug_g"), YLAB = "Mg, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water",
+  gg_ions_mg <- plot_transect_as_x(data = ions %>% filter(name == "Magnesium_meq100g"), YLAB = "Mg, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water",
                                    SCALES = "free")
-  gg_ions_k <- plot_transect_as_x(data = ions %>% filter(name == "Potassium_ug_g"), YLAB = "K, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
-  gg_ions_cl <- plot_transect_as_x(data = ions %>% filter(name == "Chloride_ug_g"), YLAB = "Cl, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water",
+  gg_ions_k <- plot_transect_as_x(data = ions %>% filter(name == "Potassium_meq100g"), YLAB = "K, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
+  gg_ions_cl <- plot_transect_as_x(data = ions %>% filter(name == "Chloride_meq100g"), YLAB = "Cl, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water",
                                    SCALES = "free")
-  gg_ions_so4 <- plot_transect_as_x(data = ions %>% filter(name == "Sulfate_ug_g"), YLAB = "SO4, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water",
+  gg_ions_so4 <- plot_transect_as_x(data = ions %>% filter(name == "Sulfate_meq100g"), YLAB = "SO4, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water",
                                     SCALES = "free")
-  gg_ions_no3 <- plot_transect_as_x(data = ions %>% filter(name == "Nitrate_ug_g"), YLAB = "NO3, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
-  gg_ions_po4 <- plot_transect_as_x(data = ions %>% filter(name == "Phosphate_ug_g"), YLAB = "PO4, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
+  gg_ions_no3 <- plot_transect_as_x(data = ions %>% filter(name == "Nitrate_meq100g"), YLAB = "NO3, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
+  gg_ions_po4 <- plot_transect_as_x(data = ions %>% filter(name == "Phosphate_meq100g"), YLAB = "PO4, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
   
   
   list(gg_gwc = gg_gwc,
@@ -689,12 +689,12 @@ make_graphs_by_transect = function(data_combined){
        gg_icp_na = gg_icp_na, 
        gg_icp_k = gg_icp_k , 
        gg_icp_al = gg_icp_al, 
-       gg_icp_fe = gg_icp_fe, 
-       gg_icp_mn = gg_icp_mn, 
+       #gg_icp_fe = gg_icp_fe, 
+       #gg_icp_mn = gg_icp_mn, 
        gg_icp_cec = gg_icp_cec,
        gg_p_mehlich = gg_p_mehlich,
        gg_ferr_fetotal = gg_ferr_fetotal, 
-       gg_ferr_fe23 = gg_ferr_fe23,
+       #gg_ferr_fe23 = gg_ferr_fe23,
        gg_ions_ca = gg_ions_ca, 
        gg_ions_na = gg_ions_na, 
        gg_ions_mg = gg_ions_mg, 
@@ -740,33 +740,33 @@ make_graphs_by_site = function(data_combined){
   gg_din_no3n <- plot_site_as_x(data = din %>% filter(name == "no3n_ug_g"), YLAB = "NO3-N, μg/g", TITLE = "Extractable Inorganic N", SUBTITLE = "extracted with 2M KCl")
   
   icp <- combined_surface %>% filter(analysis == "ICP")
-  gg_icp_ca <- plot_site_as_x(data = icp %>% filter(name == "Ca_ug_g"), YLAB = "Ca, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
-  gg_icp_mg <- plot_site_as_x(data = icp %>% filter(name == "Mg_ug_g"), YLAB = "Mg, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
-  gg_icp_na <- plot_site_as_x(data = icp %>% filter(name == "Na_ug_g"), YLAB = "Na, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
-  gg_icp_k <- plot_site_as_x(data = icp %>% filter(name == "K_ug_g"), YLAB = "K, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
+  gg_icp_ca <- plot_site_as_x(data = icp %>% filter(name == "Ca_meq100g"), YLAB = "Ca, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
+  gg_icp_mg <- plot_site_as_x(data = icp %>% filter(name == "Mg_meq100g"), YLAB = "Mg, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
+  gg_icp_na <- plot_site_as_x(data = icp %>% filter(name == "Na_meq100g"), YLAB = "Na, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
+  gg_icp_k <- plot_site_as_x(data = icp %>% filter(name == "K_meq100g"), YLAB = "K, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
   
-  gg_icp_al <- plot_site_as_x(data = icp %>% filter(name == "Al_ug_g"), YLAB = "Al, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
-  gg_icp_fe <- plot_site_as_x(data = icp %>% filter(name == "Fe_ug_g"), YLAB = "Fe, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
-  gg_icp_mn <- plot_site_as_x(data = icp %>% filter(name == "Mn_ug_g"), YLAB = "Fe, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
+  gg_icp_al <- plot_site_as_x(data = icp %>% filter(name == "Al_meq100g"), YLAB = "Al, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
+  #gg_icp_fe <- plot_site_as_x(data = icp %>% filter(name == "Fe_ug_g"), YLAB = "Fe, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
+  #gg_icp_mn <- plot_site_as_x(data = icp %>% filter(name == "Mn_ug_g"), YLAB = "Fe, μg/g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
   gg_icp_cec <- plot_site_as_x(data = icp %>% filter(name == "cec_meq100g"), YLAB = "CEC, meq/100g", TITLE = "ICP-OES", SUBTITLE = "extracted with 1M NH4Cl")
   
   gg_p_mehlich <- plot_site_as_x(data = combined_surface %>% filter(name == "mehlichp_ugg"), YLAB = "P, μg/g", TITLE = "Mehlich-3 extractable P", 
                                      SUBTITLE = "measured colorimetrically (molybdate/ascorbic acid method)")
   
   ferrozine <- combined_surface %>% filter(analysis == "Ferrozine")
-  gg_ferr_fetotal <- plot_site_as_x(data = ferrozine %>% filter(name == "Fe_total_ug_g"), YLAB = "Fe, μg/g", 
+  gg_ferr_fetotal <- plot_site_as_x(data = ferrozine %>% filter(name == "Fe_ugg"), YLAB = "Fe, μg/g", 
                                         TITLE = "Total Fe", 
                                         SUBTITLE = "extracted with 0.5M HCl, measured colorimetrically using ferrozine")
   
   ions <- combined_surface %>% filter(analysis == "IC")
-  gg_ions_ca <- plot_site_as_x(data = ions %>% filter(name == "Calcium_ug_g"), YLAB = "Ca, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
-  gg_ions_na <- plot_site_as_x(data = ions %>% filter(name == "Sodium_ug_g"), YLAB = "Na, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
-  gg_ions_mg <- plot_site_as_x(data = ions %>% filter(name == "Magnesium_ug_g"), YLAB = "Mg, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
-  gg_ions_k <- plot_site_as_x(data = ions %>% filter(name == "Potassium_ug_g"), YLAB = "K, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
-  gg_ions_cl <- plot_site_as_x(data = ions %>% filter(name == "Chloride_ug_g"), YLAB = "Cl, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
-  gg_ions_so4 <- plot_site_as_x(data = ions %>% filter(name == "Sulfate_ug_g"), YLAB = "SO4, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
-  gg_ions_no3 <- plot_site_as_x(data = ions %>% filter(name == "Nitrate_ug_g"), YLAB = "NO3, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
-  gg_ions_po4 <- plot_site_as_x(data = ions %>% filter(name == "Phosphate_ug_g"), YLAB = "PO4, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
+  gg_ions_ca <- plot_site_as_x(data = ions %>% filter(name == "Calcium_meq100g"), YLAB = "Ca, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
+  gg_ions_na <- plot_site_as_x(data = ions %>% filter(name == "Sodium_meq100g"), YLAB = "Na, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
+  gg_ions_mg <- plot_site_as_x(data = ions %>% filter(name == "Magnesium_meq100g"), YLAB = "Mg, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
+  gg_ions_k <- plot_site_as_x(data = ions %>% filter(name == "Potassium_meq100g"), YLAB = "K, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
+  gg_ions_cl <- plot_site_as_x(data = ions %>% filter(name == "Chloride_meq100g"), YLAB = "Cl, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
+  gg_ions_so4 <- plot_site_as_x(data = ions %>% filter(name == "Sulfate_meq100g"), YLAB = "SO4, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
+  gg_ions_no3 <- plot_site_as_x(data = ions %>% filter(name == "Nitrate_meq100g"), YLAB = "NO3, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
+  gg_ions_po4 <- plot_site_as_x(data = ions %>% filter(name == "Phosphate_meq100g"), YLAB = "PO4, μg/g", TITLE = "IC", SUBTITLE = "extracted with MQ water")
   
   
   list(gg_gwc = gg_gwc,
@@ -784,8 +784,8 @@ make_graphs_by_site = function(data_combined){
        gg_icp_na = gg_icp_na, 
        gg_icp_k = gg_icp_k , 
        gg_icp_al = gg_icp_al, 
-       gg_icp_fe = gg_icp_fe, 
-       gg_icp_mn = gg_icp_mn, 
+       #gg_icp_fe = gg_icp_fe, 
+       #gg_icp_mn = gg_icp_mn, 
        gg_icp_cec = gg_icp_cec,
        gg_p_mehlich = gg_p_mehlich,
        gg_ferr_fetotal = gg_ferr_fetotal, 
