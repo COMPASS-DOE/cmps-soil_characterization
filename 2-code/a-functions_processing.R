@@ -348,10 +348,6 @@ process_icp = function(icp_data, analysis_key, moisture_processed, subsampling){
     pivot_wider()%>% 
     mutate(analysis = "ICP")
 
-  icp_samples
-}
-compute_cec = function(icp_processed){
-  
   charges = 
     tribble(
       ~ion, ~charge, ~atomic_wt,
@@ -363,18 +359,24 @@ compute_cec = function(icp_processed){
     )
   
   icp_meq = 
-    icp_processed %>% 
+    icp_samples %>% 
     dplyr::select(sample_label, analysis, ends_with("ug_g")) %>% 
     pivot_longer(cols = ends_with("ug_g"), values_to = "ug_g") %>% 
     separate(name, sep = "_", into = "ion", remove = FALSE) %>% 
     left_join(charges) %>% 
-    mutate(meq_100g = ug_g * charge/atomic_wt * 100/1000) %>% 
-    filter(!is.na(meq_100g))
+    mutate(ion = paste0(ion, "_meq100g"), 
+           meq100g = ug_g * charge/atomic_wt * 100/1000) %>% 
+    filter(!is.na(meq100g))
   
-  icp_meq %>% 
-    group_by(sample_label, analysis) %>% 
-    dplyr::summarise(cec_meq100g = sum(meq_100g))
+  icp_meq_wide = 
+    icp_meq %>% 
+    dplyr::select(sample_label, analysis, ion, meq100g) %>% 
+    pivot_wider(names_from = "ion", values_from = "meq100g") %>% 
+    rowwise() %>% 
+    mutate(cec_meq100g = rowSums(across(where(is.numeric)))) %>% 
+    mutate_if(is.numeric, round, 2)
   
+  icp_meq_wide
 }
 
 # Iron - ferrozine
