@@ -82,9 +82,10 @@ process_pH = function(pH_data){
 #pH_samples = 
   pH_data %>% 
   dplyr::select(sample_label, pH, specific_conductance_ms_cm) %>% 
+    rename(spConductance_mscm = specific_conductance_ms_cm) %>% 
   mutate_at(vars(-sample_label), as.numeric)  %>% 
   filter(grepl("COMPASS", sample_label)) %>% 
-  filter(!is.na(pH) | !is.na(specific_conductance_ms_cm))%>% 
+  filter(!is.na(pH) | !is.na(spConductance_mscm))%>% 
     mutate(analysis = "PH")
 }
 
@@ -934,22 +935,16 @@ combine_data = function(moisture_processed, pH_processed, tctnts_data_samples, l
     reorder_horizon() %>% 
     force() 
   
-  data_combined_wide = 
-   data_combined %>% 
-   dplyr::select(sample_label, analysis, name, value) %>% 
-    separate(name, sep = "_", into = "variable", remove = F) %>% 
-    mutate(name = paste0(variable, " (", analysis, ")")) %>% 
-    dplyr::select(sample_label, name, value) %>% 
-    pivot_wider() %>% 
-    #  dplyr::select(-c("Ammonia (IC)","Bromide (IC)", "Nitrite (IC)", "Fluoride (IC)")) %>% 
-    left_join(sample_key) %>% 
-   #  mutate(`Phosphate (IC)` = case_when(is.na(`Phosphate (IC)`) & site != "GCREW" ~ 0,
-   #                                      TRUE ~ `Phosphate (IC)`)) %>% 
-   force()
+  data_combined_surface_only = 
+    data_combined %>% 
+    mutate(surface = case_when(region == "WLE" & horizon == "A" ~ "surface",
+                     (site == "MSM" | site == "GWI") & horizon == "O" ~ "surface",
+                     site == "GCREW" & horizon == "A" ~ "surface")) %>% 
+    filter(surface == "surface") %>% 
+    dplyr::select(-surface)
   
-  list(data_combined = data_combined,
-       data_combined_wide = data_combined_wide
-       )
+  list(data_combined_surface_only = data_combined_surface_only,
+       data_combined_all_horizons = data_combined)
 
 }
 #data_combined = combine_data()  

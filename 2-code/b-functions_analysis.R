@@ -333,9 +333,35 @@ compute_analysis_matrix = function(data_combined){
 }
 
 
-
-compute_overall_pca = function(data_combined_wide, sample_key){
+compute_overall_pca = function(data_combined, sample_key){
   library(ggbiplot)
+  
+  data_combined_wide = 
+    data_combined %>% 
+    dplyr::select(sample_label, analysis, name, value) %>% 
+    separate(name, sep = "_", into = "variable", remove = F) %>% 
+    #mutate(name = paste0(variable, " (", analysis, ")")) %>% 
+    dplyr::select(sample_label, variable, value) %>% 
+    pivot_wider(names_from = "variable") %>% 
+    dplyr::select(-"Bromide") %>% 
+    left_join(sample_key) %>% 
+    filter(!transect %in% "wte") %>% 
+    filter(!grepl("016", sample_label)) %>% # this one sample is very weird
+    force()
+  
+  data_combined_wide_NO_IC = 
+    data_combined %>% 
+    dplyr::select(sample_label, analysis, name, value) %>% 
+    filter(!analysis %in% "IC") %>% 
+    separate(name, sep = "_", into = "variable", remove = F) %>% 
+    #mutate(name = paste0(variable, " (", analysis, ")")) %>% 
+    dplyr::select(sample_label, variable, value) %>% 
+    pivot_wider(names_from = "variable") %>% 
+    left_join(sample_key) %>% 
+    filter(!transect %in% "wte") %>% 
+    filter(!grepl("016", sample_label)) %>% # this one sample is very weird
+    force()
+  
   
   fit_pca_function = function(dat){
     
@@ -365,22 +391,10 @@ compute_overall_pca = function(data_combined_wide, sample_key){
          pca_int = pca_int)
   }
   
-  combined_surface = 
-    data_combined_wide %>% 
-    filter(horizon != "B") %>% 
-    dplyr::select(-"Bromide (IC)") %>% 
-    filter(sample_label != "COMPASS_Dec2021_016") %>% 
-    dplyr::select(-ends_with("(IC)"), -"S (ICP)", -"Fe (ICP)", -"P (ICP)") %>% 
-    force() 
-  
-  combined_surface_no_ferrozine = 
-    combined_surface %>% 
-    dplyr::select(-ends_with("(Ferrozine)"))
-  
   ## PCA input files ----
-  pca_overall = fit_pca_function(combined_surface_no_ferrozine)
-  pca_overall_wle = fit_pca_function(combined_surface_no_ferrozine %>% filter(region == "WLE") %>% dplyr::select(-ends_with("(IC)")))
-  pca_overall_cb = fit_pca_function(combined_surface %>% filter(region == "CB") %>% dplyr::select(-ends_with("(IC)")))
+  pca_overall = fit_pca_function(data_combined_wide_NO_IC) # using NO-IC version because we don't have IC for GCREW
+  pca_overall_wle = fit_pca_function(data_combined_wide %>% filter(region == "WLE"))
+  pca_overall_cb = fit_pca_function(data_combined_wide_NO_IC %>% filter(region == "CB"))
   
   
   ## PCA plots overall ----
@@ -488,20 +502,37 @@ compute_correlations = function(data_combined_wide, TITLE){
 
   }
 
-  combined_surface = 
-    data_combined_wide %>% 
-    filter(horizon != "B") %>% 
-    force() 
+  data_combined_wide = 
+    data_combined %>% 
+    dplyr::select(sample_label, analysis, name, value) %>% 
+    separate(name, sep = "_", into = "variable", remove = F) %>% 
+    #mutate(name = paste0(variable, " (", analysis, ")")) %>% 
+    dplyr::select(sample_label, variable, value) %>% 
+    pivot_wider(names_from = "variable") %>% 
+    dplyr::select(-"Bromide") %>% 
+    left_join(sample_key) %>% 
+    filter(!transect %in% "wte") %>% 
+    filter(!grepl("016", sample_label)) %>% # this one sample is very weird
+    force()
   
-  combined_surface_no_ferrozine = 
-    combined_surface %>% 
-    dplyr::select(-ends_with("(Ferrozine)"))
+  data_combined_wide_NO_IC = 
+    data_combined %>% 
+    dplyr::select(sample_label, analysis, name, value) %>% 
+    filter(!analysis %in% "IC") %>% 
+    separate(name, sep = "_", into = "variable", remove = F) %>% 
+    #mutate(name = paste0(variable, " (", analysis, ")")) %>% 
+    dplyr::select(sample_label, variable, value) %>% 
+    pivot_wider(names_from = "variable") %>% 
+    left_join(sample_key) %>% 
+    filter(!transect %in% "wte") %>% 
+    filter(!grepl("016", sample_label)) %>% # this one sample is very weird
+    force()
   
   
   
-  corr_all = fit_correlations_function(dat = combined_surface_no_ferrozine%>% dplyr::select(-"Bromide (IC)"), TITLE = "all")
-  corr_wle = fit_correlations_function(dat = combined_surface_no_ferrozine %>% filter(region == "WLE")%>% dplyr::select(-"Bromide (IC)"), TITLE = "WLE" )
-  corr_cb = fit_correlations_function(dat = combined_surface %>% filter(region == "CB"), TITLE = "CB")
+  corr_all = fit_correlations_function(dat = data_combined_wide_NO_IC, TITLE = "all")
+  corr_wle = fit_correlations_function(dat = data_combined_wide_NO_IC %>% filter(region == "WLE"), TITLE = "WLE" )
+  corr_cb = fit_correlations_function(dat = data_combined_wide_NO_IC %>% filter(region == "CB"), TITLE = "CB")
   
   list(corr_all = corr_all,
        corr_regions = corr_wle + corr_cb)
