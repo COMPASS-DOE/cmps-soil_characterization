@@ -760,6 +760,7 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     mutate(ion = paste0(ion, "_meq100g")) %>% 
     dplyr::select(sample_label, analysis, ion, meq_100g) %>% 
     pivot_wider(names_from = "ion", values_from = "meq_100g") %>% 
+    mutate_if(is.numeric, round, 3) %>% 
     force()
     
   list(samples2 = samples2,
