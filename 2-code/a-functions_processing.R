@@ -67,10 +67,10 @@ process_loi = function(loi_data){
                              customer_id >= 215 ~ paste0("COMPASS_Aug22_", customer_id)),
            sample_label = case_when(region == "WLE" ~ sample_label,
                                     region == "CB" ~ label)) %>% 
-    mutate(percent_om = case_when(region == "CB" ~ percent_om,
+    mutate(percentOM = case_when(region == "CB" ~ percent_om,
                                   region == "WLE" ~ 100*(wt_tray_drysoil_g - wt_tray_combustedsoil_g)/(wt_tray_drysoil_g - wt_tray_g)),
-           percent_om = round(percent_om, 2)) %>%
-    dplyr::select(sample_label, percent_om) %>% 
+           percentOM = round(percentOM, 2)) %>%
+    dplyr::select(sample_label, percentOM) %>% 
     mutate(analysis = "LOI") %>% 
     force()
   
@@ -240,9 +240,11 @@ process_dic = function(dic_data, analysis_key, moisture_processed, subsampling){
     rename(fm_g = WSOC_g) %>% 
     mutate(od_g = fm_g/((gwc_perc/100)+1),
            soilwater_g = fm_g - od_g,
-           dic_ug_g = dic_mgL_corr * ((40 + soilwater_g)/od_g),
-           dic_ug_g = round(dic_ug_g, 2)) %>% 
-    dplyr::select(sample_label, dic_mgL_corr, dic_ug_g, dic_flag)
+           dic_ugg = dic_mgL_corr * ((40 + soilwater_g)/od_g),
+           dic_ugg = round(dic_ugg, 2)) %>% 
+    dplyr::select(sample_label, dic_mgL_corr, dic_ugg, dic_flag) %>% 
+    rename(dic_mgL = dic_mgL_corr) %>% 
+    mutate(analysis = "DIC")
   
   dic_samples
   
@@ -912,13 +914,13 @@ process_xrd = function(xrd_data, sample_key){
 #
 # Combined chemistry data -------------------------------------------------
 combine_data = function(moisture_processed, pH_processed, tctnts_data_samples, loi_processed, 
-                        weoc_processed, din_processed, icp_processed, cec_processed,
-                        ferrozine_processed, mehlich_processed, ions_processed,
+                        weoc_processed, dic_processed, din_processed, icp_processed,
+                        ferrozine_processed, mehlich_processed, ions_processed_meq,
                         sample_key){
   
   df_list = list(moisture_processed, pH_processed, tctnts_data_samples, loi_processed,
-                 weoc_processed, din_processed, icp_processed, cec_processed,
-                 ferrozine_processed, mehlich_processed, ions_processed)
+                 weoc_processed, dic_processed, din_processed, icp_processed,
+                 ferrozine_processed, mehlich_processed, ions_processed_meq)
   
   data_combined = 
     df_list %>% reduce(full_join) %>% 
