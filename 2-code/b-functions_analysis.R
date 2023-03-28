@@ -316,7 +316,32 @@ OLD_plots = function(){
   
 }
 
+## process data for analysis ----
 
+make_data_subset = function(data_combined){
+  
+ # data_combined_subset = 
+    data_combined %>% 
+    filter(!transect %in% "wte") %>% 
+    filter(!grepl("Bromide|Fluoride|Nitrate|Calcium|Magnesium|Potassium|Sodium|Phosphate|Ammonia", name, ignore.case = TRUE))
+}
+make_data_wide = function(data_combined_subset){
+  
+  #data_combined_wide = 
+    data_combined_subset %>% 
+    dplyr::select(sample_label, analysis, name, value) %>% 
+    separate(name, sep = "_", into = "variable", remove = F) %>% 
+    #mutate(name = paste0(variable, " (", analysis, ")")) %>% 
+    dplyr::select(sample_label, variable, value) %>% 
+    pivot_wider(names_from = "variable") %>% 
+    left_join(sample_key) %>% 
+    filter(!grepl("016", sample_label)) %>% # this one sample is very weird
+    force()
+  
+}
+
+
+## overall analyses ----
 compute_analysis_matrix = function(data_combined){
 
   #data_combined2 = 
@@ -332,36 +357,14 @@ compute_analysis_matrix = function(data_combined){
   
 }
 
-
 compute_overall_pca = function(data_combined, sample_key){
   library(ggbiplot)
   
-  data_combined_wide = 
-    data_combined %>% 
-    dplyr::select(sample_label, analysis, name, value) %>% 
-    separate(name, sep = "_", into = "variable", remove = F) %>% 
-    #mutate(name = paste0(variable, " (", analysis, ")")) %>% 
-    dplyr::select(sample_label, variable, value) %>% 
-    pivot_wider(names_from = "variable") %>% 
-    dplyr::select(-"Bromide") %>% 
-    left_join(sample_key) %>% 
-    filter(!transect %in% "wte") %>% 
-    filter(!grepl("016", sample_label)) %>% # this one sample is very weird
-    force()
-  
-  data_combined_wide_NO_IC = 
-    data_combined %>% 
-    dplyr::select(sample_label, analysis, name, value) %>% 
-    filter(!analysis %in% "IC") %>% 
-    separate(name, sep = "_", into = "variable", remove = F) %>% 
-    #mutate(name = paste0(variable, " (", analysis, ")")) %>% 
-    dplyr::select(sample_label, variable, value) %>% 
-    pivot_wider(names_from = "variable") %>% 
-    left_join(sample_key) %>% 
-    filter(!transect %in% "wte") %>% 
-    filter(!grepl("016", sample_label)) %>% # this one sample is very weird
-    force()
-  
+  data_combined_subset = make_data_subset(data_combined)
+  data_combined_wide = make_data_wide(data_combined_subset)
+  data_combined_wide_NO_IC = make_data_wide(data_combined_subset %>% 
+                                              filter(!analysis %in% "IC") %>% 
+                                              filter(!grepl("dic", name, ignore.case = TRUE)))
   
   fit_pca_function = function(dat){
     
@@ -393,7 +396,7 @@ compute_overall_pca = function(data_combined, sample_key){
   
   ## PCA input files ----
   pca_overall = fit_pca_function(data_combined_wide_NO_IC) # using NO-IC version because we don't have IC for GCREW
-  pca_overall_wle = fit_pca_function(data_combined_wide %>% filter(region == "WLE"))
+  pca_overall_wle = fit_pca_function(data_combined_wide_NO_IC %>% filter(region == "WLE"))
   pca_overall_cb = fit_pca_function(data_combined_wide_NO_IC %>% filter(region == "CB"))
   
   
@@ -427,8 +430,8 @@ compute_overall_pca = function(data_combined, sample_key){
                        values = pal_transect)+
     #scale_shape_manual(values = c(21, 19))+
     #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
-    #xlim(-4,4)+
-    #ylim(-3.5,3.5)+
+    xlim(-6,6)+
+    ylim(-4.5,4.5)+
     labs(shape="",
          title = "PCA: WLE",
          subtitle = "surface horizons")+
@@ -447,8 +450,8 @@ compute_overall_pca = function(data_combined, sample_key){
                        values = pal_transect)+
     #scale_shape_manual(values = c(21, 19))+
     #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
-    #xlim(-4,4)+
-    #ylim(-3.5,3.5)+
+    xlim(-5.5,7.5)+
+    ylim(-5,5)+
     labs(shape="",
          title = "PCA: CB",
          subtitle = "surface horizons")+
@@ -456,8 +459,9 @@ compute_overall_pca = function(data_combined, sample_key){
     theme(legend.position = "top", legend.box = "vertical")+
     NULL
   
-  library(patchwork)
-  gg_pca_regions = gg_pca_wle + gg_pca_cb
+#  library(patchwork)
+#  gg_pca_regions = gg_pca_wle + gg_pca_cb
+  gg_pca_regions = cowplot::plot_grid(gg_pca_wle + gg_pca_cb)
   
   list(gg_pca_overall = gg_pca_overall,
        gg_pca_regions = gg_pca_regions)
@@ -539,10 +543,34 @@ compute_correlations = function(data_combined_wide, TITLE){
 
 }
 
-
+compute_permanova = function(data_combined){
+  
+  data_combined_subset = 
+    data_combined %>% 
+    filter(!transect %in% "wte") %>% 
+    filter(!grepl("Bromide|Fluoride", name, ignore.case = TRUE))
+  
+  data_combined_wide_NO_IC = 
+    data_combined_subset %>% 
+    dplyr::select(sample_label, analysis, name, value) %>% 
+    filter(!analysis %in% "IC") %>% 
+    filter(!grepl("dic", name, ignore.case = TRUE)) %>% 
+    separate(name, sep = "_", into = "variable", remove = F) %>% 
+    dplyr::select(sample_label, variable, value) %>% 
+    pivot_wider(names_from = "variable") %>% 
+    left_join(sample_key) %>% 
+    filter(!grepl("016", sample_label)) %>% # this one sample is very weird
+    force()
+  
+  library(vegan)
+  
+  adonis2(data_combined_permanova %>% dplyr::select(is.numeric) ~ (region + site + transect)^2, 
+          data = data_combined_permanova) 
+  
+}
 
 ########################
-# plots for each analyte
+# plots for each analyte ----
 ## there are different functions for different types of graphs
 ## the function names describe the variable on the x-axis
 
@@ -553,7 +581,7 @@ plot_transect_as_x = function(data, YLAB, TITLE = "", SUBTITLE = "", SCALES = "f
          aes(x = transect,
              y = value,
              group= site,
-             color = horizon,
+             #color = horizon,
              shape = site,
              #alpha = horizon
          )) +
@@ -1149,13 +1177,15 @@ plot_texture = function(texture_processed){
 
 ########################
 
-# make summary tables
+# make summary tables ----
 make_summary_tables <- function(data_combined){
   
+  data_combined_subset = make_data_subset(data_combined)
+  
+  # totals by transect
   data_combined_summary <- 
-    data_combined %>% 
-    filter(horizon != "B") %>% 
-    group_by(analysis, name, region, transect, horizon) %>% 
+    data_combined_subset %>% 
+    group_by(analysis, name, region, transect) %>% 
     dplyr::summarise(mean = mean(value),
                      mean = round(mean, 2),
                      sd = sd(value),
@@ -1167,6 +1197,6 @@ make_summary_tables <- function(data_combined){
     dplyr::select(-c(region, transect, mean, sd, se)) %>% 
     pivot_wider(names_from = region_transect, values_from = mean_se)
   
-  
-  
+
 }
+
