@@ -1405,3 +1405,71 @@ make_graphs_by_transect_SITE_AS_COLOR = function(data_combined_subset){
        gg_cb_spcond = gg_cb_spcond
   )
 }
+
+include_wte = function(data_combined){
+  
+  owc_wte = 
+    data_combined %>% 
+    filter(site == "OWC") %>% 
+    filter(!grepl("Bromide|Fluoride|Nitrate|Calcium|Magnesium|Potassium|Sodium|Phosphate|Ammonia", name, ignore.case = TRUE)) %>% 
+    filter(!analysis %in% c("Ferrozine", "LOI"))
+  
+  
+  owc_wte_wide = make_data_wide(owc_wte)
+    
+  
+  fit_pca_function = function(dat){
+    
+    dat %>% 
+      drop_na()
+    
+    num = 
+      dat %>%       
+      dplyr::select(where(is.numeric)) %>%
+      dplyr::mutate(row = row_number()) %>% 
+      drop_na()
+    
+    num_row_numbers = num %>% dplyr::select(row)
+    
+    grp = 
+      dat %>% 
+      dplyr::select(where(is.character)) %>% 
+      dplyr::mutate(row = row_number()) %>% 
+      right_join(num_row_numbers)
+    
+    
+    num = num %>% dplyr::select(-row)
+    pca_int = prcomp(num, scale. = T)
+    
+    list(num = num,
+         grp = grp,
+         pca_int = pca_int)
+  }
+  
+  ## PCA input files ----
+  pca_owc = fit_pca_function(owc_wte_wide)
+  
+  ## PCA plots overall ----
+  
+  ggbiplot(pca_owc$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_owc$grp$transect), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+    geom_point(size=3,stroke=1, alpha = 1,
+               aes(#shape = pca_owc$grp$site,
+                   color = groups))+ 
+    scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+                       values = pal_transect)+
+    #scale_shape_manual(values = c(21, 19))+
+    #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
+   # xlim(-6,6)+
+  #  ylim(-4.5,4.5)+
+    labs(shape="",
+         title = "PCA: OWC",
+         subtitle = "surface horizons")+
+    theme_kp()+
+    theme(legend.position = "top", legend.box = "vertical")+
+    NULL
+  
+  
+  
+}
