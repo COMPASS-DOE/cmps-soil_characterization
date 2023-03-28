@@ -1254,3 +1254,31 @@ make_summary_tables <- function(data_combined){
   }
 }
 
+#
+# stats ----
+compute_lme_for_analytes = function(data_combined){
+  
+  fit_lme = function(dat){
+    
+    a = nlme::lme(value ~ transect, 
+                  random =~1|site, 
+                  data = dat) %>% 
+      anova()
+  
+    a %>% 
+      as.data.frame() %>% 
+      rownames_to_column("variable") %>% 
+      filter(variable == "transect") %>%
+      rename(p_value = `p-value`) %>% 
+      dplyr::select(p_value) %>% 
+      mutate(p_value = round(p_value, 3))
+    
+    }
+
+  x_lme = data_combined_subset %>% 
+    group_by(region, name) %>% 
+    do(fit_lme(.))
+}
+  
+
+
