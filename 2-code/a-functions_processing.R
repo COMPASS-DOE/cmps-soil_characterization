@@ -923,7 +923,7 @@ combine_data = function(moisture_processed, pH_processed, tctnts_data_samples, l
                  weoc_processed, dic_processed, din_processed, icp_processed,
                  ferrozine_processed, mehlich_processed, ions_processed_meq)
   
-  data_combined = 
+  data_combined_all_horizons = 
     df_list %>% reduce(full_join) %>% 
     dplyr::select(-notes, -ends_with(c("_ppm", "_mgL", "_flag"))) %>% 
     filter(!grepl("_vac|rep", sample_label)) %>% 
@@ -935,19 +935,23 @@ combine_data = function(moisture_processed, pH_processed, tctnts_data_samples, l
     reorder_horizon() %>% 
     force() 
   
-  data_combined_surface_only = 
-    data_combined %>% 
-    mutate(surface = case_when(region == "WLE" & horizon == "A" ~ "surface",
-                     (site == "MSM" | site == "GWI") & horizon == "O" ~ "surface",
-                     site == "GCREW" & horizon == "A" ~ "surface")) %>% 
-    filter(surface == "surface") %>% 
-    dplyr::select(-surface)
-  
-  list(data_combined_surface_only = data_combined_surface_only,
-       data_combined_all_horizons = data_combined)
+  data_combined_all_horizons
 
 }
 #data_combined = combine_data()  
 
+subset_surface_horizons = function(data_combined_all_horizons){
+  
+  data_combined_surface_only = 
+    data_combined_all_horizons %>% 
+    mutate(surface = case_when(region == "WLE" & horizon == "A" ~ "surface",
+                               (site == "MSM" | site == "GWI") & horizon == "O" ~ "surface",
+                               site == "GCREW" & horizon == "A" ~ "surface")) %>% 
+    filter(surface == "surface") %>% 
+    dplyr::select(-surface)
+  
+  data_combined_surface_only
+  
+}
 
 
