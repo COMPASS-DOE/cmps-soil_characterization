@@ -1282,3 +1282,126 @@ compute_lme_for_analytes = function(data_combined){
   
 
 
+
+
+
+plot_site_as_color = function(data, YLAB = "", TITLE = "", SUBTITLE = "", SCALES = "free_x"){
+  
+  compute_lme_hsd_for_graphs = function(data_combined){
+    
+    fit_lme_hsd_transect = function(dat){
+      # this function will assign post-hoc HSD letters to the transect
+      # use lme4::lmer -> multcomp::glht -> multcomp::cld
+      lmer = lme4::lmer(value ~ transect + (1|site), data = dat)
+      
+      
+      #library(emmeans)
+      #inter.test1 <- emmeans(lmer, "transect")
+      
+      h = summary(glht(lmer, linfct = mcp(transect = "Tukey")), test = adjusted("holm"))
+      x = cld(h, decreasing = TRUE) # decreasing order of HSD letters
+      x$mcletters$monospacedLetters %>% # sigh
+        as.data.frame() %>% 
+        rownames_to_column("transect") %>% 
+        rename(label = ".") %>% 
+        mutate(label = str_remove_all(label, " "))
+      
+    }
+    
+    library(multcomp)
+    library(multcompView)
+    
+    x_lme_hsd = 
+      data_combined %>% 
+      group_by(region, analysis, name) %>% 
+      do(fit_lme_hsd(.))
+    
+    lme_y =
+      data_combined %>% 
+      group_by(region, analysis, name) %>% 
+      dplyr::summarise(max = max(value),
+                       y = max + max/5) %>% 
+      ungroup()
+    
+    x_lme_hsd %>% 
+      left_join(lme_y %>% dplyr::select(-max))
+  }
+  lme_for_graphs = compute_lme_hsd_for_graphs(data)  
+  
+  ggplot(data,
+         aes(x = transect,
+             y = value
+             #shape = horizon,
+             #alpha = horizon
+         )) +
+    # plot points
+    geom_point(aes(group = site,
+                   color = site),
+               size = 2.5, stroke = 1,
+               position = position_dodge(width = 0.4))+
+    # plot HSD letters
+    geom_text(data = lme_for_graphs, aes(y = y, label = label), size = 5)+
+    scale_alpha_manual(values = c(1, 0.3))+
+    scale_color_manual(breaks = c("CC", "PR", "OWC", "MSM", "GWI", "GCREW"), values = c('#ED6e85', '#ffc115', '#7f4420', '#90BE6D', '#03045E', '#00B4D8'))+
+    #scale_shape_manual(breaks = c("CC", "PR", "OWC", "MSM", "GWI", "GCREW"), values = c(1,2,3,4,5,6))+
+    facet_wrap(~region, scales = SCALES,
+               labeller = as_labeller(c("CB" = "Chesapeake Bay", "WLE" = "Lake Erie")))+
+    theme_kp()+
+    labs(x = "",
+         y = YLAB,
+         title = TITLE,
+         subtitle = SUBTITLE,
+         shape = "Site",
+         alpha = "Horizon",
+         color = "Site")+
+    theme(legend.position = "right", legend.box = "vertical")+
+    NULL
+  
+}
+make_graphs_by_transect_SITE_AS_COLOR = function(data_combined_subset){
+  
+  mehlich_p = data_combined_subset %>% filter(name == "mehlichp_ugg")
+  gg_wle_mehlich = plot_site_as_color(data = mehlich_p %>% filter(region == "WLE"), YLAB = "P, μg/g", TITLE = "Mehlich-3 extractable P", 
+                                       SUBTITLE = "measured colorimetrically (molybdate/ascorbic acid method)")
+  
+  
+  icp <- 
+    data_combined_subset %>% 
+    filter(analysis == "ICP") %>% 
+    mutate(name = str_remove(name, "_meq100g"), 
+           name = recode(name, "cec" = "CEC"),
+           name = factor(name, levels = c("CEC", "Ca", "Na", "K"))) %>% filter(!is.na(name))
+  gg_wle_icp = plot_site_as_color(data = icp %>% filter(region == "WLE"), YLAB = "meq/100g") + facet_wrap(~name, scales = "free_y")
+  gg_cb_icp = plot_site_as_color(data = icp %>% filter(region == "CB"), YLAB = "meq/100g") + facet_wrap(~name, scales = "free_y")
+  
+  
+  ions <- 
+    data_combined_subset %>% 
+    filter(analysis == "IC") %>% 
+    filter(grepl("Chloride|Sulfate", name)) %>% 
+    mutate(name = str_remove(name, "_meq100g"))
+  
+  gg_wle_anions = plot_site_as_color(data = ions %>% filter(region == "WLE"), YLAB = "meq/100g") + facet_wrap(~name, scales = "free_y")
+  gg_cb_anions = plot_site_as_color(data = ions %>% filter(region == "CB"), YLAB = "meq/100g") + facet_wrap(~name, scales = "free_y")
+  
+
+  ferrozine <- data_combined_subset %>% filter(analysis == "Ferrozine")
+  gg_cb_fe <- plot_site_as_color(data = ferrozine %>% filter(region == "CB"), YLAB = "Fe, μg/g", 
+                                        TITLE = "Total Fe", 
+                                        SUBTITLE = "extracted with 0.5M HCl, measured colorimetrically using ferrozine")
+  
+  
+  pH <- data_combined_subset %>% filter(analysis == "PH")
+  gg_cb_spcond <- plot_site_as_color(data = pH %>% filter(grepl("spCond", name)) %>% filter(region == "CB"), 
+                                     YLAB = "Specific Conductance mS/cm", TITLE = "Specific Conductance")
+ 
+  
+  list(gg_wle_mehlich = gg_wle_mehlich,
+       gg_wle_icp = gg_wle_icp,
+       gg_cb_icp = gg_cb_icp,
+       gg_wle_anions = gg_wle_anions,
+       gg_cb_anions = gg_cb_anions,
+       gg_cb_fe = gg_cb_fe,
+       gg_cb_spcond = gg_cb_spcond
+  )
+}
