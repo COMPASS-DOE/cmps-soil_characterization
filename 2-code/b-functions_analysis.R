@@ -1197,6 +1197,60 @@ make_summary_tables <- function(data_combined){
     dplyr::select(-c(region, transect, mean, sd, se)) %>% 
     pivot_wider(names_from = region_transect, values_from = mean_se)
   
-
+  # by site-transect
+  data_combined_summary_site <- 
+    data_combined_subset %>% 
+    group_by(analysis, name, region, site, transect) %>% 
+    dplyr::summarise(mean = mean(value),
+                     mean = round(mean, 2),
+                     sd = sd(value),
+                     se = sd/sqrt(n()),
+                     se = round(se, 2)) %>% 
+    mutate(region_site_transect = paste0(region, "_", site, "_", transect),
+           mean_se = paste(mean, "\u00b1", se)) %>% 
+    ungroup() %>% 
+    dplyr::select(-c(region, transect, site, mean, sd, se)) %>% 
+    pivot_wider(names_from = region_site_transect, values_from = mean_se)
+  
+  # TO-DO: HSD letters for totals and for sites
+  compute_site_aov_by_transect = function(){
+    
+    fit_aov = function(dat){
+      a = 
+        aov(value ~ site, data = dat) %>% broom::tidy() %>% filter(term == "site") %>% 
+        rename(p_value = `p.value`) %>% 
+        dplyr::select(p_value)%>% 
+        mutate(p_value = round(p_value, 3))
+      
+    }
+    
+    fit_hsd = function(dat){
+      a = aov(value ~ site, data = dat)
+      h = agricolae::HSD.test(a, "site")
+      h$groups %>% as.data.frame() %>% rownames_to_column("site") %>% 
+        dplyr::select(site, groups)
+      
+    }
+    
+    x = data_combined %>% 
+      filter(!grepl("Bromide", name)) %>% 
+      filter(transect != "wte") %>% 
+      #distinct(name, region, transect, site) %>% 
+      group_by(name, region, transect) %>% 
+      #dplyr::summarise(n = n())
+      
+      do(fit_aov(.))
+    
+    
+    # x_hsd = 
+    #dat = 
+    data_combined %>% 
+      filter(!analysis == "DIC") %>% 
+      #filter(!analysis == "IC") %>% 
+      filter(!grepl("Bromide|Phosphate|Fluoride", name)) %>% 
+      group_by(name, region, transect) %>% 
+      do(fit_hsd(.))
+    
+  }
 }
 
