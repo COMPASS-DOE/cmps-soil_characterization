@@ -325,7 +325,7 @@ make_data_subset = function(data_combined){
     filter(!transect %in% "wte") %>% 
     filter(!grepl("Bromide|Fluoride|Nitrate|Calcium|Magnesium|Potassium|Sodium|Phosphate|Ammonia", name, ignore.case = TRUE))
 }
-make_data_wide = function(data_combined_subset){
+make_data_wide = function(data_combined_subset, sample_key){
   
   #data_combined_wide = 
     data_combined_subset %>% 
@@ -361,10 +361,11 @@ compute_overall_pca = function(data_combined, sample_key){
   library(ggbiplot)
   
   data_combined_subset = make_data_subset(data_combined)
-  data_combined_wide = make_data_wide(data_combined_subset)
+  data_combined_wide = make_data_wide(data_combined_subset, sample_key)
   data_combined_wide_NO_IC = make_data_wide(data_combined_subset %>% 
                                               filter(!analysis %in% "IC") %>% 
-                                              filter(!grepl("dic", name, ignore.case = TRUE)))
+                                              filter(!grepl("dic", name, ignore.case = TRUE)),
+                                            sample_key)
   
   fit_pca_function = function(dat){
     
@@ -468,14 +469,15 @@ compute_overall_pca = function(data_combined, sample_key){
   
 }
 
-compute_correlations = function(data_combined_wide, TITLE){
+compute_correlations = function(data_combined, sample_key){
   #library(corrplot)
   
   data_combined_subset = make_data_subset(data_combined)
-  data_combined_wide = make_data_wide(data_combined_subset)
+  data_combined_wide = make_data_wide(data_combined_subset, sample_key)
   data_combined_wide_NO_IC = make_data_wide(data_combined_subset %>% 
                                               filter(!analysis %in% "IC") %>% 
-                                              filter(!grepl("dic", name, ignore.case = TRUE)))
+                                              filter(!grepl("dic", name, ignore.case = TRUE)),
+                                            sample_key)
   
   fit_correlations_function = function(dat, TITLE){
     num = 
@@ -516,8 +518,9 @@ compute_correlations = function(data_combined_wide, TITLE){
   corr_wle = fit_correlations_function(dat = data_combined_wide_NO_IC %>% filter(region == "WLE"), TITLE = "WLE" )
   corr_cb = fit_correlations_function(dat = data_combined_wide_NO_IC %>% filter(region == "CB"), TITLE = "CB")
   
+  corr_regions = cowplot::plot_grid(corr_wle, corr_cb)
   list(corr_all = corr_all,
-       corr_regions = corr_wle + corr_cb)
+       corr_regions = corr_regions)
 
 }
 
