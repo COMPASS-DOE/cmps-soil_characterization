@@ -66,6 +66,43 @@ tar_read(gg_correlations)$corr_regions
 
 ## EACH ANALYSIS
 
+### figures for manuscript
+
+<details>
+  <summary>click to open</summary>
+  
+```{r ms_mehlich, fig.height=5, fig.width=6}
+tar_read(gg_by_transect_colorsites)$gg_wle_mehlich
+```
+
+
+```{r ms_wle_icp, fig.height=9, fig.width=9}
+tar_read(gg_by_transect_colorsites)$gg_wle_icp
+```
+
+```{r ms_cb_icp, fig.height=9, fig.width=9}
+tar_read(gg_by_transect_colorsites)$gg_cb_icp
+```
+
+```{r ms_wle_anions, fig.height=5, fig.width=9}
+tar_read(gg_by_transect_colorsites)$gg_wle_anions
+```
+
+```{r ms_cb_anions, fig.height=5, fig.width=9}
+tar_read(gg_by_transect_colorsites)$gg_cb_anions
+```
+
+```{r ms_cb_fe, fig.height=5, fig.width=6}
+tar_read(gg_by_transect_colorsites)$gg_cb_fe
+```
+
+```{r ms_cb_cond, fig.height=5, fig.width=6}
+tar_read(gg_by_transect_colorsites)$gg_cb_spcond
+```
+
+</details>
+
+
 ### by transect
 
 <details>
