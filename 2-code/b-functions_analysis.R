@@ -645,7 +645,7 @@ make_graphs_by_transect = function(data_combined){
   
   pH <- combined_surface %>% filter(analysis == "PH")
   gg_ph <- plot_transect_as_x(data = pH %>% filter(name == "pH"), YLAB = "pH", TITLE = "pH")
-  gg_sp_conduc <- plot_transect_as_x(data = pH %>% filter(grepl("specific_conductance", name)), 
+  gg_sp_conduc <- plot_transect_as_x(data = pH %>% filter(grepl("spConductance_mscm", name)), 
                                      YLAB = "Specific Conductance μS/cm", TITLE = "Specific Conductance")
   
   tctnts <- combined_surface %>% filter(analysis == "TCTNTS")
@@ -761,7 +761,7 @@ make_graphs_by_site = function(data_combined){
   
   pH <- combined_surface %>% filter(analysis == "PH")
   gg_ph <- plot_site_as_x(data = pH %>% filter(name == "pH"), YLAB = "pH", TITLE = "pH")
-  gg_sp_conduc <- plot_site_as_x(data = pH %>% filter(grepl("specific_conductance", name)), 
+  gg_sp_conduc <- plot_site_as_x(data = pH %>% filter(grepl("spConductance_mscm", name)), 
                                      YLAB = "Specific Conductance μS/cm", TITLE = "Specific Conductance")
   
   tctnts <- combined_surface %>% filter(analysis == "TCTNTS")
