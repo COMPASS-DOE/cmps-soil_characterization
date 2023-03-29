@@ -471,6 +471,12 @@ compute_overall_pca = function(data_combined, sample_key){
 compute_correlations = function(data_combined_wide, TITLE){
   #library(corrplot)
   
+  data_combined_subset = make_data_subset(data_combined)
+  data_combined_wide = make_data_wide(data_combined_subset)
+  data_combined_wide_NO_IC = make_data_wide(data_combined_subset %>% 
+                                              filter(!analysis %in% "IC") %>% 
+                                              filter(!grepl("dic", name, ignore.case = TRUE)))
+  
   fit_correlations_function = function(dat, TITLE){
     num = 
       dat %>%       
@@ -506,34 +512,6 @@ compute_correlations = function(data_combined_wide, TITLE){
 
   }
 
-  data_combined_wide = 
-    data_combined %>% 
-    dplyr::select(sample_label, analysis, name, value) %>% 
-    separate(name, sep = "_", into = "variable", remove = F) %>% 
-    #mutate(name = paste0(variable, " (", analysis, ")")) %>% 
-    dplyr::select(sample_label, variable, value) %>% 
-    pivot_wider(names_from = "variable") %>% 
-    dplyr::select(-"Bromide") %>% 
-    left_join(sample_key) %>% 
-    filter(!transect %in% "wte") %>% 
-    filter(!grepl("016", sample_label)) %>% # this one sample is very weird
-    force()
-  
-  data_combined_wide_NO_IC = 
-    data_combined %>% 
-    dplyr::select(sample_label, analysis, name, value) %>% 
-    filter(!analysis %in% "IC") %>% 
-    separate(name, sep = "_", into = "variable", remove = F) %>% 
-    #mutate(name = paste0(variable, " (", analysis, ")")) %>% 
-    dplyr::select(sample_label, variable, value) %>% 
-    pivot_wider(names_from = "variable") %>% 
-    left_join(sample_key) %>% 
-    filter(!transect %in% "wte") %>% 
-    filter(!grepl("016", sample_label)) %>% # this one sample is very weird
-    force()
-  
-  
-  
   corr_all = fit_correlations_function(dat = data_combined_wide_NO_IC, TITLE = "all")
   corr_wle = fit_correlations_function(dat = data_combined_wide_NO_IC %>% filter(region == "WLE"), TITLE = "WLE" )
   corr_cb = fit_correlations_function(dat = data_combined_wide_NO_IC %>% filter(region == "CB"), TITLE = "CB")
