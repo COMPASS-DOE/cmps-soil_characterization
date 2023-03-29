@@ -1182,7 +1182,26 @@ make_summary_tables <- function(data_combined){
   
   data_combined_subset = make_data_subset(data_combined)
   
-  # totals by transect
+  # get all the hsd letters for all combinations ----
+  hsd_transect_overall = 
+    data_combined_subset %>% 
+    group_by(analysis, name, region) %>% 
+    do(fit_lme_hsd_transect(.))
+  
+  hsd_site_by_transect = 
+    data_combined_subset %>% 
+    filter(!grepl("DIC", analysis)) %>% 
+    group_by(analysis, name, region, transect) %>% 
+    do(fit_hsd_site(.))
+  
+  hsd_transect_by_site = 
+    data_combined_subset %>% 
+    group_by(analysis, name, region, site) %>% 
+    do(fit_hsd_transect(.))
+  
+  # calculate summaries by transect and by site ----
+  # include the hsd letters
+  ## totals by transect
   data_combined_summary <- 
     data_combined_subset %>% 
     group_by(analysis, name, region, transect) %>% 
@@ -1191,13 +1210,16 @@ make_summary_tables <- function(data_combined){
                      sd = sd(value),
                      se = sd/sqrt(n()),
                      se = round(se, 2)) %>% 
-    mutate(region_transect = paste0(region, "_", transect),
-           mean_se = paste(mean, "\u00b1", se)) %>% 
+    left_join(hsd_transect_overall) %>% 
+    mutate(#region_transect = paste0(region, "_", transect),
+      mean_se = paste(mean, "\u00b1", se, groups),
+      site = "MEAN") %>% 
     ungroup() %>% 
-    dplyr::select(-c(region, transect, mean, sd, se)) %>% 
-    pivot_wider(names_from = region_transect, values_from = mean_se)
+    #dplyr::select(-c(region, transect, mean, sd, se)) %>% 
+    #pivot_wider(names_from = region_transect, values_from = mean_se) %>% 
+    force()
   
-  # by site-transect
+  ## by site-transect
   data_combined_summary_site <- 
     data_combined_subset %>% 
     group_by(analysis, name, region, site, transect) %>% 
@@ -1206,128 +1228,146 @@ make_summary_tables <- function(data_combined){
                      sd = sd(value),
                      se = sd/sqrt(n()),
                      se = round(se, 2)) %>% 
-    mutate(region_site_transect = paste0(region, "_", site, "_", transect),
-           mean_se = paste(mean, "\u00b1", se)) %>% 
+    left_join(hsd_site_by_transect %>% rename(group1 = groups)) %>% 
+    left_join(hsd_transect_by_site %>% rename(group2 = groups)) %>% 
+    mutate(# region_site_transect = paste0(region, "_", site, "_", transect),
+      mean_se = paste(mean, "\u00b1", se, group1, group2)) %>% 
     ungroup() %>% 
-    dplyr::select(-c(region, transect, site, mean, sd, se)) %>% 
-    pivot_wider(names_from = region_site_transect, values_from = mean_se)
+    #dplyr::select(-c(region, transect, site, mean, sd, se)) %>% 
+    #pivot_wider(names_from = region_site_transect, values_from = mean_se) %>% 
+    force()
   
-  # TO-DO: HSD letters for totals and for sites
-  compute_site_aov_by_transect = function(){
-    
-    fit_aov = function(dat){
-      a = 
-        aov(value ~ site, data = dat) %>% broom::tidy() %>% filter(term == "site") %>% 
-        rename(p_value = `p.value`) %>% 
-        dplyr::select(p_value)%>% 
-        mutate(p_value = round(p_value, 3))
-      
-    }
-    
-    fit_hsd = function(dat){
-      a = aov(value ~ site, data = dat)
-      h = agricolae::HSD.test(a, "site")
-      h$groups %>% as.data.frame() %>% rownames_to_column("site") %>% 
-        dplyr::select(site, groups)
-      
-    }
-    
-    x = data_combined %>% 
-      filter(!grepl("Bromide", name)) %>% 
-      filter(transect != "wte") %>% 
-      #distinct(name, region, transect, site) %>% 
-      group_by(name, region, transect) %>% 
-      #dplyr::summarise(n = n())
-      
-      do(fit_aov(.))
-    
-    
-    # x_hsd = 
-    #dat = 
-    data_combined %>% 
-      filter(!analysis == "DIC") %>% 
-      #filter(!analysis == "IC") %>% 
-      filter(!grepl("Bromide|Phosphate|Fluoride", name)) %>% 
-      group_by(name, region, transect) %>% 
-      do(fit_hsd(.))
-    
-  }
+  # combine the site and transect summaries ----
+  # then split into different groups based on analysis
+  data_summary_ALL = 
+    data_combined_summary_site %>% 
+    dplyr::select(analysis, name, region, site, transect, mean_se) %>% 
+    bind_rows(data_combined_summary %>% dplyr::select(analysis, name, region, site, transect, mean_se)) %>% 
+    #mutate(site = site %>% forcats::fct_relevel("MEAN", after = Inf)) %>% 
+    mutate(site = factor(site, levels = c("CC", "PR", "OWC", "MSM", "GWI", "GCREW", "MEAN"))) %>% 
+    arrange(analysis, name, region, site)
+  
+  summary_BULK = 
+    data_summary_ALL %>% 
+    filter(grepl("TCTNTS|PH|LOI", analysis, ignore.case = TRUE)) %>% 
+    pivot_wider(names_from = "transect", values_from = "mean_se")
+  
+  summary_ICP = 
+    data_summary_ALL %>% 
+    filter(analysis == "ICP") %>% 
+    pivot_wider(names_from = "transect", values_from = "mean_se")
+  
+  summary_IC = 
+    data_summary_ALL %>% 
+    filter(analysis == "IC") %>% 
+    pivot_wider(names_from = "transect", values_from = "mean_se")
+  
+  summary_NUTRIENTS = 
+    data_summary_ALL %>% 
+    filter(grepl("ferrozine|mehlich|din", analysis, ignore.case = TRUE)) %>% 
+    pivot_wider(names_from = "transect", values_from = "mean_se")
+  
+  summary_DOC_DIC = 
+    data_summary_ALL %>% 
+    filter(grepl("npoc|dic", analysis, ignore.case = TRUE)) %>% 
+    pivot_wider(names_from = "transect", values_from = "mean_se")
+  
+  list(summary_BULK = summary_BULK,
+       summary_ICP = summary_ICP,
+       summary_IC = summary_IC,
+       summary_NUTRIENTS = summary_NUTRIENTS,
+       summary_DOC_DIC = summary_DOC_DIC)
+  
 }
+# summary_table = make_summary_tables(data_combined)
 
 #
 # stats ----
-compute_lme_for_analytes = function(data_combined){
-  
-  fit_lme = function(dat){
-    
-    a = nlme::lme(value ~ transect, 
-                  random =~1|site, 
-                  data = dat) %>% 
-      anova()
-  
-    a %>% 
-      as.data.frame() %>% 
-      rownames_to_column("variable") %>% 
-      filter(variable == "transect") %>%
-      rename(p_value = `p-value`) %>% 
-      dplyr::select(p_value) %>% 
-      mutate(p_value = round(p_value, 3))
-    
-    }
 
-  x_lme = data_combined_subset %>% 
-    group_by(region, name) %>% 
-    do(fit_lme(.))
+fit_lme_transect = function(dat){
+  
+  a = nlme::lme(value ~ transect, 
+                random =~1|site, 
+                data = dat) %>% 
+    anova()
+  
+  a %>% 
+    as.data.frame() %>% 
+    rownames_to_column("variable") %>% 
+    filter(variable == "transect") %>%
+    rename(p_value = `p-value`) %>% 
+    dplyr::select(p_value) %>% 
+    mutate(p_value = round(p_value, 3))
+  
 }
+fit_lme_hsd_transect = function(dat){
+  # this function will assign post-hoc HSD letters to the transect
+  # use lme4::lmer -> multcomp::glht -> multcomp::cld
   
+  lmer = lme4::lmer(value ~ transect + (1|site), data = dat)
+  h = summary(glht(lmer, linfct = mcp(transect = "Tukey")), test = adjusted("holm"))
+  x = cld(h, decreasing = TRUE) # decreasing order of HSD letters
+  x$mcletters$monospacedLetters %>% # sigh
+    as.data.frame() %>% 
+    rownames_to_column("transect") %>% 
+    rename(groups = ".") %>% 
+    mutate(groups = str_remove_all(groups, " "),
+           groups = toupper(groups))
+  
+}
+fit_aov_site = function(dat){
+  # a = 
+  aov(value ~ site, data = dat) %>% broom::tidy() %>% filter(term == "site") %>% 
+    rename(p_value = `p.value`) %>% 
+    dplyr::select(p_value)%>% 
+    mutate(p_value = round(p_value, 3))
+}
+fit_hsd_site = function(dat){
+  a = aov(value ~ site, data = dat)
+  h = agricolae::HSD.test(a, "site")
+  h$groups %>% 
+    as.data.frame() %>% 
+    rownames_to_column("site") %>% 
+    dplyr::select(site, groups) %>% 
+    mutate(groups = tolower(groups))
+}
+fit_hsd_transect = function(dat){
+  a = aov(value ~ transect, data = dat)
+  h = agricolae::HSD.test(a, "transect")
+  h$groups %>% 
+    as.data.frame() %>% 
+    rownames_to_column("transect") %>% 
+    dplyr::select(transect, groups) %>% 
+    mutate(groups = str_replace_all(groups, c("a" = "α", "b" = "β", "c" = "ψ")))
+}
 
-
-
-
+library(multcomp)
+library(multcompView)
 
 plot_site_as_color = function(data, YLAB = "", TITLE = "", SUBTITLE = "", SCALES = "free_x"){
   
-  compute_lme_hsd_for_graphs = function(data_combined){
-    
-    fit_lme_hsd_transect = function(dat){
-      # this function will assign post-hoc HSD letters to the transect
-      # use lme4::lmer -> multcomp::glht -> multcomp::cld
-      lmer = lme4::lmer(value ~ transect + (1|site), data = dat)
-      
-      
-      #library(emmeans)
-      #inter.test1 <- emmeans(lmer, "transect")
-      
-      h = summary(glht(lmer, linfct = mcp(transect = "Tukey")), test = adjusted("holm"))
-      x = cld(h, decreasing = TRUE) # decreasing order of HSD letters
-      x$mcletters$monospacedLetters %>% # sigh
-        as.data.frame() %>% 
-        rownames_to_column("transect") %>% 
-        rename(label = ".") %>% 
-        mutate(label = str_remove_all(label, " "))
-      
-    }
-    
-    library(multcomp)
-    library(multcompView)
-    
-    x_lme_hsd = 
-      data_combined %>% 
-      group_by(region, analysis, name) %>% 
-      do(fit_lme_hsd(.))
-    
-    lme_y =
-      data_combined %>% 
-      group_by(region, analysis, name) %>% 
-      dplyr::summarise(max = max(value),
-                       y = max + max/5) %>% 
-      ungroup()
-    
-    x_lme_hsd %>% 
-      left_join(lme_y %>% dplyr::select(-max))
-  }
-  lme_for_graphs = compute_lme_hsd_for_graphs(data)  
+  # make summary table for HSD letters ----
+  hsd_transect_overall = 
+    data_combined_subset %>% 
+    group_by(analysis, name, region) %>% 
+    do(fit_lme_hsd_transect(.))
   
+  ## then calculate the y-axis position for the labels
+  lme_y =
+    data_combined %>% 
+    group_by(region, analysis, name) %>% 
+    dplyr::summarise(max = max(value),
+                     y = max + max/5) %>% 
+    ungroup()
+  
+  ## combine them
+  lme_for_graphs = 
+    hsd_transect_overall %>% 
+    left_join(lme_y %>% dplyr::select(-max))
+  
+  #
+  # graphs ----
+    
   ggplot(data,
          aes(x = transect,
              y = value
@@ -1343,7 +1383,6 @@ plot_site_as_color = function(data, YLAB = "", TITLE = "", SUBTITLE = "", SCALES
     geom_text(data = lme_for_graphs, aes(y = y, label = label), size = 5)+
     scale_alpha_manual(values = c(1, 0.3))+
     scale_color_manual(breaks = c("CC", "PR", "OWC", "MSM", "GWI", "GCREW"), values = c('#ED6e85', '#ffc115', '#7f4420', '#90BE6D', '#03045E', '#00B4D8'))+
-    #scale_shape_manual(breaks = c("CC", "PR", "OWC", "MSM", "GWI", "GCREW"), values = c(1,2,3,4,5,6))+
     facet_wrap(~region, scales = SCALES,
                labeller = as_labeller(c("CB" = "Chesapeake Bay", "WLE" = "Lake Erie")))+
     theme_kp()+
