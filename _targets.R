@@ -99,35 +99,35 @@ list(
   ## tar_target(gg_ions, plot_ions(ions_processed, sample_key)),
   
   # combined data
-  tar_target(data_combined, combine_data(moisture_processed, pH_processed, tctnts_data_samples, loi_processed,
+  tar_target(data_combined_all_horizons, combine_data(moisture_processed, pH_processed, tctnts_data_samples, loi_processed,
                                          weoc_processed, dic_processed, din_processed, icp_processed,
                                          ferrozine_processed, mehlich_processed, ions_processed_meq, 
-                                         sample_key)$data_combined),
-  tar_target(data_combined_wide, combine_data(moisture_processed, pH_processed, tctnts_data_samples, loi_processed,
-                                         weoc_processed, dic_processed, din_processed, icp_processed,
-                                         ferrozine_processed, mehlich_processed, ions_processed_meq, 
-                                         sample_key)$data_combined_wide),
+                                         sample_key)),
+  tar_target(data_combined, subset_surface_horizons(data_combined_all_horizons)),
   tar_target(analysis_completion_matrix, compute_analysis_matrix(data_combined)),
-  tar_target(gg_pca_all, compute_overall_pca(data_combined_wide, sample_key)),
-  tar_target(gg_correlations, compute_correlations(data_combined_wide, sample_key)),
+  tar_target(gg_pca_all, compute_overall_pca(data_combined, sample_key)),
+  tar_target(gg_correlations, compute_correlations(data_combined, sample_key)),
   
-  
+  tar_target(gg_by_transect_colorsites, make_graphs_by_transect_SITE_AS_COLOR(data_combined)),
   tar_target(gg_by_transect, make_graphs_by_transect(data_combined)),
   tar_target(gg_by_site_oa, make_graphs_by_site(data_combined %>% filter(horizon != "B"))),
   tar_target(gg_by_site_oab, make_graphs_by_site(data_combined)),
   tar_target(gg_xrd, plot_xrd(xrd_processed)),
   
+  tar_target(summary_tables, make_summary_tables(data_combined)),
+  
   # export
   tar_target(export, {
-    write.csv(data_combined, "1-data/processed/chemistry_combined.csv", row.names = FALSE)
+    write.csv(data_combined, "1-data/processed/chemistry_combined_surface_horizon.csv", row.names = FALSE)
+    write.csv(data_combined_all_horizons, "1-data/processed/chemistry_combined_all_horizons.csv", row.names = FALSE)
     write.csv(icr_meta, "1-data/processed/icr_meta.csv", row.names = FALSE)
     crunch::write.csv.gz(icr_data_long, "1-data/processed/icr_long_all_samples.csv.gz", row.names = FALSE)
     crunch::write.csv.gz(icr_data_trt, "1-data/processed/icr_long_treatments.csv.gz", row.names = FALSE)
     
   }, format = "file"),
-  
-  
-  # report  
-  tar_render(report, path = "3-reports/characterization_report.Rmd")
+   
+   
+   # report  
+   tar_render(report, path = "3-reports/characterization_report.Rmd")
   
 )
