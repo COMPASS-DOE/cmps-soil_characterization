@@ -1329,13 +1329,13 @@ plot_site_as_color = function(data, YLAB = "", TITLE = "", SUBTITLE = "", SCALES
   
   # make summary table for HSD letters ----
   hsd_transect_overall = 
-    data_combined_subset %>% 
+    data %>% 
     group_by(analysis, name, region) %>% 
     do(fit_lme_hsd_transect(.))
   
   ## then calculate the y-axis position for the labels
   lme_y =
-    data_combined %>% 
+    data %>% 
     group_by(region, analysis, name) %>% 
     dplyr::summarise(max = max(value),
                      y = max + max/5) %>% 
@@ -1361,7 +1361,7 @@ plot_site_as_color = function(data, YLAB = "", TITLE = "", SUBTITLE = "", SCALES
                size = 2.5, stroke = 1,
                position = position_dodge(width = 0.4))+
     # plot HSD letters
-    geom_text(data = lme_for_graphs, aes(y = y, label = label), size = 5)+
+    geom_text(data = lme_for_graphs, aes(y = y, label = groups), size = 5)+
     scale_alpha_manual(values = c(1, 0.3))+
     scale_color_manual(breaks = c("CC", "PR", "OWC", "MSM", "GWI", "GCREW"), values = c('#ED6e85', '#ffc115', '#7f4420', '#90BE6D', '#03045E', '#00B4D8'))+
     facet_wrap(~region, scales = SCALES,
@@ -1378,7 +1378,9 @@ plot_site_as_color = function(data, YLAB = "", TITLE = "", SUBTITLE = "", SCALES
     NULL
   
 }
-make_graphs_by_transect_SITE_AS_COLOR = function(data_combined_subset){
+make_graphs_by_transect_SITE_AS_COLOR = function(data_combined){
+  
+  data_combined_subset = make_data_subset(data_combined)
   
   mehlich_p = data_combined_subset %>% filter(name == "mehlichp_ugg")
   gg_wle_mehlich = plot_site_as_color(data = mehlich_p %>% filter(region == "WLE"), YLAB = "P, μg/g", TITLE = "Mehlich-3 extractable P", 
