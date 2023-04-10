@@ -1431,8 +1431,7 @@ make_graphs_by_transect_SITE_AS_COLOR = function(data_combined){
   data_combined_subset = make_data_subset(data_combined)
   
   mehlich_p = data_combined_subset %>% filter(name == "mehlichp_ugg")
-  gg_wle_mehlich = plot_site_as_color(data = mehlich_p %>% filter(region == "WLE"), YLAB = "P, μg/g", TITLE = "Mehlich-3 extractable P", 
-                                       SUBTITLE = "measured colorimetrically (molybdate/ascorbic acid method)")
+  gg_wle_mehlich = plot_site_as_color(data = mehlich_p %>% filter(region == "WLE"), YLAB = "Extractable P, μg/g")
   
   
   icp <- 
@@ -1456,14 +1455,12 @@ make_graphs_by_transect_SITE_AS_COLOR = function(data_combined){
   
 
   ferrozine <- data_combined_subset %>% filter(analysis == "Ferrozine")
-  gg_cb_fe <- plot_site_as_color(data = ferrozine %>% filter(region == "CB"), YLAB = "Fe, μg/g", 
-                                        TITLE = "Total Fe", 
-                                        SUBTITLE = "extracted with 0.5M HCl, measured colorimetrically using ferrozine")
+  gg_cb_fe <- plot_site_as_color(data = ferrozine %>% filter(region == "CB"), YLAB = "Extractable Fe, μg/g")
   
   
   pH <- data_combined_subset %>% filter(analysis == "PH")
   gg_cb_spcond <- plot_site_as_color(data = pH %>% filter(grepl("spCond", name)) %>% filter(region == "CB"), 
-                                     YLAB = "Specific Conductance mS/cm", TITLE = "Specific Conductance")
+                                     YLAB = "Specific Conductance mS/cm")
  
   
   list(gg_wle_mehlich = gg_wle_mehlich,
