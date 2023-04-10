@@ -1327,6 +1327,52 @@ fit_hsd_transect = function(dat){
 library(multcomp)
 library(multcompView)
 
+fit_betadispers = function(){
+  
+  data_combined_subset = 
+    data_combined %>% 
+    filter(!transect %in% "wte") %>% 
+    filter(!grepl("Bromide|Fluoride", name, ignore.case = TRUE))
+  
+  data_combined_wide_NO_IC = 
+    data_combined_subset %>% 
+    dplyr::select(sample_label, analysis, name, value) %>% 
+    filter(!analysis %in% "IC") %>% 
+    filter(!grepl("dic", name, ignore.case = TRUE)) %>% 
+    separate(name, sep = "_", into = "variable", remove = F) %>% 
+    dplyr::select(sample_label, variable, value) %>% 
+    pivot_wider(names_from = "variable") %>% 
+    left_join(sample_key) %>% 
+    filter(!grepl("016", sample_label)) %>% # this one sample is very weird
+    force()
+  
+  
+  
+  
+  g = data_combined_wide_NO_IC %>% drop_na() %>% filter(region == "CB")
+  g_data = g %>% dplyr::select(where(is.numeric)) 
+  g_matrix = as.matrix(g_data)
+  g_sample = g %>% dplyr::select(where(is.character)) 
+  
+  library(vegan)
+  g_rel = funrar::make_relative(g_matrix)
+  e_distance = vegdist(g_rel, method="euclidean")
+  
+  betadisp=betadisper(e_distance, g_sample$transect,type = "centroid")
+  scores(betadisp, display = c("sites", "centroids"))
+  boxplot(betadisp, ylab = "Distance to centroid")
+  
+  
+  anova(betadisp)
+  TukeyHSD(betadisp)
+  
+  permutest(betadisp, pairwise = T)
+
+    
+}
+
+############### #
+
 plot_site_as_color = function(data, YLAB = "", TITLE = "", SUBTITLE = "", SCALES = "free_x"){
   
   # make summary table for HSD letters ----
