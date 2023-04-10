@@ -22,7 +22,8 @@ sample_key_subset =
   sample_key %>% 
   dplyr::select(sample_label, region, site, transect, tree_number, horizon) %>% 
   filter(!is.na(sample_label)) %>% 
-  mutate(transect = tolower(transect))
+  mutate(transect = tolower(transect),
+         site = recode(site, "PR" = "PTR", "CC" = "CRC", "GCREW" = "GCW"))
 sample_key_subset[sample_key_subset == "NULL"] <- NA
 
 ## export
