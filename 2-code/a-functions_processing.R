@@ -22,6 +22,10 @@ reorder_transect = function(dat){
   dat %>% 
     mutate(transect = factor(transect, levels = c("upland", "transition", "wte", "wc", "wetland")))
 }
+reorder_site = function(dat){
+  dat %>% 
+    mutate(site = factor(site, levels = c("CRC", "PTR", "OWC", "GCW", "MSM", "GWI")))
+}
 
 
 # Chemistry data ----------------------------------------------------------
@@ -808,8 +812,8 @@ process_wrc = function(wrc_data){
            kpa_eval = round((10^pf_eval)/10,2),
            kpa_fit = round((10^pf_fit)/10,2)) %>% 
     mutate(transect = recode(transect, "wetland" = "wc"),
-           region = case_when(site %in% c("CC", "OWC", "PR") ~ "WLE",
-                              site %in% c("MSM", "GWI", "GCREW") ~ "CB")) %>% 
+           region = case_when(site %in% c("CRC", "OWC", "PTR") ~ "WLE",
+                              site %in% c("MSM", "GWI", "GCW") ~ "CB")) %>% 
     reorder_transect()
   
 }
@@ -933,6 +937,7 @@ combine_data = function(moisture_processed, pH_processed, tctnts_data_samples, l
     mutate(transect = recode(transect, "wc" = "wetland")) %>% 
     reorder_transect() %>% 
     reorder_horizon() %>% 
+    reorder_site() %>% 
     force() 
   
   data_combined_all_horizons
@@ -946,7 +951,7 @@ subset_surface_horizons = function(data_combined_all_horizons){
     data_combined_all_horizons %>% 
     mutate(surface = case_when(region == "WLE" & horizon == "A" ~ "surface",
                                (site == "MSM" | site == "GWI") & horizon == "O" ~ "surface",
-                               site == "GCREW" & horizon == "A" ~ "surface")) %>% 
+                               site == "GCW" & horizon == "A" ~ "surface")) %>% 
     filter(surface == "surface") %>% 
     dplyr::select(-surface)
   

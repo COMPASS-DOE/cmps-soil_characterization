@@ -352,7 +352,7 @@ compute_analysis_matrix = function(data_combined){
     group_by(region, site, transect, horizon, analysis) %>% 
     dplyr::summarise(n = n()) %>% 
     pivot_wider(values_from = "n", names_from = "analysis") %>% 
-    reorder_transect() %>% reorder_horizon() %>% 
+    reorder_transect() %>% reorder_horizon() %>% reorder_site() %>% 
     arrange(desc(region), site, transect, horizon)
   
 }
@@ -571,7 +571,7 @@ plot_transect_as_x = function(data, YLAB, TITLE = "", SUBTITLE = "", SCALES = "f
                position = position_dodge(width = 0.4))+
     scale_alpha_manual(values = c(1, 0.3))+
     scale_color_manual(values = c("grey60", "black"))+
-    scale_shape_manual(breaks = c("CC", "PR", "OWC", "MSM", "GWI", "GCREW"), values = c(1,2,3,4,5,6))+
+    scale_shape_manual(breaks = c("CRC", "PTR", "OWC", "MSM", "GWI", "GCW"), values = c(1,2,3,4,5,6))+
     facet_wrap(~region, scales = SCALES,
                labeller = as_labeller(c("CB" = "Chesapeake Bay", "WLE" = "Lake Erie")))+
     theme_kp()+
@@ -601,7 +601,7 @@ plot_region_as_x = function(data, YLAB){
                position = position_dodge(width = 0.4))+
     scale_alpha_manual(values = c(1, 0.3))+
     scale_color_manual(values  = pal_transect)+
-    scale_shape_manual(breaks = c("CC", "PR", "OWC", "MSM", "GWI", "GCREW"), values = c(1,2,3,4,5,6))+
+    scale_shape_manual(breaks = c("CRC", "PTR", "OWC", "MSM", "GWI", "GCW"), values = c(1,2,3,4,5,6))+
     facet_wrap(~horizon, ncol = 2, scales = "free_x")+
     theme_kp()+
     labs(x = "",
@@ -851,7 +851,8 @@ plot_xrd = function(xrd_processed){
                  names_to = "mineral",
                  values_to = "percentage") %>% 
     reorder_horizon() %>% 
-    reorder_transect()
+    reorder_transect() %>% 
+    reorder_site()
   
   xrd_summary %>% 
     ggplot(aes(x = sample_label, y = percentage, fill = mineral))+
@@ -1055,7 +1056,8 @@ plot_ions_piper = function(dic_processed, ions_processed){
     left_join(sample_key) %>% 
     filter(horizon != "B") %>% 
     reorder_horizon() %>% 
-    reorder_transect()
+    reorder_transect() %>% 
+    reorder_site()
   
   #ggplot_piper() + geom_point(aes(x,y), data=piper_data)
   ggplot_piper() + 
@@ -1064,7 +1066,7 @@ plot_ions_piper = function(dic_processed, ions_processed){
                size = 3, stroke = 1,
                data=piper_data2 %>% filter(region == "WLE"))+
     scale_color_manual(values = pal_transect)+
-    scale_shape_manual(breaks = c("CC", "PR", "OWC", "MSM", "GWI", "GCREW"), values = c(1,2,3,4,5,6))+
+    scale_shape_manual(breaks = c("CRC", "PTR", "OWC", "MSM", "GWI", "GCW"), values = c(1,2,3,4,5,6))+
     labs(title = "Piper Plot using water-extractable ions",
          subtitle = "WLE region")
   
@@ -1074,7 +1076,7 @@ plot_ions_piper = function(dic_processed, ions_processed){
                size = 3, stroke = 1,
                data=piper_data2 %>% filter(region == "CB"))+
     scale_color_manual(values = rev(soilpalettes::soil_palette("redox2", 3)))+
-    scale_shape_manual(breaks = c("CC", "PR", "OWC", "MSM", "GWI", "GCREW"), values = c(1,2,3,4,5,6))+
+    scale_shape_manual(breaks = c("CRC", "PTR", "OWC", "MSM", "GWI", "GCW"), values = c(1,2,3,4,5,6))+
     labs(title = "Piper Plot using water-extractable ions",
          subtitle = "CB region")
 
@@ -1225,7 +1227,7 @@ make_summary_tables <- function(data_combined){
     dplyr::select(analysis, name, region, site, transect, mean_se) %>% 
     bind_rows(data_combined_summary %>% dplyr::select(analysis, name, region, site, transect, mean_se)) %>% 
     #mutate(site = site %>% forcats::fct_relevel("MEAN", after = Inf)) %>% 
-    mutate(site = factor(site, levels = c("CC", "PR", "OWC", "MSM", "GWI", "GCREW", "MEAN"))) %>% 
+    mutate(site = factor(site, levels = c("CRC", "PTR", "OWC", "MSM", "GWI", "GCW", "MEAN"))) %>% 
     arrange(analysis, name, region, site)
   
   summary_BULK = 
@@ -1363,7 +1365,7 @@ plot_site_as_color = function(data, YLAB = "", TITLE = "", SUBTITLE = "", SCALES
     # plot HSD letters
     geom_text(data = lme_for_graphs, aes(y = y, label = groups), size = 5)+
     scale_alpha_manual(values = c(1, 0.3))+
-    scale_color_manual(breaks = c("CC", "PR", "OWC", "MSM", "GWI", "GCREW"), values = c('#ED6e85', '#ffc115', '#7f4420', '#90BE6D', '#03045E', '#00B4D8'))+
+    scale_color_manual(breaks = c("CRC", "PTR", "OWC", "GCW", "MSM", "GWI"), values = c('#ED6e85', '#7f4420', '#ffc115', '#90BE6D', '#03045E', '#00B4D8'))+
     facet_wrap(~region, scales = SCALES,
                labeller = as_labeller(c("CB" = "Chesapeake Bay", "WLE" = "Lake Erie")))+
     theme_kp()+
