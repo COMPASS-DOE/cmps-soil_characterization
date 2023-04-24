@@ -1228,7 +1228,8 @@ make_summary_tables <- function(data_combined){
     bind_rows(data_combined_summary %>% dplyr::select(analysis, name, region, site, transect, mean_se)) %>% 
     #mutate(site = site %>% forcats::fct_relevel("MEAN", after = Inf)) %>% 
     mutate(site = factor(site, levels = c("CRC", "PTR", "OWC", "MSM", "GWI", "GCW", "MEAN"))) %>% 
-    arrange(analysis, name, region, site)
+    reorder_site() %>% reorder_transect() %>% 
+    arrange(region, analysis, name, site, transect)
   
   summary_BULK = 
     data_summary_ALL %>% 
@@ -1262,7 +1263,9 @@ make_summary_tables <- function(data_combined){
        summary_DOC_DIC = summary_DOC_DIC)
   
 }
-# summary_table = make_summary_tables(data_combined)
+ summary_table = make_summary_tables(data_combined)
+write.xlsx(summary_table, "summary_tables.xlsx")
+
 
 #
 # stats ----
