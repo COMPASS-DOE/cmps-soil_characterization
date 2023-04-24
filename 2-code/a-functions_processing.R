@@ -496,7 +496,8 @@ process_iron = function(ferrozine_map, ferrozine_data, moisture_processed, subsa
       pivot_wider() %>% 
       mutate(analysis = "Ferrozine") %>% 
       dplyr::select(sample_label, analysis, Fe_total_ug_g) %>% 
-      rename(Fe_ugg = Fe_total_ug_g)
+      rename(Fe_ugg = Fe_total_ug_g) %>% 
+      filter(Fe_ugg >= 0)
     
     samples2
   }
