@@ -480,7 +480,7 @@ process_iron = function(ferrozine_map, ferrozine_data, moisture_processed, subsa
       dplyr::select(sample_label, starts_with("Fe")) %>% 
       pivot_longer(cols = starts_with("Fe"), names_to = "species", values_to = "ppm") %>% 
       left_join(moisture_processed) %>% 
-      left_join(subsampling %>% dplyr::select(sample_label, iron_g)) %>% 
+      left_join(subsampling %>% dplyr::select(sample_label, iron_g) %>% drop_na()) %>% 
       rename(fm_g = iron_g) %>% 
       mutate(ppm = as.numeric(ppm),
              od_g = fm_g/((gwc_perc/100)+1),
