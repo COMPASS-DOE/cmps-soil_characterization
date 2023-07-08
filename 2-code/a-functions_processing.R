@@ -653,9 +653,12 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
   
   ions = 
     ions_data %>% 
+    dplyr::select(-`Bromide UV`) %>% 
+    filter(is.na(skip)) %>% 
+    dplyr::select(-skip) %>% 
     mutate_all(as.character) %>% 
     pivot_longer(-c(analysis_ID, source.x, source.y)) %>% 
-    mutate(date_run = str_extract(source.x, "[0-9]{8}"),
+    mutate(date_run = str_extract(source.y, "[0-9]{8}"),
            date_run = lubridate::ymd(date_run)) %>% 
     dplyr::select(-starts_with("source")) %>% 
     filter(!grepl("...[0-9]", name)) %>% 
@@ -680,57 +683,68 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     standards %>% 
     group_by(ion) %>% 
     dplyr::summarise(max = max(ppm))
+
+  # get the dilution factors
+  # this is complicated because we handled dilutions differently for the batches. 
+  # Batch 1 had dilutions recorded in the Google Sheet, based on salinity/pH: "1s82bKl85AmqWerNpvGQv-ddgFQpjyFoMeRW9QdZmRZw"
+  # Batch 2 (GCW) had dilutions built into the name
   
-  
-  dilutions = 
+  dilutions_1 = 
     read_sheet("1s82bKl85AmqWerNpvGQv-ddgFQpjyFoMeRW9QdZmRZw", sheet = "dilutions") %>% 
     mutate_all(as.character) %>% 
     dplyr::select(sample_label, dilution_factor) %>% 
-    mutate(dilution_factor = as.numeric(dilution_factor))
+    mutate(dilution_factor = as.numeric(dilution_factor)) %>% 
+    left_join(samples %>% 
+                left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) %>% distinct(analysis_ID, sample_label)) %>% 
+    dplyr::select(analysis_ID, dilution_factor)
   
   
-  high_samples = 
-    samples2 = 
+  dilutions_2 = 
     samples %>% 
-    left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) %>%
-    filter(grepl("COMPASS_", sample_label)) %>% 
-    # do blank/dilution correction
-    left_join(dilutions, by = "sample_label") %>% 
-    mutate(dilution_factor = replace_na(dilution_factor, 1),
-           ppm_dil_corrected = ppm * dilution_factor,
-           ppm_dil_corrected = round(ppm_dil_corrected, 2)) %>% 
-    left_join(standards_max) %>% 
-    mutate(HIGH = ppm > max) %>% 
-    filter(HIGH)
-  #  high_samples %>% distinct(sample_label) 
-  #  high_samples %>% write.csv("high.csv")
+    filter(date_run == "2023-05-03") %>% 
+    mutate(dilution_factor = case_when(grepl("_10x", analysis_ID) ~ 10,
+                                       grepl("_20x", analysis_ID) ~ 20,
+                                       TRUE ~ 1)) %>% 
+    distinct(analysis_ID, dilution_factor)
   
+  dilutions = bind_rows(dilutions_1, dilutions_2)
   
-  
-  
-  
-  
-  
-  
+##   high_samples = 
+##     samples2 = 
+##     samples %>% 
+##     left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) %>%
+##     filter(grepl("COMPASS_", sample_label)) %>% 
+##     # do blank/dilution correction
+##     left_join(dilutions, by = "sample_label") %>% 
+##     mutate(dilution_factor = replace_na(dilution_factor, 1),
+##            ppm_dil_corrected = ppm * dilution_factor,
+##            ppm_dil_corrected = round(ppm_dil_corrected, 2)) %>% 
+##     left_join(standards_max) %>% 
+##     mutate(HIGH = ppm > max) %>% 
+##     filter(HIGH)
+#  high_samples %>% distinct(sample_label) 
+#  high_samples %>% write.csv("high.csv")
   
   samples2 = 
     samples %>% 
+    mutate(analysis_ID_OLD = analysis_ID,
+           analysis_ID = str_remove(analysis_ID, "_[0-9]{2}x")) %>% 
     left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) %>%
     filter(grepl("COMPASS_", sample_label)) %>% 
     # do blank/dilution correction
-    left_join(dilutions, by = "sample_label") %>% 
+    left_join(dilutions, by = c("analysis_ID_OLD" = "analysis_ID")) %>% 
     mutate(dilution_factor = replace_na(dilution_factor, 1),
            ppm_dil_corrected = ppm * dilution_factor,
            ppm_dil_corrected = round(ppm_dil_corrected, 2)) %>% 
     # join gwc and subsampling weights to normalize data to soil weight
     left_join(moisture_processed) %>% 
-    left_join(subsampling %>% dplyr::select(notes, sample_label, WSOC_g)) %>% 
+    left_join(subsampling %>% dplyr::select(notes, sample_label, WSOC_g) %>% drop_na()) %>% 
     rename(fm_g = WSOC_g) %>% 
     mutate(od_g = fm_g/((gwc_perc/100)+1),
            soilwater_g = fm_g - od_g,
            ug_g = ppm_dil_corrected * ((40 + soilwater_g)/od_g),
            ug_g = round(ug_g, 2)) %>% 
-    dplyr::select(sample_label, ion, ppm_dil_corrected, ug_g) %>% 
+    dplyr::select(sample_label, ion, dilution_factor, ppm_dil_corrected, ug_g) %>% 
     rename(ppm = ppm_dil_corrected) %>% 
     pivot_longer(-c(sample_label, ion)) %>% 
     mutate(ion = paste0(ion, "_", name)) %>% 
@@ -739,7 +753,6 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     mutate(analysis = "IC") %>% 
     mutate_all(as.character) %>% 
     mutate_at(vars(ends_with(c("ppm", "ug_g"))), as.numeric)
-  
   
   # convert to meq
   charges = 
@@ -771,10 +784,10 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     pivot_wider(names_from = "ion", values_from = "meq_100g") %>% 
     mutate_if(is.numeric, round, 3) %>% 
     force()
-  
+    
   list(samples2 = samples2,
        samples_meq = samples_meq)
-}
+  }
 
 
 #
@@ -888,7 +901,7 @@ import_xrd = function(FILEPATH){
   xrd_dat <- do.call(bind_rows, lapply(filePaths_xrd, function(path) {
     df <- read_csv(path) 
     df %>% filter(!grepl("-", File))
-  }))
+    }))
 }
 #xrd_data = import_xrd(FILEPATH = "1-data/xrd")
 process_xrd = function(xrd_data, sample_key){
@@ -901,7 +914,7 @@ process_xrd = function(xrd_data, sample_key){
     mutate(percent = parse_number(percent),
            percent = if_else(is.na(percent), 0, percent),
            File = str_pad(File, 3, pad = "0"))
-  
+
   sample_key2 = 
     sample_key %>% 
     mutate(File = str_extract(sample_label, "_[0-9]{3}"),
@@ -913,9 +926,9 @@ process_xrd = function(xrd_data, sample_key){
     pivot_wider(names_from = "mineral", values_from = "percent") %>% 
     dplyr::select(-Notes, -Rwp) %>% 
     replace(.,is.na(.),0)  
-  
-  # processed2 %>% write.csv("XRD_processed_2023-01-06.csv", row.names = F)
-}
+
+ # processed2 %>% write.csv("XRD_processed_2023-01-06.csv", row.names = F)
+  }
 
 
 #
@@ -943,7 +956,7 @@ combine_data = function(moisture_processed, pH_processed, tctnts_data_samples, l
     force() 
   
   data_combined_all_horizons
-  
+
 }
 #data_combined = combine_data()  
 
