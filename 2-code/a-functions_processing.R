@@ -187,7 +187,7 @@ process_weoc = function(weoc_data, analysis_key, moisture_processed, subsampling
            npoc_corr_mgL = (npoc_mgL) * NPOC_dilution) %>% 
     # join gwc and subsampling weights to normalize data to soil weight
     left_join(moisture_processed) %>% 
-    left_join(subsampling %>% dplyr::select(notes, sample_label, WSOC_g)) %>% 
+    left_join(subsampling %>% dplyr::select(notes, sample_label, WSOC_g) %>% drop_na()) %>% 
     rename(fm_g = WSOC_g) %>% 
     mutate(od_g = fm_g/((gwc_perc/100)+1),
            soilwater_g = fm_g - od_g,
@@ -241,7 +241,7 @@ process_dic = function(dic_data, analysis_key, moisture_processed, subsampling){
                                     TRUE ~ dic_mgL_corr)) %>% 
     # join gwc and subsampling weights to normalize data to soil weight
     left_join(moisture_processed) %>% 
-    left_join(subsampling %>% dplyr::select(notes, sample_label, WSOC_g)) %>% 
+    left_join(subsampling %>% dplyr::select(notes, sample_label, WSOC_g) %>% drop_na()) %>% 
     rename(fm_g = WSOC_g) %>% 
     mutate(od_g = fm_g/((gwc_perc/100)+1),
            soilwater_g = fm_g - od_g,
@@ -295,7 +295,7 @@ process_din = function(din_data, analysis_key, moisture_processed, subsampling){
     
     # join gwc and subsampling weights to normalize data to soil weight
     left_join(moisture_processed) %>% 
-    left_join(subsampling %>% dplyr::select(notes, sample_label, NH4_NO3_g)) %>% 
+    left_join(subsampling %>% dplyr::select(notes, sample_label, NH4_NO3_g) %>% drop_na()) %>% 
     rename(fm_g = NH4_NO3_g) %>% 
     mutate(od_g = fm_g/((gwc_perc/100)+1),
            soilwater_g = fm_g - od_g,
@@ -339,7 +339,7 @@ process_icp = function(icp_data, analysis_key, moisture_processed, subsampling){
     icp_processed %>% 
     pivot_longer(cols = c(Na:S), names_to = "species", values_to = "ppm") %>% 
     left_join(moisture_processed) %>% 
-    left_join(subsampling %>% dplyr::select(sample_label, base_cations_g)) %>% 
+    left_join(subsampling %>% dplyr::select(sample_label, base_cations_g) %>% drop_na()) %>% 
     rename(fm_g = base_cations_g) %>% 
     mutate(ppm = as.numeric(ppm),
            od_g = fm_g/((gwc_perc/100)+1),
@@ -608,10 +608,11 @@ process_mehlich = function(mehlich_map, mehlich_data, moisture_processed, subsam
   samples2 = 
     samples %>% 
     left_join(moisture_processed) %>% 
-    left_join(subsampling %>% dplyr::select(sample_label, starts_with("mehlich"))) %>% 
+    left_join(subsampling %>% dplyr::select(sample_label, starts_with("mehlich")) %>% drop_na()) %>% 
     rename(fm_g = mehlichp_g,
            extractant_mL = mehlichp_mL) %>% 
     mutate(ppm = as.numeric(ppm_calculated),
+           extractant_mL = as.numeric(extractant_mL),
            od_g = fm_g/((gwc_perc/100)+1),
            soilwater_g = fm_g - od_g,
            ug_g = ppm * ((extractant_mL + soilwater_g)/od_g),
@@ -679,7 +680,7 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     standards %>% 
     group_by(ion) %>% 
     dplyr::summarise(max = max(ppm))
-
+  
   
   dilutions = 
     read_sheet("1s82bKl85AmqWerNpvGQv-ddgFQpjyFoMeRW9QdZmRZw", sheet = "dilutions") %>% 
@@ -701,16 +702,16 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     left_join(standards_max) %>% 
     mutate(HIGH = ppm > max) %>% 
     filter(HIGH)
-#  high_samples %>% distinct(sample_label) 
-#  high_samples %>% write.csv("high.csv")
-
+  #  high_samples %>% distinct(sample_label) 
+  #  high_samples %>% write.csv("high.csv")
   
   
   
   
   
   
-
+  
+  
   
   samples2 = 
     samples %>% 
@@ -738,7 +739,7 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     mutate(analysis = "IC") %>% 
     mutate_all(as.character) %>% 
     mutate_at(vars(ends_with(c("ppm", "ug_g"))), as.numeric)
-    
+  
   
   # convert to meq
   charges = 
@@ -770,10 +771,10 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     pivot_wider(names_from = "ion", values_from = "meq_100g") %>% 
     mutate_if(is.numeric, round, 3) %>% 
     force()
-    
+  
   list(samples2 = samples2,
        samples_meq = samples_meq)
-  }
+}
 
 
 #
@@ -887,7 +888,7 @@ import_xrd = function(FILEPATH){
   xrd_dat <- do.call(bind_rows, lapply(filePaths_xrd, function(path) {
     df <- read_csv(path) 
     df %>% filter(!grepl("-", File))
-    }))
+  }))
 }
 #xrd_data = import_xrd(FILEPATH = "1-data/xrd")
 process_xrd = function(xrd_data, sample_key){
@@ -900,7 +901,7 @@ process_xrd = function(xrd_data, sample_key){
     mutate(percent = parse_number(percent),
            percent = if_else(is.na(percent), 0, percent),
            File = str_pad(File, 3, pad = "0"))
-
+  
   sample_key2 = 
     sample_key %>% 
     mutate(File = str_extract(sample_label, "_[0-9]{3}"),
@@ -912,9 +913,9 @@ process_xrd = function(xrd_data, sample_key){
     pivot_wider(names_from = "mineral", values_from = "percent") %>% 
     dplyr::select(-Notes, -Rwp) %>% 
     replace(.,is.na(.),0)  
-
- # processed2 %>% write.csv("XRD_processed_2023-01-06.csv", row.names = F)
-  }
+  
+  # processed2 %>% write.csv("XRD_processed_2023-01-06.csv", row.names = F)
+}
 
 
 #
@@ -942,7 +943,7 @@ combine_data = function(moisture_processed, pH_processed, tctnts_data_samples, l
     force() 
   
   data_combined_all_horizons
-
+  
 }
 #data_combined = combine_data()  
 
@@ -959,5 +960,3 @@ subset_surface_horizons = function(data_combined_all_horizons){
   data_combined_surface_only
   
 }
-
-
