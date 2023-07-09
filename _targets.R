@@ -70,7 +70,7 @@ list(
   tar_target(icr_data_trt, make_fticr_data(icr_report, analysis_key, sample_key)$data_long_trt),
   tar_target(icr_relabund_samples, compute_icr_relabund(icr_data_long, icr_meta)),
   tar_target(ions_data, import_ions(FILEPATH = "1-data/ions")),
-  tar_target(ions_processed, process_ions(ions_data, analysis_key, sample_key, moisture_processed, subsampling)$samples2),
+  tar_target(ions_processed, process_ions(ions_data, analysis_key, sample_key, moisture_processed, subsampling)$samples3),
   tar_target(ions_processed_meq, process_ions(ions_data, analysis_key, sample_key, moisture_processed, subsampling)$samples_meq),
   tar_target(xrd_data, import_xrd(FILEPATH = "1-data/xrd")),
   tar_target(xrd_processed, process_xrd(xrd_data, sample_key)),

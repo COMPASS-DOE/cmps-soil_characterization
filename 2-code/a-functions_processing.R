@@ -644,7 +644,7 @@ import_ions = function(FILEPATH){
     rename(analysis_ID = "...3")
   
   ions <- 
-    full_join(cations, anions, by = "analysis_ID")
+    bind_rows(cations, anions)
   
   ions
 }
@@ -657,10 +657,9 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     filter(is.na(skip)) %>% 
     dplyr::select(-skip) %>% 
     mutate_all(as.character) %>% 
-    pivot_longer(-c(analysis_ID, source.x, source.y)) %>% 
-    mutate(date_run = str_extract(source.y, "[0-9]{8}"),
+    pivot_longer(-c(analysis_ID, source, dilution_factor)) %>% 
+    mutate(date_run = str_extract(source, "[0-9]{8}"),
            date_run = lubridate::ymd(date_run)) %>% 
-    dplyr::select(-starts_with("source")) %>% 
     filter(!grepl("...[0-9]", name)) %>% 
     filter(!name %in% c("Nitrate", "Nitrite")) %>% 
     mutate(value = recode(value, "n.a." = "0"),
@@ -687,27 +686,31 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
   # get the dilution factors
   # this is complicated because we handled dilutions differently for the batches. 
   # Batch 1 had dilutions recorded in the Google Sheet, based on salinity/pH: "1s82bKl85AmqWerNpvGQv-ddgFQpjyFoMeRW9QdZmRZw"
-  # Batch 2 (GCW) had dilutions built into the name
+  # Batch 2 (GCW) had dilutions built into the name, which has been manually added as separate column `dilution_factor`
   
-  dilutions_1 = 
+  dilutions_non_gcw = 
     read_sheet("1s82bKl85AmqWerNpvGQv-ddgFQpjyFoMeRW9QdZmRZw", sheet = "dilutions") %>% 
     mutate_all(as.character) %>% 
     dplyr::select(sample_label, dilution_factor) %>% 
     mutate(dilution_factor = as.numeric(dilution_factor)) %>% 
-    left_join(samples %>% 
-                left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) %>% distinct(analysis_ID, sample_label)) %>% 
-    dplyr::select(analysis_ID, dilution_factor)
+    left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label) %>% filter(grepl("DOC", analysis_ID)))
   
   
-  dilutions_2 = 
+  samples_dilutions_non_gcw = 
     samples %>% 
-    filter(date_run == "2023-05-03") %>% 
-    mutate(dilution_factor = case_when(grepl("_10x", analysis_ID) ~ 10,
-                                       grepl("_20x", analysis_ID) ~ 20,
-                                       TRUE ~ 1)) %>% 
-    distinct(analysis_ID, dilution_factor)
+    filter(!grepl("gcw", source)) %>% 
+    dplyr::select(-dilution_factor) %>% 
+    left_join(dilutions_non_gcw) %>% 
+    dplyr::select(-sample_label)
   
-  dilutions = bind_rows(dilutions_1, dilutions_2)
+  dilutions_gcw = 
+    samples %>% 
+    filter(grepl("gcw", source)) %>% 
+    mutate(dilution_factor = as.numeric(dilution_factor))
+  
+  all_samples_with_dilutions = 
+    bind_rows(samples_dilutions_non_gcw, dilutions_gcw) %>% 
+    mutate(dilution_factor = replace_na(dilution_factor, 1))
   
 ##   high_samples = 
 ##     samples2 = 
@@ -726,25 +729,40 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
 #  high_samples %>% write.csv("high.csv")
   
   samples2 = 
-    samples %>% 
-    mutate(analysis_ID_OLD = analysis_ID,
+    all_samples_with_dilutions %>% 
+    dplyr::select(-source) %>% 
+    mutate(#analysis_ID_OLD = analysis_ID,
            analysis_ID = str_remove(analysis_ID, "_[0-9]{2}x")) %>% 
     left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) %>%
     filter(grepl("COMPASS_", sample_label)) %>% 
     # do blank/dilution correction
-    left_join(dilutions, by = c("analysis_ID_OLD" = "analysis_ID")) %>% 
-    mutate(dilution_factor = replace_na(dilution_factor, 1),
+    mutate(
            ppm_dil_corrected = ppm * dilution_factor,
            ppm_dil_corrected = round(ppm_dil_corrected, 2)) %>% 
     # join gwc and subsampling weights to normalize data to soil weight
-    left_join(moisture_processed) %>% 
-    left_join(subsampling %>% dplyr::select(notes, sample_label, WSOC_g) %>% drop_na()) %>% 
+    left_join(moisture_processed) 
+  
+  ## breaking up this flow to fix the subsampling weights
+  ## for GCW, we need to use the "redo" samples, not the original ones
+
+  subsampling2 = 
+    subsampling %>%   
+    filter(!grepl("Aug", sample_label) | (grepl("Aug", sample_label) & grepl("redo", sample_label))) %>% 
+    dplyr::select(sample_label, WSOC_g, WSOC_mL) %>% 
+    mutate(sample_label = str_remove(sample_label, "_redo"),
+           WSOC_mL = as.numeric(WSOC_mL)) %>% 
+    drop_na()
+      
+     
+  samples3 = 
+    samples2 %>% 
+    left_join(subsampling2) %>% 
     rename(fm_g = WSOC_g) %>% 
     mutate(od_g = fm_g/((gwc_perc/100)+1),
            soilwater_g = fm_g - od_g,
-           ug_g = ppm_dil_corrected * ((40 + soilwater_g)/od_g),
+           ug_g = ppm_dil_corrected * ((WSOC_mL + soilwater_g)/od_g),
            ug_g = round(ug_g, 2)) %>% 
-    dplyr::select(sample_label, ion, dilution_factor, ppm_dil_corrected, ug_g) %>% 
+    dplyr::select(sample_label, ion, ppm_dil_corrected, ug_g) %>% 
     rename(ppm = ppm_dil_corrected) %>% 
     pivot_longer(-c(sample_label, ion)) %>% 
     mutate(ion = paste0(ion, "_", name)) %>% 
@@ -772,7 +790,7 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     )
   
   samples_meq = 
-    samples2 %>%
+    samples3 %>%
     dplyr::select(sample_label, analysis, ends_with("ug_g")) %>% 
     pivot_longer(-c(sample_label, analysis), values_to = "ug_g") %>% 
     separate(name, sep = "_", into = "ion", remove = F) %>% 
@@ -785,7 +803,7 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     mutate_if(is.numeric, round, 3) %>% 
     force()
     
-  list(samples2 = samples2,
+  list(samples3 = samples3,
        samples_meq = samples_meq)
   }
 
