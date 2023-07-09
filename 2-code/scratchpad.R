@@ -748,3 +748,17 @@ calcium_saturation =
   pivot_wider(names_from = name, values_from = "value") %>% 
   mutate(ca_saturation = (Ca_meq100g/cec_meq100g)*100,
          na_saturation = (Na_meq100g/cec_meq100g)*100)
+
+#
+# extracting ICP and IC data for all sites ----
+icp_long = 
+  icp_samples %>% 
+  pivot_longer(-c("sample_label", "analysis"))
+ic_long = 
+  ions_processed %>% 
+  pivot_longer(-c("sample_label", "analysis"))
+icp_ic_long = 
+  bind_rows(icp_long, ic_long) %>% 
+  drop_na() %>% 
+  left_join(sample_key)
+icp_ic_long %>% write.csv("1-data/processed/synoptic_ICP_IC_all_horizons.csv", row.names = F)
