@@ -15,27 +15,27 @@ click to open
 Number of reps available per analysis. Most were 8-9 reps, but some
 (e.g. WLE B-horizons) had fewer reps.
 
-| region | site | transect   | horizon | DIN | Ferrozine | GWC | ICP | LOI | Mehlich3 | NPOC |  PH | TCTNTS | DIC |  IC |
-|:-------|:-----|:-----------|:--------|----:|----------:|----:|----:|----:|---------:|-----:|----:|-------:|----:|----:|
-| WLE    | CRC  | upland     | A       |   9 |         9 |   9 |   9 |   9 |        9 |    9 |   9 |      9 |   9 |   9 |
-| WLE    | CRC  | transition | A       |   9 |         9 |   9 |   9 |   9 |        9 |    9 |   9 |      9 |   9 |   9 |
-| WLE    | CRC  | wetland    | A       |   9 |         8 |   9 |   9 |   9 |        9 |    9 |   9 |      9 |   9 |   9 |
-| WLE    | PTR  | upland     | A       |   9 |         9 |   9 |   9 |   9 |        6 |    9 |   9 |      9 |   9 |   9 |
-| WLE    | PTR  | transition | A       |   9 |         9 |   9 |   9 |   9 |        9 |    9 |   9 |      9 |   9 |   9 |
-| WLE    | PTR  | wetland    | A       |  15 |        15 |  15 |  15 |  15 |       15 |   15 |  15 |     15 |  15 |  15 |
-| WLE    | OWC  | upland     | A       |   9 |         9 |   9 |   9 |   9 |        9 |    9 |   9 |      9 |   8 |   9 |
-| WLE    | OWC  | transition | A       |   9 |         9 |   9 |   9 |   9 |        9 |    9 |   9 |      8 |   9 |   9 |
-| WLE    | OWC  | wte        | A       |   9 |         9 |   9 |   9 |   9 |        9 |    9 |   9 |      9 |   9 |   9 |
-| WLE    | OWC  | wetland    | A       |   8 |        NA |   8 |   8 |  NA |        8 |    8 |   8 |      8 |   8 |   8 |
-| CB     | GCW  | upland     | A       |   8 |         8 |   8 |   8 |   8 |        8 |    8 |   8 |      8 |  NA |  NA |
-| CB     | GCW  | transition | A       |   8 |         8 |   8 |   8 |   8 |        8 |    8 |   8 |      8 |  NA |  NA |
-| CB     | GCW  | wetland    | A       |   8 |         6 |   8 |   7 |   8 |        8 |    8 |   8 |      7 |  NA |  NA |
-| CB     | MSM  | upland     | O       |   8 |         7 |   8 |   8 |   8 |        7 |    8 |   8 |      8 |   8 |   8 |
-| CB     | MSM  | transition | O       |   8 |         8 |   8 |   8 |   8 |        8 |    8 |   8 |      7 |   8 |   8 |
-| CB     | MSM  | wetland    | O       |   9 |         9 |   9 |   9 |   9 |        9 |    9 |   9 |      9 |   9 |   9 |
-| CB     | GWI  | upland     | O       |   8 |         8 |   9 |   8 |   8 |        8 |    8 |   8 |      8 |   8 |   8 |
-| CB     | GWI  | transition | O       |   8 |         7 |   8 |   8 |   8 |        8 |    8 |   8 |      5 |   8 |   8 |
-| CB     | GWI  | wetland    | O       |   8 |         8 |   8 |   8 |   8 |        8 |    8 |   8 |      8 |   8 |   8 |
+| region | site | transect   | horizon | DIN | Ferrozine | GWC |  IC | ICP | LOI | Mehlich3 | NPOC |  PH | TCTNTS | DIC |
+|:-------|:-----|:-----------|:--------|----:|----------:|----:|----:|----:|----:|---------:|-----:|----:|-------:|----:|
+| WLE    | CRC  | upland     | A       |   9 |         9 |   9 |   9 |   9 |   9 |        9 |    9 |   9 |      9 |   9 |
+| WLE    | CRC  | transition | A       |   9 |         9 |   9 |   9 |   9 |   9 |        9 |    9 |   9 |      9 |   9 |
+| WLE    | CRC  | wetland    | A       |   9 |         8 |   9 |   9 |   9 |   9 |        9 |    9 |   9 |      9 |   9 |
+| WLE    | PTR  | upland     | A       |   9 |         9 |   9 |   9 |   9 |   9 |        6 |    9 |   9 |      9 |   9 |
+| WLE    | PTR  | transition | A       |   9 |         9 |   9 |   9 |   9 |   9 |        9 |    9 |   9 |      9 |   9 |
+| WLE    | PTR  | wetland    | A       |  15 |        15 |  15 |  15 |  15 |  15 |       15 |   15 |  15 |     15 |  15 |
+| WLE    | OWC  | upland     | A       |   9 |         9 |   9 |   9 |   9 |   9 |        9 |    9 |   9 |      9 |   8 |
+| WLE    | OWC  | transition | A       |   9 |         9 |   9 |   9 |   9 |   9 |        9 |    9 |   9 |      8 |   9 |
+| WLE    | OWC  | wte        | A       |   9 |         9 |   9 |   9 |   9 |   9 |        9 |    9 |   9 |      9 |   9 |
+| WLE    | OWC  | wetland    | A       |   8 |         7 |   8 |   8 |   8 |  NA |        8 |    8 |   8 |      8 |   8 |
+| CB     | GCW  | upland     | A       |   8 |         8 |   8 |   8 |   8 |   8 |        8 |    8 |   8 |      8 |  NA |
+| CB     | GCW  | transition | A       |   8 |         8 |   8 |   8 |   8 |   8 |        8 |    8 |   8 |      8 |  NA |
+| CB     | GCW  | wetland    | A       |   8 |         6 |   8 |   8 |   7 |   8 |        8 |    8 |   8 |      7 |  NA |
+| CB     | MSM  | upland     | O       |   8 |         7 |   8 |   8 |   8 |   8 |        7 |    8 |   8 |      8 |   8 |
+| CB     | MSM  | transition | O       |   8 |         8 |   8 |   8 |   8 |   8 |        8 |    8 |   8 |      7 |   8 |
+| CB     | MSM  | wetland    | O       |   9 |         9 |   9 |   9 |   9 |   9 |        9 |    9 |   9 |      9 |   9 |
+| CB     | GWI  | upland     | O       |   8 |         8 |   9 |   8 |   8 |   8 |        8 |    8 |   8 |      8 |   8 |
+| CB     | GWI  | transition | O       |   8 |         7 |   8 |   8 |   8 |   8 |        8 |    8 |   8 |      5 |   8 |
+| CB     | GWI  | wetland    | O       |   8 |         8 |   8 |   8 |   8 |   8 |        8 |    8 |   8 |      8 |   8 |
 
 </details>
 
@@ -558,7 +558,7 @@ click to open
 Session Info
 </summary>
 
-Date run: 2023-04-10
+Date run: 2023-07-09
 
     ## R version 4.2.1 (2022-06-23)
     ## Platform: x86_64-apple-darwin17.0 (64-bit)
@@ -586,24 +586,39 @@ Date run: 2023-04-10
     ## [25] tidyverse_2.0.0     tarchetypes_0.7.2   targets_0.14.0     
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] nlme_3.1-160       fs_1.5.2           latex2exp_0.9.6    tensorA_0.36.2    
-    ##  [5] tools_4.2.1        backports_1.4.1    utf8_1.2.2         R6_2.5.1          
-    ##  [9] mgcv_1.8-40        colorspace_2.0-3   withr_2.5.0        tidyselect_1.2.0  
-    ## [13] gridExtra_2.3      processx_3.7.0     bayesm_3.1-4       compiler_4.2.1    
-    ## [17] compositions_2.0-4 cli_3.6.0          sandwich_3.0-2     labeling_0.4.2    
-    ## [21] scales_1.2.1       DEoptimR_1.0-11    robustbase_0.95-0  hexbin_1.28.2     
-    ## [25] callr_3.7.2        digest_0.6.29      minqa_1.2.4        rmarkdown_2.21    
-    ## [29] pkgconfig_2.0.3    htmltools_0.5.3    lme4_1.1-31        highr_0.9         
-    ## [33] fastmap_1.1.0      rlang_1.0.6        rstudioapi_0.14    farver_2.1.1      
-    ## [37] generics_0.1.3     zoo_1.8-11         Matrix_1.5-1       Rcpp_1.0.9        
-    ## [41] munsell_0.5.0      fansi_1.0.3        proto_1.0.0        lifecycle_1.0.3   
-    ## [45] stringi_1.7.8      yaml_2.3.5         plyr_1.8.7         grid_4.2.1        
-    ## [49] parallel_4.2.1     cowplot_1.1.1      splines_4.2.1      hms_1.1.2         
-    ## [53] knitr_1.42         ps_1.7.1           pillar_1.8.1       igraph_1.3.4      
-    ## [57] boot_1.3-28        base64url_1.4      codetools_0.2-18   glue_1.6.2        
-    ## [61] evaluate_0.16      data.table_1.14.4  vctrs_0.5.2        nloptr_2.0.3      
-    ## [65] tzdb_0.3.0         cellranger_1.1.0   gtable_0.3.0       xfun_0.37         
-    ## [69] ggcorrplot_0.1.4   googledrive_2.0.0  gargle_1.2.0       ggtern_3.4.1      
-    ## [73] cluster_2.1.3      timechange_0.2.0   ellipsis_0.3.2
+    ##   [1] googledrive_2.0.0  minqa_1.2.4        colorspace_2.0-3  
+    ##   [4] ellipsis_0.3.2     fs_1.5.2           crunch_1.30.1     
+    ##   [7] rstudioapi_0.14    hexbin_1.28.2      farver_2.1.1      
+    ##  [10] bit64_4.0.5        fansi_1.0.3        codetools_0.2-18  
+    ##  [13] splines_4.2.1      robustbase_0.95-0  knitr_1.42        
+    ##  [16] jsonlite_1.8.4     ggtern_3.4.1       nloptr_2.0.3      
+    ##  [19] cluster_2.1.3      latex2exp_0.9.6    shiny_1.7.2       
+    ##  [22] compiler_4.2.1     httr_1.4.4         backports_1.4.1   
+    ##  [25] ggcorrplot_0.1.4   Matrix_1.5-1       fastmap_1.1.0     
+    ##  [28] gargle_1.2.0       cli_3.6.0          later_1.3.0       
+    ##  [31] htmltools_0.5.3    tools_4.2.1        igraph_1.3.4      
+    ##  [34] gtable_0.3.0       agricolae_1.3-5    glue_1.6.2        
+    ##  [37] reshape2_1.4.4     rappdirs_0.3.3     Rcpp_1.0.9        
+    ##  [40] cellranger_1.1.0   vctrs_0.5.2        nlme_3.1-160      
+    ##  [43] tensorA_0.36.2     xfun_0.37          proto_1.0.0       
+    ##  [46] ps_1.7.1           lme4_1.1-31        mime_0.12         
+    ##  [49] timechange_0.2.0   miniUI_0.1.1.1     lifecycle_1.0.3   
+    ##  [52] DEoptimR_1.0-11    zoo_1.8-11         scales_1.2.1      
+    ##  [55] vroom_1.6.0        promises_1.2.0.1   hms_1.1.2         
+    ##  [58] parallel_4.2.1     sandwich_3.0-2     httpcache_1.2.0   
+    ##  [61] yaml_2.3.5         curl_4.3.2         gridExtra_2.3     
+    ##  [64] labelled_2.10.0    stringi_1.7.8      AlgDesign_1.2.1   
+    ##  [67] highr_0.9          klaR_1.7-1         boot_1.3-28       
+    ##  [70] compositions_2.0-4 rlang_1.0.6        pkgconfig_2.0.3   
+    ##  [73] evaluate_0.16      labeling_0.4.2     cowplot_1.1.1     
+    ##  [76] bit_4.0.4          processx_3.7.0     tidyselect_1.2.0  
+    ##  [79] plyr_1.8.7         R6_2.5.1           generics_0.1.3    
+    ##  [82] base64url_1.4      combinat_0.0-8     haven_2.5.1       
+    ##  [85] pillar_1.8.1       withr_2.5.0        mgcv_1.8-40       
+    ##  [88] bayesm_3.1-4       crayon_1.5.1       questionr_0.7.7   
+    ##  [91] utf8_1.2.2         tzdb_0.3.0         rmarkdown_2.21    
+    ##  [94] grid_4.2.1         data.table_1.14.4  callr_3.7.2       
+    ##  [97] digest_0.6.29      xtable_1.8-4       httpuv_1.6.5      
+    ## [100] openssl_2.0.2      munsell_0.5.0      askpass_1.1
 
 </details>
