@@ -926,13 +926,13 @@ process_xrd = function(xrd_data, sample_key){
   
   processed = 
     xrd_data %>% 
-    pivot_longer(-c(File, Notes), names_to = "mineral", values_to = "percent") %>% 
-    filter(!grepl("\u00B1", percent)) %>% 
-    filter(!grepl("...17", mineral)) %>% 
+    mutate_all(as.character) %>% 
+    pivot_longer(-c(File), names_to = "mineral", values_to = "percent") %>% 
+    filter(!grepl("\\...", mineral)) %>% 
     mutate(percent = parse_number(percent),
            percent = if_else(is.na(percent), 0, percent),
            File = str_pad(File, 3, pad = "0"))
-
+  
   sample_key2 = 
     sample_key %>% 
     mutate(File = str_extract(sample_label, "_[0-9]{3}"),
@@ -941,12 +941,13 @@ process_xrd = function(xrd_data, sample_key){
   processed2 = 
     processed %>% 
     left_join(sample_key2) %>% 
+    filter(!is.na(sample_label)) %>% 
     pivot_wider(names_from = "mineral", values_from = "percent") %>% 
-    dplyr::select(-Notes, -Rwp) %>% 
+    dplyr::select(-Rwp, -File) %>% 
     replace(.,is.na(.),0)  
-
- # processed2 %>% write.csv("XRD_processed_2023-01-06.csv", row.names = F)
-  }
+  
+  # processed2 %>% write.csv("XRD_processed_2023-01-06.csv", row.names = F)
+}
 
 
 #

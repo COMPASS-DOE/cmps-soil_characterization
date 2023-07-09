@@ -846,7 +846,7 @@ plot_xrd = function(xrd_processed){
   
   xrd_summary = 
     xrd_processed %>% 
-    dplyr::select(-c(tree_number, File)) %>% 
+    dplyr::select(-c(tree_number)) %>% 
     pivot_longer(-c(sample_label, region, site, transect, horizon),
                  names_to = "mineral",
                  values_to = "percentage") %>% 
@@ -854,13 +854,66 @@ plot_xrd = function(xrd_processed){
     reorder_transect() %>% 
     reorder_site()
   
-  xrd_summary %>% 
+  gg_bar_xrd = 
+    xrd_summary %>% 
     ggplot(aes(x = sample_label, y = percentage, fill = mineral))+
     geom_bar(stat = "identity")+
     facet_grid(horizon ~ region + site + transect, scales = "free_x")+
     theme_kp()
     
   
+  ## DO PCA
+  fit_pca_function = function(dat){
+    
+    dat %>% 
+      drop_na()
+    
+    num = 
+      dat %>%       
+      dplyr::select(where(is.numeric)) %>%
+      dplyr::mutate(row = row_number()) %>% 
+      drop_na()
+    
+    num_row_numbers = num %>% dplyr::select(row)
+    
+    grp = 
+      dat %>% 
+      dplyr::select(where(is.character)) %>% 
+      dplyr::mutate(row = row_number()) %>% 
+      right_join(num_row_numbers)
+    
+    
+    num = num %>% dplyr::select(-row)
+    pca_int = prcomp(num, scale. = T)
+    
+    list(num = num,
+         grp = grp,
+         pca_int = pca_int)
+  }
+  
+  xrd_pca = 
+    xrd_processed %>% 
+    dplyr::select(-Crystallinity, -Hornblende) %>% 
+    filter(horizon %in% c("O", "A")) %>% 
+    fit_pca_function()
+  
+  xrd_biplot = 
+    ggbiplot(xrd_pca$pca_int, obs.scale = 1, var.scale = 1,
+             groups = as.character(xrd_pca$grp$transect), 
+             ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+    geom_point(size=3,stroke=1, alpha = 1,
+               aes(shape = xrd_pca$grp$transect,
+                   color = groups)
+    )+ 
+    labs(shape="",
+         title = "XRD PCA, both regions",
+         subtitle = "Surface horizons only")+
+    theme_kp()+
+    NULL
+  
+  
+  list(gg_bar_xrd = gg_bar_xrd,
+       xrd_biplot = xrd_biplot)
 }
 
 plot_ions_piper = function(dic_processed, ions_processed){
@@ -1263,8 +1316,8 @@ make_summary_tables <- function(data_combined){
        summary_DOC_DIC = summary_DOC_DIC)
   
 }
- summary_table = make_summary_tables(data_combined)
-write.xlsx(summary_table, "summary_tables.xlsx")
+# summary_table = make_summary_tables(data_combined)
+# write.xlsx(summary_table, "summary_tables.xlsx")
 
 
 #
