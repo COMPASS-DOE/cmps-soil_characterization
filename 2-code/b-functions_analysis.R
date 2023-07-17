@@ -362,8 +362,7 @@ compute_overall_pca = function(data_combined, sample_key){
   
   data_combined_subset = make_data_subset(data_combined)
   data_combined_wide = make_data_wide(data_combined_subset, sample_key)
-  data_combined_wide_NO_IC = make_data_wide(data_combined_subset %>% 
-                                              filter(!analysis %in% "IC") %>% 
+  data_combined_wide_NO_DIC = make_data_wide(data_combined_subset %>% 
                                               filter(!grepl("dic", name, ignore.case = TRUE)),
                                             sample_key)
   
@@ -396,9 +395,9 @@ compute_overall_pca = function(data_combined, sample_key){
   }
   
   ## PCA input files ----
-  pca_overall = fit_pca_function(data_combined_wide_NO_IC) # using NO-IC version because we don't have IC for GCREW
-  pca_overall_wle = fit_pca_function(data_combined_wide_NO_IC %>% filter(region == "WLE"))
-  pca_overall_cb = fit_pca_function(data_combined_wide_NO_IC %>% filter(region == "CB"))
+  pca_overall = fit_pca_function(data_combined_wide_NO_DIC) 
+  pca_overall_wle = fit_pca_function(data_combined_wide_NO_DIC %>% filter(region == "WLE"))
+  pca_overall_cb = fit_pca_function(data_combined_wide_NO_DIC %>% filter(region == "CB"))
   
   
   ## PCA plots overall ----
@@ -1538,7 +1537,7 @@ include_wte = function(data_combined){
     filter(!analysis %in% c("Ferrozine", "LOI"))
   
   
-  owc_wte_wide = make_data_wide(owc_wte)
+  owc_wte_wide = make_data_wide(owc_wte, sample_key)
     
   
   fit_pca_function = function(dat){
