@@ -408,6 +408,7 @@ compute_overall_pca = function(data_combined, sample_key){
     geom_point(size=3,stroke=1, alpha = 1,
                aes(#shape = pca_overall$grp$transect,
                  color = groups))+ 
+    scale_color_manual(values = c("#16879C", "#BB281E" ))+
     #scale_shape_manual(values = c(21, 19))+
     #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
    # xlim(-4,20)+
@@ -461,7 +462,7 @@ compute_overall_pca = function(data_combined, sample_key){
   
 #  library(patchwork)
 #  gg_pca_regions = gg_pca_wle + gg_pca_cb
-  gg_pca_regions = cowplot::plot_grid(gg_pca_wle + gg_pca_cb)
+  gg_pca_regions = cowplot::plot_grid(gg_pca_wle , gg_pca_cb)
   
   list(gg_pca_overall = gg_pca_overall,
        gg_pca_regions = gg_pca_regions)
