@@ -844,6 +844,28 @@ make_graphs_by_site = function(data_combined){
 
 plot_xrd = function(xrd_processed){
   
+##  In general the pattern quality was much better than the Exchange samples. 
+##  The agreement index was generally less than the 10% acceptable value. I checked the few that were over this and they had a little preferred orientation.
+##  
+##  I am refining my technique for these analyses, which I also used for the Exchange samples. 
+##  I start by refining the expected basal peak positions for the clay minerals since if I don’t detect those I am not happy saying there is some of that clay mineral there. 
+##  If the basal peak is below a threshold value I exclude that clay from the refinement. 
+##  If I don’t do this, I run the risk of the program using intensity in the higher angle peaks 
+##  (e.g. in areas where preferred orientation needs more calculated intensity) to suggest the presence of clay minerals when there isn’t a basal spacing. 
+##  For the other minerals, I use an percentage cut-off (typically around 2%) to eliminate weak quantities of minerals that cannot be justified by the measured pattern.
+##  
+##  What is new in the COMPASS analysis is a calculation of a “crystallinity” value to give you an indication of amorphous content. 
+##  I noticed that some samples had a very large amorphous background, but because the results are scaled to 100 % it suggests they are 100% quartz, for example. 
+##  The crystallinity index is simply the refined scale factor for quartz divided by the refined weight fraction of quartz and the actual value is arbitrary but comparisons are useful. 
+##  Since these were all measured using the same experimental conditions, the scale factor 
+##  (a number used to scale the theoretical intensity to the measured counts) and weight fraction should strongly correlate when the sample is 100% crystalline. 
+##  
+##  If you look at the graph in the excel sheet for this parameter, you will see the samples fall into 3 main groups:
+##  Where the crystallinity number is around 0.04, corresponding to samples with around 100 % crystallinity (I assume, because most of the samples are here).
+##  Crystallinity numbers larger than 0.04, corresponding to samples with quartz preferred orientation.
+##  Crystallinity numbers much less than 0.04. These samples have significant amorphous content; sample 140 for example seems to be nearly all amorphous while the crystalline analysis suggests 100% quartz.
+  
+  
   xrd_summary = 
     xrd_processed %>% 
     dplyr::select(-c(tree_number)) %>% 
@@ -854,13 +876,38 @@ plot_xrd = function(xrd_processed){
     reorder_transect() %>% 
     reorder_site()
   
-  gg_bar_xrd = 
+ # gg_bar_xrd = 
     xrd_summary %>% 
+      filter(horizon != "B") %>% 
     ggplot(aes(x = sample_label, y = percentage, fill = mineral))+
     geom_bar(stat = "identity")+
-    facet_grid(horizon ~ region + site + transect, scales = "free_x")+
-    theme_kp()
-    
+    facet_wrap(horizon ~ region + site + transect, scales = "free_x")+
+    theme_kp()+
+    theme(axis.text.x = element_blank(),
+          legend.position = "right")
+  
+  xrd_summary %>% 
+    filter(mineral == "Crystallinity") %>% 
+    ggplot(aes(x = transect, y = percentage))+
+    geom_point()+
+    geom_hline(yintercept = 0.04, linetype = "dashed")+
+    facet_wrap(~region + site)
+  
+  
+  xrd_summary %>% 
+    filter(mineral != "Crystallinity") %>% 
+    group_by(region, site, transect, horizon, mineral) %>% 
+    dplyr::summarise(percentage_mean = mean(percentage)) %>% 
+    ggplot(aes(x = transect, y = percentage_mean, fill = mineral))+
+    geom_bar(stat = "identity")+
+  #  scale_fill_manual(values = soilpalettes::soil_palette("redox", 12))+
+    facet_grid(horizon ~ region + site)+
+    theme_kp()+
+    theme(#axis.text.x = element_blank(),
+          legend.position = "right")
+  
+  
+  
   
   ## DO PCA
   fit_pca_function = function(dat){
