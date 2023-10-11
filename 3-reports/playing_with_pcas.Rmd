@@ -1,0 +1,410 @@
+---
+title: "Playing with PCAs"
+output: 
+  github_document:
+  html_preview: true
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = FALSE,
+                      message = FALSE,
+                      warning = FALSE)
+```
+
+
+```{r}
+source("2-code/0-packages.R")
+library(ggbiplot)
+
+pal_transect = rev(soilpalettes::soil_palette("redox2", 4))
+theme_set(theme_kp())
+```
+
+```{r}
+targets::tar_load_everything()
+```
+
+```{r}
+make_data_subset = function(data_combined){
+  
+ # data_combined_subset = 
+    data_combined %>% 
+    filter(!transect %in% "wte") %>% 
+    #filter(!grepl("Bromide|Fluoride|Nitrate|Calcium|Magnesium|Potassium|Sodium|Phosphate|Ammonia", name, ignore.case = TRUE)) %>% 
+    force()
+}
+make_data_wide = function(data_combined_subset, sample_key){
+  
+  #data_combined_wide = 
+    data_combined_subset %>% 
+    dplyr::select(sample_label, analysis, name, value) %>% 
+    separate(name, sep = "_", into = "variable", remove = F) %>% 
+    #mutate(name = paste0(variable, " (", analysis, ")")) %>% 
+    dplyr::select(sample_label, variable, value) %>% 
+    pivot_wider(names_from = "variable") %>% 
+    left_join(sample_key) %>% 
+    filter(!grepl("016", sample_label)) %>% # this one sample is very weird
+    force()
+  
+}
+
+```
+
+
+
+```{r}
+
+data_combined_subset = make_data_subset(data_combined) %>% filter(!analysis %in% "LOI")
+data_combined_wide = make_data_wide(data_combined_subset, sample_key)
+data_combined_wide_NO_DIC = make_data_wide(data_combined_subset %>% 
+                                             filter(!grepl("dic", name, ignore.case = TRUE)),
+                                           sample_key)
+
+fit_pca_function = function(dat){
+  
+  dat %>% 
+    drop_na()
+  
+  num = 
+    dat %>%       
+    dplyr::select(where(is.numeric)) %>%
+    dplyr::mutate(row = row_number()) %>% 
+    drop_na()
+  
+  num_row_numbers = num %>% dplyr::select(row)
+  
+  grp = 
+    dat %>% 
+    dplyr::select(where(is.character)) %>% 
+    dplyr::mutate(row = row_number()) %>% 
+    right_join(num_row_numbers)
+  
+  
+  num = num %>% dplyr::select(-row)
+  pca_int = prcomp(num, scale. = T)
+  
+  list(num = num,
+       grp = grp,
+       pca_int = pca_int)
+}
+```
+
+--- 
+
+## OVERALL
+
+```{r}
+## PCA input files ----
+pca_overall = fit_pca_function(data_combined_wide_NO_DIC) 
+pca_overall_wle = fit_pca_function(data_combined_wide_NO_DIC %>% filter(region == "WLE"))
+pca_overall_cb = fit_pca_function(data_combined_wide_NO_DIC %>% filter(region == "CB"))
+```
+
+```{r}
+## PCA plots overall ----
+#gg_pca_overall = 
+  ggbiplot(pca_overall$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_overall$grp$region), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(#shape = pca_overall$grp$transect,
+               color = groups))+ 
+  scale_color_manual(values = c("#16879C", "#BB281E" ))+
+  #scale_shape_manual(values = c(21, 19))+
+  #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
+  # xlim(-4,20)+
+  # ylim(-8,8)+
+  labs(shape="",
+       title = "Overall PCA, both regions",
+       subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+```
+
+
+### regions separated - colored by transect
+
+```{r, fig.width=10, fig.height=6}
+gg_pca_wle = 
+  ggbiplot(pca_overall_wle$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_overall_wle$grp$transect), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(shape = pca_overall_wle$grp$site,
+                 color = groups))+ 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+                     values = pal_transect)+
+  #scale_shape_manual(values = c(21, 19))+
+  #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
+  xlim(-6,6)+
+  ylim(-4.5,4.5)+
+  labs(shape="",
+       title = "PCA: WLE",
+       subtitle = "surface horizons")+
+  theme_kp()+
+  theme(legend.position = "top", legend.box = "vertical")+
+  NULL
+
+gg_pca_cb = 
+  ggbiplot(pca_overall_cb$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_overall_cb$grp$transect), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(shape = pca_overall_cb$grp$site,
+                 color = groups))+ 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+                     values = pal_transect)+
+  #scale_shape_manual(values = c(21, 19))+
+  #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
+  xlim(-5.5,7.5)+
+  ylim(-5,5)+
+  labs(shape="",
+       title = "PCA: CB",
+       subtitle = "surface horizons")+
+  theme_kp()+
+  theme(legend.position = "top", legend.box = "vertical")+
+  NULL
+
+#  library(patchwork)
+#  gg_pca_regions = gg_pca_wle + gg_pca_cb
+gg_pca_regions = cowplot::plot_grid(gg_pca_wle , gg_pca_cb)
+gg_pca_regions
+
+```
+
+### regions separated - colored by site
+
+```{r, fig.width=10, fig.height=6}
+gg_pca_wle = 
+  ggbiplot(pca_overall_wle$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_overall_wle$grp$site), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(shape = pca_overall_wle$grp$transect,
+                 color = groups))+ 
+  xlim(-6,6)+
+  ylim(-4.5,4.5)+
+  labs(shape="",
+       title = "PCA: WLE",
+       subtitle = "surface horizons")+
+  theme_kp()+
+  theme(legend.position = "top", legend.box = "vertical")+
+  NULL
+
+gg_pca_cb = 
+  ggbiplot(pca_overall_cb$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_overall_cb$grp$site), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(shape = pca_overall_cb$grp$transect,
+                 color = groups))+ 
+  xlim(-5.5,7.5)+
+  ylim(-5,5)+
+  labs(shape="",
+       title = "PCA: CB",
+       subtitle = "surface horizons")+
+  theme_kp()+
+  theme(legend.position = "top", legend.box = "vertical")+
+  NULL
+
+#  library(patchwork)
+#  gg_pca_regions = gg_pca_wle + gg_pca_cb
+gg_pca_regions = cowplot::plot_grid(gg_pca_wle , gg_pca_cb)
+gg_pca_regions
+
+```
+
+---
+
+## BY TRANSECT
+
+```{r}
+# BY TRANSECT ----
+
+pca_overall_upland = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "upland"))
+pca_overall_transition = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "transition"))
+pca_overall_wetland = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "wc"))
+
+
+gg_overall_upland = 
+  ggbiplot(pca_overall_upland$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_overall_upland$grp$region), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(shape = pca_overall_upland$grp$site,
+                 color = groups))+ 
+  scale_color_manual(values = c("#16879C", "#BB281E" ))+
+  labs(shape="",
+       title = "PCA upland, both regions",
+       subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+
+gg_overall_transition = 
+  ggbiplot(pca_overall_transition$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_overall_transition$grp$region), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(shape = pca_overall_transition$grp$site,
+                 color = groups))+ 
+  scale_color_manual(values = c("#16879C", "#BB281E" ))+
+  labs(shape="",
+       title = "PCA transition, both regions",
+       subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+
+gg_overall_wetland = 
+  ggbiplot(pca_overall_wetland$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_overall_wetland$grp$region), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(shape = pca_overall_wetland$grp$site,
+                 color = groups))+ 
+  scale_color_manual(values = c("#16879C", "#BB281E" ))+
+  labs(shape="",
+       title = "PCA wetland, both regions",
+       subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+
+
+gg_overall_upland
+gg_overall_transition
+gg_overall_wetland
+
+
+#
+
+```
+
+--- 
+
+## BY TRANSECT + REGION
+
+```{r, fig.width=10, fig.height=6}
+# BY TRANSECT + REGION ----
+
+pca_upland_wle = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "upland" & region == "WLE"))
+pca_upland_cb = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "upland" & region == "CB"))
+
+gg_upland_wle = 
+  ggbiplot(pca_upland_wle$pca_int, obs.scale = 1, var.scale = 1,
+         groups = as.character(pca_upland_wle$grp$site), 
+         ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(
+                 color = groups))+ 
+  labs(shape="",
+       title = "PCA upland, WLE",
+       subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+
+gg_upland_cb = 
+  ggbiplot(pca_upland_cb$pca_int, obs.scale = 1, var.scale = 1,
+         groups = as.character(pca_upland_cb$grp$site), 
+         ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(
+                 color = groups))+ 
+  labs(shape="",
+       title = "PCA upland, CB",
+       subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+
+
+cowplot::plot_grid(gg_upland_wle , gg_upland_cb)
+
+```
+
+
+```{r, fig.width=10, fig.height=6}
+
+pca_transition_wle = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "transition" & region == "WLE"))
+pca_transition_cb = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "transition" & region == "CB"))
+
+gg_transition_wle = 
+  ggbiplot(pca_transition_wle$pca_int, obs.scale = 1, var.scale = 1,
+         groups = as.character(pca_transition_wle$grp$site), 
+         ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(
+                 color = groups))+ 
+  labs(shape="",
+       title = "PCA transition, WLE",
+       subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+
+gg_transition_cb = 
+  ggbiplot(pca_transition_cb$pca_int, obs.scale = 1, var.scale = 1,
+         groups = as.character(pca_transition_cb$grp$site), 
+         ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(
+                 color = groups))+ 
+  labs(
+       title = "PCA transition, CB",
+       subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+
+
+cowplot::plot_grid(gg_transition_wle , gg_transition_cb)
+
+
+```
+
+
+```{r, fig.width=10, fig.height=6}
+
+pca_wetland_wle = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "wc" & region == "WLE"))
+pca_wetland_cb = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "wc" & region == "CB"))
+
+gg_wetland_wle = 
+  ggbiplot(pca_wetland_wle$pca_int, obs.scale = 1, var.scale = 1,
+         groups = as.character(pca_wetland_wle$grp$site), 
+         ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(
+                 color = groups))+ 
+  labs(
+       title = "PCA wetland, WLE",
+       subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+
+gg_wetland_cb = 
+  ggbiplot(pca_wetland_cb$pca_int, obs.scale = 1, var.scale = 1,
+         groups = as.character(pca_wetland_cb$grp$site), 
+         ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(
+                 color = groups))+ 
+  labs(
+       title = "PCA wetland, CB",
+       subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+
+cowplot::plot_grid(gg_wetland_wle , gg_wetland_cb)
+
+```
+
+
+---
+
+## Session Info 
+
+<details>
+  <summary> Session Info </summary>
+
+Date run: `r Sys.Date()`
+
+```{r}
+sessionInfo()
+```
+
+</details>
