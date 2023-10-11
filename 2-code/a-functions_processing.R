@@ -770,7 +770,8 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     pivot_wider(names_from = "ion") %>% 
     mutate(analysis = "IC") %>% 
     mutate_all(as.character) %>% 
-    mutate_at(vars(ends_with(c("ppm", "ug_g"))), as.numeric)
+    mutate_at(vars(ends_with(c("ppm", "ug_g"))), as.numeric) %>% 
+    dplyr::select(sample_label, analysis, starts_with(c("Chloride", "Sulfate")))
   
   # convert to meq
   charges = 
