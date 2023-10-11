@@ -64,11 +64,11 @@ list(
   tar_target(mehlich_map, import_mehlich(FILEPATH = "1-data/phosphorus-mehlich")$mehlich_map),
   tar_target(mehlich_data, import_mehlich(FILEPATH = "1-data/phosphorus-mehlich")$mehlich_data),
   tar_target(mehlich_processed, process_mehlich(mehlich_map, mehlich_data, moisture_processed, subsampling)),
-  tar_target(icr_report, import_fticr_data(FILEPATH = "1-data/icr")),
-  tar_target(icr_meta, make_fticr_meta(icr_report)$meta2),
-  tar_target(icr_data_long, make_fticr_data(icr_report, analysis_key, sample_key)$data_long_blank_corrected),
-  tar_target(icr_data_trt, make_fticr_data(icr_report, analysis_key, sample_key)$data_long_trt),
-  tar_target(icr_relabund_samples, compute_icr_relabund(icr_data_long, icr_meta)),
+##  tar_target(icr_report, import_fticr_data(FILEPATH = "1-data/icr")),
+##  tar_target(icr_meta, make_fticr_meta(icr_report)$meta2),
+##  tar_target(icr_data_long, make_fticr_data(icr_report, analysis_key, sample_key)$data_long_blank_corrected),
+##  tar_target(icr_data_trt, make_fticr_data(icr_report, analysis_key, sample_key)$data_long_trt),
+##  tar_target(icr_relabund_samples, compute_icr_relabund(icr_data_long, icr_meta)),
   tar_target(ions_data, import_ions(FILEPATH = "1-data/ions")),
   tar_target(ions_processed, process_ions(ions_data, analysis_key, sample_key, moisture_processed, subsampling)$samples3),
   tar_target(ions_processed_meq, process_ions(ions_data, analysis_key, sample_key, moisture_processed, subsampling)$samples_meq),
@@ -93,9 +93,9 @@ list(
   ## tar_target(gg_icp, plot_icp(icp_processed, sample_key)),
   ## tar_target(gg_ferrozine, plot_ferrozine(ferrozine_processed, sample_key)),
   ## tar_target(gg_mehlich, plot_mehlich(mehlich_processed, sample_key)),
-   tar_target(gg_icr_vankrevelen, plot_vankrevelen(icr_data_trt, icr_meta)),
-   tar_target(gg_icr_unique, plot_vankrevelen_unique(icr_data_trt, icr_meta)),
-   tar_target(gg_icr_pca, compute_icr_pca(icr_relabund_samples, sample_key)),
+##   tar_target(gg_icr_vankrevelen, plot_vankrevelen(icr_data_trt, icr_meta)),
+##   tar_target(gg_icr_unique, plot_vankrevelen_unique(icr_data_trt, icr_meta)),
+##   tar_target(gg_icr_pca, compute_icr_pca(icr_relabund_samples, sample_key)),
   ## tar_target(gg_ions, plot_ions(ions_processed, sample_key)),
   
   # combined data
@@ -120,9 +120,9 @@ list(
   tar_target(export, {
     write.csv(data_combined, "1-data/processed/chemistry_combined_surface_horizon.csv", row.names = FALSE)
     write.csv(data_combined_all_horizons, "1-data/processed/chemistry_combined_all_horizons.csv", row.names = FALSE)
-    write.csv(icr_meta, "1-data/processed/icr_meta.csv", row.names = FALSE)
-    crunch::write.csv.gz(icr_data_long, "1-data/processed/icr_long_all_samples.csv.gz", row.names = FALSE)
-    crunch::write.csv.gz(icr_data_trt, "1-data/processed/icr_long_treatments.csv.gz", row.names = FALSE)
+##    write.csv(icr_meta, "1-data/processed/icr_meta.csv", row.names = FALSE)
+##    crunch::write.csv.gz(icr_data_long, "1-data/processed/icr_long_all_samples.csv.gz", row.names = FALSE)
+##    crunch::write.csv.gz(icr_data_trt, "1-data/processed/icr_long_treatments.csv.gz", row.names = FALSE)
     
   }, format = "file"),
    

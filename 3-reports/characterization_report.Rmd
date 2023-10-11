@@ -142,48 +142,6 @@ tar_read(gg_by_site_oab)
 ---
 
 
-## FT-ICR-MS
-
-
-<details>
-  <summary>click to open</summary>
-  
-  
-```{r, icr-vk-domains, fig.height=5, fig.width=5}
-tar_read(gg_icr_vankrevelen)$vk_domains
-```
-
-```{r, icr-vk-wle, fig.height=5, fig.width=10}
-tar_read(gg_icr_vankrevelen)$vk_wle
-
-```
-
-```{r, icr-vk-cb, fig.height=10, fig.width=10}
-tar_read(gg_icr_vankrevelen)$vk_cb
-
-```
-
-```{r, icr-unique-wle, fig.height=10, fig.width=4}
-tar_read(gg_icr_unique)$vk_unique_wle
-```
-
-```{r, icr-unique-cb, fig.height=10, fig.width=7}
-tar_read(gg_icr_unique)$vk_unique_cb
-```
-
-```{r, icr-pca, fig.height=5, fig.width=5}
-tar_read(gg_icr_pca)$biplot_all
-```
-
-
-```{r, icr-pca-regions, fig.height=5, fig.width=10}
-tar_read(gg_icr_pca)$biplot_regions
-```
-
-
-</details>
-
-
 
 ---
 
