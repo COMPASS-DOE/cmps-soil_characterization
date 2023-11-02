@@ -323,7 +323,8 @@ make_data_subset = function(data_combined){
  # data_combined_subset = 
     data_combined %>% 
     filter(!transect %in% "wte") %>% 
-    filter(!grepl("Bromide|Fluoride|Nitrate|Calcium|Magnesium|Potassium|Sodium|Phosphate|Ammonia", name, ignore.case = TRUE))
+    #filter(!grepl("Bromide|Fluoride|Nitrate|Calcium|Magnesium|Potassium|Sodium|Phosphate|Ammonia", name, ignore.case = TRUE)) %>% 
+    force()
 }
 make_data_wide = function(data_combined_subset, sample_key){
   
@@ -360,7 +361,7 @@ compute_analysis_matrix = function(data_combined){
 compute_overall_pca = function(data_combined, sample_key){
   library(ggbiplot)
   
-  data_combined_subset = make_data_subset(data_combined)
+  data_combined_subset = make_data_subset(data_combined) %>% filter(!analysis %in% "LOI")
   data_combined_wide = make_data_wide(data_combined_subset, sample_key)
   data_combined_wide_NO_DIC = make_data_wide(data_combined_subset %>% 
                                               filter(!grepl("dic", name, ignore.case = TRUE)),
