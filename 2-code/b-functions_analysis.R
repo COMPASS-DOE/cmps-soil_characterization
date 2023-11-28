@@ -337,6 +337,7 @@ make_data_wide = function(data_combined_subset, sample_key){
     pivot_wider(names_from = "variable") %>% 
     left_join(sample_key) %>% 
     filter(!grepl("016", sample_label)) %>% # this one sample is very weird
+    dplyr::select(sample_label, region, site, transect, tree_number, horizon, everything()) %>% 
     force()
   
 }

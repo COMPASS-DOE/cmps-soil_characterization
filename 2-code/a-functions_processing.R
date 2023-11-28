@@ -993,3 +993,17 @@ subset_surface_horizons = function(data_combined_all_horizons){
   data_combined_surface_only
   
 }
+
+make_data_wide_processing = function(data_combined, sample_key){
+  
+  #data_combined_wide = 
+  data_combined %>% 
+    dplyr::select(sample_label, analysis, name, value) %>% 
+    dplyr::select(sample_label, name, value) %>% 
+    pivot_wider(names_from = "name") %>% 
+    left_join(sample_key) %>% 
+    filter(!grepl("016", sample_label)) %>% # this one sample is very weird
+    dplyr::select(sample_label, region, site, transect, tree_number, horizon, everything()) %>% 
+    force()
+  
+}

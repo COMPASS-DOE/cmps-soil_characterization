@@ -104,6 +104,8 @@ list(
                                          ferrozine_processed, mehlich_processed, ions_processed_meq, 
                                          sample_key)),
   tar_target(data_combined, subset_surface_horizons(data_combined_all_horizons)),
+  tar_target(data_combined_wide, make_data_wide_processing(data_combined, sample_key)),
+
   tar_target(analysis_completion_matrix, compute_analysis_matrix(data_combined)),
   tar_target(gg_pca_all, compute_overall_pca(data_combined, sample_key)),
   tar_target(gg_correlations, compute_correlations(data_combined, sample_key)),
@@ -120,6 +122,7 @@ list(
   tar_target(export, {
     write.csv(data_combined, "1-data/processed/chemistry_combined_surface_horizon.csv", row.names = FALSE)
     write.csv(data_combined_all_horizons, "1-data/processed/chemistry_combined_all_horizons.csv", row.names = FALSE)
+    write.csv(data_combined_wide, "1-data/processed/chemistry_combined_wide.csv", row.names = FALSE)
 ##    write.csv(icr_meta, "1-data/processed/icr_meta.csv", row.names = FALSE)
 ##    crunch::write.csv.gz(icr_data_long, "1-data/processed/icr_long_all_samples.csv.gz", row.names = FALSE)
 ##    crunch::write.csv.gz(icr_data_trt, "1-data/processed/icr_long_treatments.csv.gz", row.names = FALSE)
