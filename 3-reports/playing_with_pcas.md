@@ -5,31 +5,37 @@ Playing with PCAs
 
 ## OVERALL
 
-![](playing_with_pcas_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+![](playing_with_pcas_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
 
 ### regions separated - colored by transect
 
-![](playing_with_pcas_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+![](playing_with_pcas_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->
 
 ### regions separated - colored by site
 
-![](playing_with_pcas_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](playing_with_pcas_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
 
 ------------------------------------------------------------------------
 
 ## BY TRANSECT
 
-![](playing_with_pcas_files/figure-gfm/unnamed-chunk-9-1.png)<!-- -->![](playing_with_pcas_files/figure-gfm/unnamed-chunk-9-2.png)<!-- -->![](playing_with_pcas_files/figure-gfm/unnamed-chunk-9-3.png)<!-- -->
+![](playing_with_pcas_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->![](playing_with_pcas_files/figure-gfm/unnamed-chunk-11-2.png)<!-- -->![](playing_with_pcas_files/figure-gfm/unnamed-chunk-11-3.png)<!-- -->
 
 ------------------------------------------------------------------------
 
 ## BY TRANSECT + REGION
 
-![](playing_with_pcas_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
-
-![](playing_with_pcas_files/figure-gfm/unnamed-chunk-11-1.png)<!-- -->
-
 ![](playing_with_pcas_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+![](playing_with_pcas_files/figure-gfm/unnamed-chunk-13-1.png)<!-- -->
+
+![](playing_with_pcas_files/figure-gfm/unnamed-chunk-14-1.png)<!-- -->
+
+------------------------------------------------------------------------
+
+## Plotting PC1 (drivers of variability)
+
+![](playing_with_pcas_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->![](playing_with_pcas_files/figure-gfm/unnamed-chunk-16-2.png)<!-- -->
 
 ------------------------------------------------------------------------
 
@@ -40,7 +46,7 @@ Playing with PCAs
 Session Info
 </summary>
 
-Date run: 2023-10-11
+Date run: 2023-12-05
 
     ## R version 4.2.1 (2022-06-23)
     ## Platform: x86_64-apple-darwin17.0 (64-bit)
