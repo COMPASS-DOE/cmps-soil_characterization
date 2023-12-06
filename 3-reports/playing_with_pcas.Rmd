@@ -55,7 +55,6 @@ make_data_wide = function(data_combined_subset, sample_key){
 ```{r, eval=FALSE}
 
 data_combined_subset = make_data_subset(data_combined) %>% filter(!analysis %in% "LOI")
-data_combined_wide = make_data_wide(data_combined_subset, sample_key)
 data_combined_wide_NO_DIC = make_data_wide(data_combined_subset %>% 
                                              filter(!grepl("dic", name, ignore.case = TRUE)),
                                            sample_key)
@@ -65,7 +64,15 @@ data_combined_wide_NO_DIC = make_data_wide(data_combined_subset %>%
 ```{r}
 ## Set df for PCA
 
-data_wide_PCA = data_combined_wide %>% dplyr::select(-c("dic", "gwc"))
+data_combined_wide = make_data_wide(data_combined, sample_key)
+data_wide_PCA = 
+  data_combined_wide %>% 
+  dplyr::select(-c("dic", "gwc", "percentOM")) %>% 
+  rename(CEC = cec,
+         NH4N = nh4n,
+         NO3N = no3n,
+         P = mehlichp,
+         WEOC = npoc)
 
 ```
 
@@ -134,22 +141,22 @@ pca_overall_cb = fit_pca_function(data_wide_PCA %>% filter(region == "CB"))
   NULL
 
 
-  ggbiplot(pca_overall$pca_int, obs.scale = 1, var.scale = 1,
-           groups = as.character(pca_overall$grp$transect), 
-           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
-  geom_point(size=3,stroke=1, alpha = 1,
-             aes(shape = pca_overall$grp$region,
-               color = pca_overall$grp$transect))+ 
- # scale_color_manual(values = c("#16879C", "#BB281E" ))+
-  #scale_shape_manual(values = c(21, 19))+
-  #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
-  # xlim(-4,20)+
-  # ylim(-8,8)+
-  labs(shape="",
-       title = "Overall PCA, both regions",
-       subtitle = "Surface horizons only")+
-  theme_kp()+
-  NULL
+#  ggbiplot(pca_overall$pca_int, obs.scale = 1, var.scale = 1,
+#           groups = as.character(pca_overall$grp$transect), 
+#           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+#  geom_point(size=3,stroke=1, alpha = 1,
+#             aes(shape = pca_overall$grp$region,
+#               color = pca_overall$grp$transect))+ 
+# # scale_color_manual(values = c("#16879C", "#BB281E" ))+
+#  #scale_shape_manual(values = c(21, 19))+
+#  #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
+#  # xlim(-4,20)+
+#  # ylim(-8,8)+
+#  labs(shape="",
+#       title = "Overall PCA, both regions",
+#       subtitle = "Surface horizons only")+
+#  theme_kp()+
+#  NULL
 
 ```
 
@@ -253,9 +260,9 @@ gg_pca_regions
 ```{r}
 # BY TRANSECT ----
 
-pca_overall_upland = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "upland"))
-pca_overall_transition = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "transition"))
-pca_overall_wetland = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "wc"))
+pca_overall_upland = fit_pca_function(data_wide_PCA %>% filter(transect == "upland"))
+pca_overall_transition = fit_pca_function(data_wide_PCA %>% filter(transect == "transition"))
+pca_overall_wetland = fit_pca_function(data_wide_PCA %>% filter(transect == "wc"))
 
 
 gg_overall_upland = 
@@ -317,8 +324,8 @@ gg_overall_wetland
 ```{r, fig.width=10, fig.height=6}
 # BY TRANSECT + REGION ----
 
-pca_upland_wle = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "upland" & region == "WLE"))
-pca_upland_cb = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "upland" & region == "CB"))
+pca_upland_wle = fit_pca_function(data_wide_PCA %>% filter(transect == "upland" & region == "WLE"))
+pca_upland_cb = fit_pca_function(data_wide_PCA %>% filter(transect == "upland" & region == "CB"))
 
 gg_upland_wle = 
   ggbiplot(pca_upland_wle$pca_int, obs.scale = 1, var.scale = 1,
@@ -354,8 +361,8 @@ cowplot::plot_grid(gg_upland_wle , gg_upland_cb)
 
 ```{r, fig.width=10, fig.height=6}
 
-pca_transition_wle = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "transition" & region == "WLE"))
-pca_transition_cb = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "transition" & region == "CB"))
+pca_transition_wle = fit_pca_function(data_wide_PCA %>% filter(transect == "transition" & region == "WLE"))
+pca_transition_cb = fit_pca_function(data_wide_PCA %>% filter(transect == "transition" & region == "CB"))
 
 gg_transition_wle = 
   ggbiplot(pca_transition_wle$pca_int, obs.scale = 1, var.scale = 1,
@@ -392,8 +399,8 @@ cowplot::plot_grid(gg_transition_wle , gg_transition_cb)
 
 ```{r, fig.width=10, fig.height=6}
 
-pca_wetland_wle = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "wc" & region == "WLE"))
-pca_wetland_cb = fit_pca_function(data_combined_wide_NO_DIC %>% filter(transect == "wc" & region == "CB"))
+pca_wetland_wle = fit_pca_function(data_wide_PCA %>% filter(transect == "wc" & region == "WLE"))
+pca_wetland_cb = fit_pca_function(data_wide_PCA %>% filter(transect == "wc" & region == "CB"))
 
 gg_wetland_wle = 
   ggbiplot(pca_wetland_wle$pca_int, obs.scale = 1, var.scale = 1,
@@ -422,6 +429,63 @@ gg_wetland_cb =
   NULL
 
 cowplot::plot_grid(gg_wetland_wle , gg_wetland_cb)
+
+```
+
+---
+
+## Plotting PC1 (drivers of variability)
+
+```{r}
+get_pc_values = function(dat){
+  
+  pca = fit_pca_function(dat)
+  
+  x = pca$pca_int$rotation
+  x2 = 
+    x %>% 
+    as.data.frame() %>% 
+    dplyr::select(PC1) %>% 
+    arrange(desc(PC1)) %>% 
+    rownames_to_column("variable") %>% 
+    mutate(variable = fct_reorder(variable, (PC1)))
+
+  x2
+}
+```
+
+```{r, fig.height=8, fig.width=6}
+
+pc_overall = get_pc_values(data_wide_PCA) %>% mutate(region = "combined")
+pc_wle = get_pc_values(data_wide_PCA %>% filter(region == "WLE")) %>% mutate(region = "WLE")
+pc_cb = get_pc_values(data_wide_PCA %>% filter(region == "CB")) %>% mutate(region = "CB")
+
+pc_all = 
+  bind_rows(pc_overall, pc_wle, pc_cb) %>% 
+  mutate(variable = fct_reorder(variable, (PC1)))
+
+pc_all %>% 
+  mutate(variable = fct_reorder(variable, (PC1))) %>% 
+  filter(region != "combined") %>% 
+  ggplot(aes(x = PC1, y = variable, color = region))+
+  geom_point(size = 5)+
+  scale_colour_manual(values = c("#81C0A7", "#1A421D"))+
+  xlim(-0.4, 0.4)+
+  geom_vline(xintercept = 0)+
+  labs(y = "")+
+  theme_kp()
+
+pc_all %>% 
+  mutate(variable = fct_reorder(variable, (PC1))) %>% 
+  filter(region != "combined") %>% 
+  ggplot(aes(x = abs(PC1), y = variable, color = region))+
+  geom_point(size = 5)+
+  scale_colour_manual(values = c("#81C0A7", "#1A421D"))+
+ # xlim(0, 0.4)+
+  #geom_vline(xintercept = 0)+
+  labs(y = "",
+       x = "|PC1|")+
+  theme_kp()
 
 ```
 
