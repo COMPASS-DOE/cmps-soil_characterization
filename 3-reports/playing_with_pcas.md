@@ -5,7 +5,7 @@ Playing with PCAs
 
 ## OVERALL
 
-![](playing_with_pcas_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->
+![](playing_with_pcas_files/figure-gfm/unnamed-chunk-8-1.png)<!-- -->![](playing_with_pcas_files/figure-gfm/unnamed-chunk-8-2.png)<!-- -->
 
 ### regions separated - colored by transect
 
@@ -37,6 +37,12 @@ Playing with PCAs
 
 ![](playing_with_pcas_files/figure-gfm/unnamed-chunk-16-1.png)<!-- -->![](playing_with_pcas_files/figure-gfm/unnamed-chunk-16-2.png)<!-- -->
 
+PC1 loadings by transect
+![](playing_with_pcas_files/figure-gfm/unnamed-chunk-17-1.png)<!-- -->
+
+PC1 loadings by region+transect
+![](playing_with_pcas_files/figure-gfm/unnamed-chunk-18-1.png)<!-- -->
+
 ------------------------------------------------------------------------
 
 ## Session Info
@@ -46,7 +52,7 @@ Playing with PCAs
 Session Info
 </summary>
 
-Date run: 2023-12-05
+Date run: 2024-01-11
 
     ## R version 4.2.1 (2022-06-23)
     ## Platform: x86_64-apple-darwin17.0 (64-bit)

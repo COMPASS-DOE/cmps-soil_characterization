@@ -52,7 +52,7 @@ make_data_wide = function(data_combined_subset, sample_key){
 
 
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 
 data_combined_subset = make_data_subset(data_combined) # %>% filter(!analysis %in% "LOI")
 data_combined_wide_NO_DIC = make_data_wide(data_combined_subset %>% 
@@ -488,6 +488,57 @@ pc_all %>%
   theme_kp()
 
 ```
+
+
+PC1 loadings by transect
+```{r}
+
+pc_transect = 
+  data_wide_PCA %>% 
+  group_by(transect) %>% 
+  do(get_pc_values(.)) %>% 
+  mutate(transect = factor(transect, levels = c("upland", "transition", "wc")))
+
+
+pc_transect %>% 
+  mutate(variable = fct_reorder(variable, abs(PC1))) %>% 
+  ggplot(aes(x = abs(PC1), y = variable))+
+  geom_point(size = 5)+
+  scale_colour_manual(values = c("#81C0A7", "#1A421D"))+
+ # xlim(0, 0.4)+
+  #geom_vline(xintercept = 0)+
+  labs(y = "",
+       x = "|PC1|")+
+  facet_grid(. ~ transect)+
+  theme_kp()
+
+```
+
+
+PC1 loadings by region+transect
+```{r}
+
+pc_region_transect = 
+  data_wide_PCA %>% 
+  group_by(region, transect) %>% 
+  do(get_pc_values(.)) %>% 
+  mutate(transect = factor(transect, levels = c("upland", "transition", "wc")))
+
+pc_region_transect %>% 
+  mutate(variable = fct_reorder(variable, abs(PC1))) %>% 
+  ggplot(aes(x = abs(PC1), y = variable, color = region))+
+  geom_point(size = 5)+
+  scale_colour_manual(values = c("#81C0A7", "#1A421D"))+
+ # xlim(0, 0.4)+
+  #geom_vline(xintercept = 0)+
+  labs(y = "",
+       x = "|PC1|")+
+  facet_grid(. ~ transect)+
+  theme_kp()
+
+```
+
+
 
 
 ---
