@@ -835,10 +835,10 @@ import_wrc_data = function(FILEPATH){
 #wrc_data = import_wrc_data(FILEPATH = "1-data/wrc")
 process_wrc = function(wrc_data){
   
-  #wrc_processed <- 
+wrc_processed <- 
   wrc_data %>% 
     mutate(source = str_remove(source, ".xlsx")) %>% 
-    separate(source, sep = "_", into = c("EC", "kit", "site", "transect")) %>% 
+    separate(source, sep = "_", into = c("site", "transect")) %>% 
     dplyr::select(site, transect, water_content_vol_percent, starts_with("pf")) %>% 
     mutate_at(vars(starts_with("pf")), as.numeric) %>% 
     mutate_at(vars(starts_with("water")), as.numeric) %>% 
