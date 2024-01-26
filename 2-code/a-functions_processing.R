@@ -852,6 +852,30 @@ wrc_processed <-
   
 }
 
+import_wrc_parameters = function(FILEPATH){
+  
+  filePaths_wrc <- list.files(path = FILEPATH, pattern = "xlsx", full.names = TRUE, recursive = FALSE)
+  wrc_parameters <- do.call(bind_rows, lapply(filePaths_wrc, function(path) {
+    
+    df_parameters <- readxl::read_excel(path, sheet = "Fitting-Parameter value") %>% mutate_all(as.character) %>% janitor::clean_names()
+    df_parameters = df_parameters %>% mutate(source = basename(path)) %>% dplyr::select(parameter, value, source)
+    
+    
+  }
+  ))
+  
+  parameters_processed <- 
+    wrc_parameters %>% 
+    mutate(source = str_remove(source, ".xlsx"),
+           value = parse_number(value)) %>% 
+    separate(source, sep = "_", into = c("site", "transect")) %>% 
+    filter(parameter %in% c("alpha", "n", "th_r", "th_s"))  %>% 
+    pivot_wider(names_from = "parameter", values_from = "value")
+  
+  #parameters_processed %>% write.csv("1-data/wrc/wrc_msm_mcdowell/wrc_parameters_all_sites.csv", row.names = F, na = "")
+  
+}
+
 
 # soil texture
 compute_texture = function(hydrometer_df){
