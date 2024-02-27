@@ -870,7 +870,13 @@ import_wrc_parameters = function(FILEPATH){
            value = parse_number(value)) %>% 
     separate(source, sep = "_", into = c("site", "transect")) %>% 
     filter(parameter %in% c("alpha", "n", "th_r", "th_s"))  %>% 
-    pivot_wider(names_from = "parameter", values_from = "value")
+    pivot_wider(names_from = "parameter", values_from = "value") %>% 
+    mutate(transect = tolower(transect)) %>% 
+    mutate(m = 1 - (1/n),
+           transect = case_match(transect, "upland" ~ "UP", "transition" ~ "TR", "wetland" ~ "W")) %>% 
+    rename(location = transect,
+           theta_r = th_r,
+           theta_s = th_s)
   
   #parameters_processed %>% write.csv("1-data/wrc/wrc_msm_mcdowell/wrc_parameters_all_sites.csv", row.names = F, na = "")
   
@@ -878,11 +884,13 @@ import_wrc_parameters = function(FILEPATH){
 
 
 # soil texture
-compute_texture = function(hydrometer_df){
+compute_texture = function(){
+  
+  hydrometer_df = googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/13yOYC7vVzVzatXgJUaey2RYdmsJnfnmLmnVWVt4mOXo/edit#gid=0")
   
   hydrometer_data_processed = 
     hydrometer_df %>% 
-    mutate_at(vars(-c(site, sample_id, date_started, notes)), as.numeric) %>% 
+    mutate_at(vars(contains(c("wt", "reading"))), as.numeric) %>% 
     mutate(wt_dry_soil_g = (wt_jar_soil_g - wt_half_gallon_jar_g) + (wt_sieve_soil_53um_g - wt_sieve_g))
   
   #
@@ -923,16 +931,10 @@ compute_texture = function(hydrometer_df){
         percent_sand = ((wt_sieve_soil_53um_g - wt_sieve_g)/wt_dry_soil_g) * 100,
         percent_silt = 100 - (percent_sand + percent_clay)
       ) %>% 
-      dplyr::select(site, sample_id, starts_with("percent_"))
+      dplyr::select(sample_id, starts_with("percent_"))
     
   }
   soil_texture = compute_soil_texture(dat = hydrometer_data_processed)
-  
-  # process/clean up the data
-  soil_texture %>% 
-    separate(sample_id, sep = "_", into = c("kit_id", "transect")) %>% 
-    mutate(transect = recode(transect, 
-                             "U" = "upland", "T" = "transition", "W" = "wetland"))
   
 }
 

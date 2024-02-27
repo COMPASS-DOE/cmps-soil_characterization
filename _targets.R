@@ -76,9 +76,9 @@ list(
   tar_target(xrd_processed, process_xrd(xrd_data, sample_key)),
   tar_target(wrc_data, import_wrc_data(FILEPATH = "1-data/wrc")),
   tar_target(wrc_processed, process_wrc(wrc_data)),
-  tar_target(hydrometer_data, "1-data/particle_size.csv", format = "file"),
-  tar_target(hydrometer_df, read.csv(hydrometer_data)),
-  tar_target(texture_processed, compute_texture(hydrometer_df)),
+  #tar_target(hydrometer_data, "1-data/particle_size.csv", format = "file"),
+  #tar_target(hydrometer_df, read.csv(hydrometer_data)),
+  tar_target(texture_processed, compute_texture()),
   tar_target(gg_wrc, plot_wrc(wrc_processed)),
   tar_target(gg_texture, plot_texture(texture_processed)),
   
