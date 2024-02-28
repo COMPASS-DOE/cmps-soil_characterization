@@ -934,7 +934,7 @@ compute_texture = function(){
       dplyr::select(sample_id, starts_with("percent_"))
     
   }
-  soil_texture = compute_soil_texture(dat = hydrometer_data_processed)
+  soil_texture = compute_soil_texture(dat = hydrometer_data_processed) %>% rename(sample_label = sample_id)
   
 }
 
