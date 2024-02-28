@@ -1228,24 +1228,30 @@ plot_wrc = function(wrc_processed){
 
 ## texture
 
-plot_texture = function(texture_processed){
+plot_texture = function(texture_processed, sample_key){
 
+  texture = 
+    texture_processed %>% 
+    left_join(sample_key)
+  
   # plot the soil texture triangle
   library(ggtern) 
   data(USDA)
   
   gg_texture = 
-    ggtern(data = texture_processed,
+    ggtern(data = texture,
            aes(x = percent_sand, y = percent_clay, z = percent_silt)) +
     geom_polygon(data = USDA, 
                  aes(x = Sand, y = Clay, z = Silt, group = Label),
                  fill = NA, size = 0.3, alpha = 0.5, color = "grey30")+
     geom_point(aes(color = site, shape = transect),
-               size = 3)+
+               size = 5)+
     theme_bw()+
     theme_showarrows()+
     theme_hidetitles()+
-    theme_clockwise() 
+    theme_clockwise() +
+    #facet_wrap(~ site)+
+    NULL
   
   USDA_text <- 
     USDA  %>% 

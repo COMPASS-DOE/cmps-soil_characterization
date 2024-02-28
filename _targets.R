@@ -80,7 +80,7 @@ list(
   #tar_target(hydrometer_df, read.csv(hydrometer_data)),
   tar_target(texture_processed, compute_texture()),
   tar_target(gg_wrc, plot_wrc(wrc_processed)),
-  tar_target(gg_texture, plot_texture(texture_processed)),
+  tar_target(gg_texture, plot_texture(texture_processed, sample_key)),
   
   # analysis - graphs
   ## tar_target(gg_moisture, plot_moisture(moisture_processed, sample_key)),
