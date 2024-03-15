@@ -432,6 +432,83 @@ cowplot::plot_grid(gg_wetland_wle , gg_wetland_cb)
 
 ```
 
+## BY SITE
+```{r}
+
+pca_owc = fit_pca_function(data_wide_PCA %>% filter(site == "OWC")) 
+pca_ptr = fit_pca_function(data_wide_PCA %>% filter(site == "PTR")) 
+pca_crc = fit_pca_function(data_wide_PCA %>% filter(site == "CRC")) 
+pca_gcw = fit_pca_function(data_wide_PCA %>% filter(site == "GCW")) 
+pca_msm = fit_pca_function(data_wide_PCA %>% filter(site == "MSM")) 
+pca_gwi = fit_pca_function(data_wide_PCA %>% filter(site == "GWI")) 
+
+gg_pca_owc = ggbiplot(pca_owc$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_owc$grp$transect), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(color = groups))+ 
+  labs(shape="", title = "PCA OWC", subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+
+gg_pca_ptr = ggbiplot(pca_ptr$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_ptr$grp$transect), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(color = groups))+ 
+  labs(shape="", title = "PCA PTR", subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+
+gg_pca_crc = ggbiplot(pca_crc$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_crc$grp$transect), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(color = groups))+ 
+  labs(shape="", title = "PCA CRC", subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+
+gg_pca_gcw = ggbiplot(pca_gcw$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_gcw$grp$transect), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(color = groups))+ 
+  labs(shape="", title = "PCA GCW", subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+
+gg_pca_msm = ggbiplot(pca_msm$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_msm$grp$transect), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(color = groups))+ 
+  labs(shape="", title = "PCA MSM", subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+
+gg_pca_gwi = ggbiplot(pca_gwi$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_gwi$grp$transect), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(color = groups))+ 
+  labs(shape="", title = "PCA GWI", subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+
+library(patchwork)
+
+gg_pca_gcw + gg_pca_msm + gg_pca_gwi +
+  plot_layout(guides = "collect")&
+  theme(legend.position = "bottom")
+
+gg_pca_owc + gg_pca_ptr + gg_pca_crc +
+  plot_layout(guides = "collect")&
+  theme(legend.position = "bottom")
+
+
+```
+
 ---
 
 ## Plotting PC1 (drivers of variability)
