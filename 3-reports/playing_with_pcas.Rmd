@@ -454,6 +454,25 @@ get_pc_values = function(dat){
 }
 ```
 
+```{r}
+do_pca = function(dat){
+  
+  pca = fit_pca_function(dat)
+  
+  x = pca$pca_int$rotation %>% as.data.frame() %>% rownames_to_column("variable")
+
+}
+
+x = data_wide_PCA %>% group_by(region, transect) %>% do(do_pca(.))
+
+x %>% 
+  ggplot(aes(x = PC1, y = PC2, label = variable))+
+  geom_point()+geom_text()+
+  facet_grid(transect ~ region)
+
+
+```
+
 
 ```{r, fig.height=8, fig.width=6}
 
