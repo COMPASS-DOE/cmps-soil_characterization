@@ -558,6 +558,87 @@ pc_region_transect %>%
 
 ---
 
+## CLUSTERS
+
+```{r}
+
+
+library(cluster)
+library(factoextra)
+
+
+df = data_wide_PCA %>% filter(region == "CB") %>%   drop_na() %>% dplyr::select(where(is.numeric))
+grp = data_wide_PCA %>% filter(region == "CB")%>% drop_na() %>% dplyr::select(!where(is.numeric))
+
+fviz_nbclust(df, FUN = hcut, method = "wss")
+fviz_nbclust(df, FUN = hcut, method = "silhouette")
+# three clusters
+
+d <- dist(df, method = "euclidean")
+hc1 <- hclust(d, method = "complete" )
+plot(hc1, cex = 0.6, hang = -1)
+hc5 <- hclust(d, method = "ward.D2" )
+sub_grp <- cutree(hc5, k = 3)
+table(sub_grp)
+plot(hc5, cex = 0.6)
+rect.hclust(hc5, k = 3, border = 2:5)
+
+df_cl <- mutate(df, cluster = sub_grp) %>% cbind(grp) %>% mutate(cluster = as.character(cluster))
+count(df_cl,cluster)
+
+```
+
+```{r}
+library(ggConvexHull)
+
+pca_cluster = fit_pca_function(df_cl) 
+
+ggbiplot::ggbiplot(pca_cluster$pca_int, obs.scale = 1, var.scale = 1,
+                   groups = as.character(pca_cluster$grp$cluster), 
+                   ellipse = F, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_convexhull(aes(group = pca_cluster$grp$cluster,
+                      fill = pca_cluster$grp$cluster), alpha = 0.2)+
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(shape = pca_cluster$grp$site,
+                 color = groups))+ 
+  # scale_color_manual(values = c("#16879C", "#BB281E" ))+
+  #scale_shape_manual(values = c(21, 19))+
+  #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
+  # xlim(-4,20)+
+  # ylim(-8,8)+
+  labs(fill="cluster",
+       color = "cluster",
+       shape = "region",
+       title = "Overall PCA, both regions",
+       subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+  
+```
+
+```{r}
+df_cl %>%
+ # distinct(region, site, transect, cluster) %>% 
+  ggplot(aes(y = cluster, x = site))+
+  geom_point(aes(color = transect, shape = transect),
+             size = 4, stroke = 1,
+             position = position_jitterdodge(jitter.width = 0.0, jitter.height = 0.1, 
+                                             dodge.width = 0.4))
+
+devtools::install_github("liamgilbey/ggwaffle")
+library(ggwaffle)
+
+df_cl %>% 
+  ggplot()+
+  geom_waffle(aes(x = transect, y = site, fill = cluster))
+    
+
+    
+```
+
+
+
+
 ---
 
 ## CV
