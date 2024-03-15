@@ -537,6 +537,21 @@ pc_region_transect %>%
   theme_kp()
 
 
+pc_region_transect %>% 
+  filter(transect != "transition") %>% 
+  mutate(variable = fct_reorder(variable, abs(PC1))) %>% 
+  ggplot(aes(x = abs(PC1), y = variable, color = transect))+
+  geom_point(size = 5)+
+  scale_colour_manual(values = c("red", "blue"))+
+ # xlim(0, 0.4)+
+  #geom_vline(xintercept = 0)+
+  labs(y = "",
+       x = "|PC1|")+
+  facet_grid(. ~ region)+
+  theme_kp()+
+  geom_vline(xintercept = 0.3, linetype = "dashed")+
+  geom_vline(xintercept = 0.1, linetype = "dashed")
+
 
 
 ```
