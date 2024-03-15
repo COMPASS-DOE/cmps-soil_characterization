@@ -560,6 +560,42 @@ pc_region_transect %>%
 
 ---
 
+## CV
+
+```{r}
+cv = 
+  data_combined %>% 
+  group_by(region, site, transect, horizon, analysis, name) %>% 
+  dplyr::summarise(cv = 100 * sd(value)/mean(value),
+                   n = n(),
+                   mean = mean(value)) %>% 
+  filter(!transect %in% "wte")
+```
+
+```{r}
+(cv %>% 
+   filter(!(name == "Al_meq100g" & region == "WLE")) %>% 
+  ggplot(aes(x = transect, y = cv))+
+  geom_violin(scale = "area", fill = "grey90")+
+  geom_jitter(width = 0.1, size = 3, aes(color = site, text = name))+
+   geom_boxplot(width = 0.05, outlier.color = NA)+
+  facet_wrap(~region)+
+   theme_kp())  %>% plotly::ggplotly()
+
+
+cv %>% 
+  ggplot(aes(x = region, y = cv))+
+  geom_point(width = 0.1, aes(color = transect), 
+             position = position_dodge(width = 0.2))+
+  expand_limits(y = 0)+
+  facet_wrap(~ name, scales = "free_y")
+
+
+View(data_combined_wide %>% dplyr::select(region, site, transect, horizon, contains(c("dic", "pH"))))
+```
+
+
+
 ---
 
 ## Session Info 
