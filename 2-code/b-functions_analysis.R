@@ -1231,7 +1231,8 @@ plot_wrc = function(wrc_processed){
 plot_texture = function(texture_processed, sample_key){
 
   texture = 
-    texture_processed %>% 
+#    texture_processed %>% 
+    soil_texture %>% 
     left_join(sample_key)
   
   # plot the soil texture triangle
@@ -1239,7 +1240,7 @@ plot_texture = function(texture_processed, sample_key){
   data(USDA)
   
   gg_texture = 
-    ggtern(data = texture,
+    ggtern(data = texture %>% filter(region == "CB"),
            aes(x = percent_sand, y = percent_clay, z = percent_silt)) +
     geom_polygon(data = USDA, 
                  aes(x = Sand, y = Clay, z = Silt, group = Label),
@@ -1250,8 +1251,26 @@ plot_texture = function(texture_processed, sample_key){
     theme_showarrows()+
     theme_hidetitles()+
     theme_clockwise() +
-    #facet_wrap(~ site)+
+    facet_wrap(~ site + horizon)+
     NULL
+  
+  ggtern(data = texture %>% filter(region == "CB" & site == "MSM"),
+         aes(x = percent_sand, y = percent_clay, z = percent_silt)) +
+    geom_polygon(data = USDA, 
+                 aes(x = Sand, y = Clay, z = Silt, group = Label),
+                 fill = NA, size = 0.3, alpha = 0.5, color = "grey30")+
+    geom_point(aes(color = transect, shape = horizon),
+               size = 5, stroke = 1)+
+ #   scale_shape_manual(values = c(21, 22, 23))+
+    theme_bw()+
+    theme_showarrows()+
+    theme_hidetitles()+
+    theme_clockwise() +
+    facet_wrap(~ horizon)+
+    NULL+
+    geom_text(data = USDA_text,
+              aes(x = Sand, y = Clay, z = Silt, label = Label),
+              size = 3, color = "grey30")
   
   USDA_text <- 
     USDA  %>% 
