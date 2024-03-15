@@ -116,7 +116,7 @@ fit_pca_function = function(dat){
 ```{r}
 ## PCA input files ----
 pca_overall = fit_pca_function(data_wide_PCA) 
-pca_overall_wle = fit_pca_function(data_wide_PCA %>% filter(region == "WLE"))
+pca_overall_wle = fit_pca_function(dat = data_wide_PCA %>% filter(region == "WLE"))
 pca_overall_cb = fit_pca_function(data_wide_PCA %>% filter(region == "CB"))
 ```
 
@@ -167,7 +167,7 @@ pca_overall_cb = fit_pca_function(data_wide_PCA %>% filter(region == "CB"))
 gg_pca_wle = 
   ggbiplot(pca_overall_wle$pca_int, obs.scale = 1, var.scale = 1,
            groups = as.character(pca_overall_wle$grp$transect), 
-           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 1) +
   geom_point(size=3,stroke=1, alpha = 1,
              aes(shape = pca_overall_wle$grp$site,
                  color = groups))+ 
@@ -454,6 +454,7 @@ get_pc_values = function(dat){
 }
 ```
 
+
 ```{r, fig.height=8, fig.width=6}
 
 pc_overall = get_pc_values(data_wide_PCA) %>% mutate(region = "combined")
@@ -488,7 +489,6 @@ pc_all %>%
   theme_kp()
 
 ```
-
 
 PC1 loadings by transect
 ```{r}
@@ -536,10 +536,14 @@ pc_region_transect %>%
   facet_grid(. ~ transect)+
   theme_kp()
 
+
+
+
 ```
 
+---
 
-
+---
 
 ---
 
