@@ -1239,3 +1239,95 @@ data("dune", package = "vegan")
 
 pairwise_permanova(sp_matrix = data_wide_PCA %>% filter(region == "CB") %>% drop_na() %>% dplyr::select(where(is.numeric)), 
                    group_var = data_wide_PCA %>% filter(region == "CB") %>% drop_na() %>% dplyr::pull(transect))
+
+
+
+## scaling
+
+data_scaled = 
+  data_combined_subset %>% 
+  group_by(region, site, transect, horizon, name) %>% 
+  dplyr::summarise(value = mean(value)) %>% 
+  pivot_wider(names_from = "transect") %>% 
+  mutate(transition_scaled = (transition - upland) / (wetland - upland),
+         upland_scaled = (upland - upland) / (wetland - upland),
+         wetland_scaled = (wetland - upland) / (wetland - upland))
+
+data_scaling_max_min = 
+  data_combined_subset %>% 
+  filter(transect != "transition") %>% 
+  group_by(region, site, transect, horizon, name) %>% 
+  dplyr::summarise(value = mean(value)) %>% 
+  group_by(region, site, horizon, name) %>% 
+  dplyr::summarise(max = max(value),
+                   min = min(value))
+
+data_scaled2 = 
+  data_combined_subset %>% 
+  group_by(region, site, transect, horizon, name) %>% 
+  dplyr::summarise(value = mean(value)) %>% 
+  left_join(data_scaling_max_min) %>% 
+  mutate(scaled = (value - min) / (max - min)) %>% 
+  dplyr::select(region, site, transect, horizon, name, scaled) %>%
+  pivot_wider(names_from = "transect", values_from = "scaled") %>% 
+  mutate(correction = case_when(upland < wetland ~ 1,
+                                upland > wetland ~ -1)) %>% 
+  pivot_longer(cols = c(upland, wetland, transition), names_to = "transect", values_to = "scaled") %>% 
+  mutate(scaled = scaled * correction,
+         scaled = case_when(transect == "upland" ~ 0,
+                            transect == "wetland" ~ 1,
+                            TRUE ~ scaled),
+         scaled2 = case_when(scaled > 4 ~ 4,
+                             scaled < -1 ~ -1,
+                             TRUE ~ scaled),
+         label = case_when(scaled > 4 | scaled < -1 ~ round(scaled,1)))
+  
+
+data_scaled %>%
+  dplyr::select(region, site, horizon, name, ends_with("scaled")) %>% 
+  pivot_longer(cols = c(upland_scaled, transition_scaled, wetland_scaled), names_to = "transect") %>% 
+  ggplot(aes(x = value, y = name, color = transect))+
+  geom_segment(aes(x = 0, xend = value, yend = name), color = "black", linetype = "dashed", linewidth = 0.2)+
+  geom_segment(aes(x = 0, xend = 1, yend = name), color = "black")+
+  geom_point(size = 3)+
+ # xlim(-1, 2.5)+
+  #scale_x_log10()+
+  facet_wrap(~region + site)+
+  theme_bw()+
+  theme(panel.grid = element_blank(),
+        #axis.text.x = element_blank()
+        )
+
+data_scaled2 %>%
+  ggplot(aes(x = scaled2, y = name, color = transect))+
+  geom_segment(aes(x = 0, xend = scaled2, yend = name), color = "black", linetype = "dashed", linewidth = 0.2)+
+  geom_segment(aes(x = 0, xend = 1, yend = name), color = "black")+
+  geom_point(size = 3)+
+  #geom_text(aes(x = scaled2, y = name, label = label), color = "black")+
+   xlim(-1, 5)+
+ # scale_x_log10()+
+  facet_wrap(~region + site)+
+  theme_bw()+
+  theme(panel.grid = element_blank(),
+        #axis.text.x = element_blank()
+  )
+
+
+data_scaled2 %>%
+  ggplot(aes(x = scaled2, y = name))+
+  geom_segment(aes(x = 0, xend = scaled2, yend = name), color = "black", linetype = "dashed", linewidth = 0.2)+
+  geom_segment(aes(x = 0, xend = 1, yend = name), color = "black")+
+  geom_point(data = data_scaled2 %>% filter(transect != "transition"), color = "black",
+             size = 1)+
+  geom_point(data = data_scaled2 %>% filter(transect == "transition"), 
+             aes(color = site), size = 3, shape = 21, fill = "white", stroke = 1)+
+  annotate("text", label = "U", x = 0, y = 21.5)+
+  annotate("text", label = "W", x = 1, y = 21.5)+
+  #geom_text(aes(x = scaled2, y = name, label = label), color = "black")+
+  xlim(-1, 5)+
+  # scale_x_log10()+
+  facet_wrap(~region)+
+  theme_bw()+
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_blank()
+  )
