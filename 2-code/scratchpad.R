@@ -1253,17 +1253,53 @@ data_scaled =
          upland_scaled = (upland - upland) / (wetland - upland),
          wetland_scaled = (wetland - upland) / (wetland - upland))
 
+
+data_scaled %>%
+  dplyr::select(region, site, horizon, name, ends_with("scaled")) %>% 
+  pivot_longer(cols = c(upland_scaled, transition_scaled, wetland_scaled), names_to = "transect") %>% 
+  ggplot(aes(x = value, y = name, color = transect))+
+  geom_segment(aes(x = 0, xend = value, yend = name), color = "black", linetype = "dashed", linewidth = 0.2)+
+  geom_segment(aes(x = 0, xend = 1, yend = name), color = "black")+
+  geom_point(size = 3)+
+  # xlim(-1, 2.5)+
+  #scale_x_log10()+
+  facet_wrap(~region + site)+
+  theme_bw()+
+  theme(panel.grid = element_blank(),
+        #axis.text.x = element_blank()
+  )
+
+
+
+
+data_long = 
+  data_combined_wide %>% 
+  dplyr::select(-"gwc") %>% 
+  rename(CEC = cec,
+         NH4N = nh4n,
+         NO3N = no3n,
+         P = mehlichp,
+         WEOC = npoc,
+         DIC = dic,
+         SOM = percentOM,
+         Cl = Chloride,
+         SO4 = Sulfate) %>% 
+  mutate(transect = case_when(transect == "wc" ~ "wetland", TRUE ~ transect)) %>% 
+  pivot_longer(cols = -c(sample_label, region, site, transect, tree_number, horizon)) %>% 
+  filter(!is.na(value))
+
+
 data_scaling_max_min = 
-  data_combined_subset %>% 
+  data_long %>% 
   filter(transect != "transition") %>% 
   group_by(region, site, transect, horizon, name) %>% 
   dplyr::summarise(value = mean(value)) %>% 
   group_by(region, site, horizon, name) %>% 
-  dplyr::summarise(max = max(value),
-                   min = min(value))
+  dplyr::summarise(max = max(value, na.rm = T),
+                   min = min(value, na.rm = T))
 
 data_scaled2 = 
-  data_combined_subset %>% 
+  data_long %>% 
   group_by(region, site, transect, horizon, name) %>% 
   dplyr::summarise(value = mean(value)) %>% 
   left_join(data_scaling_max_min) %>% 
@@ -1280,54 +1316,89 @@ data_scaled2 =
          scaled2 = case_when(scaled > 4 ~ 4,
                              scaled < -1 ~ -1,
                              TRUE ~ scaled),
-         label = case_when(scaled > 4 | scaled < -1 ~ round(scaled,1)))
+         label = case_when(scaled > 4 | scaled < -1 ~ round(scaled,1))) %>% 
+  # order analytes
+  mutate(name = factor(name, levels = c("TC", "TN", "TS", "SOM",
+                                        "pH", "spConductance",
+                                        "WEOC", "DIC",
+                                        "Fe", "P",
+                                        "Ca", "Mg", "Na", "K", "Al", "CEC",
+                                        "NH4N", "NO3N", "Cl", "SO4"
+                                        )))
   
 
-data_scaled %>%
-  dplyr::select(region, site, horizon, name, ends_with("scaled")) %>% 
-  pivot_longer(cols = c(upland_scaled, transition_scaled, wetland_scaled), names_to = "transect") %>% 
-  ggplot(aes(x = value, y = name, color = transect))+
-  geom_segment(aes(x = 0, xend = value, yend = name), color = "black", linetype = "dashed", linewidth = 0.2)+
-  geom_segment(aes(x = 0, xend = 1, yend = name), color = "black")+
-  geom_point(size = 3)+
- # xlim(-1, 2.5)+
-  #scale_x_log10()+
-  facet_wrap(~region + site)+
-  theme_bw()+
-  theme(panel.grid = element_blank(),
-        #axis.text.x = element_blank()
-        )
+    # data_scaled2 %>%
+    #   ggplot(aes(x = scaled2, y = name, color = transect))+
+    #   geom_segment(aes(x = 0, xend = scaled2, yend = name), color = "black", linetype = "dashed", linewidth = 0.2)+
+    #   geom_segment(aes(x = 0, xend = 1, yend = name), color = "black")+
+    #   geom_point(size = 3)+
+    #   #geom_text(aes(x = scaled2, y = name, label = label), color = "black")+
+    #    xlim(-1, 5)+
+    #  # scale_x_log10()+
+    #   facet_wrap(~region + site)+
+    #   theme_bw()+
+    #   theme(panel.grid = element_blank(),
+    #         #axis.text.x = element_blank()
+    #   )
 
-data_scaled2 %>%
-  ggplot(aes(x = scaled2, y = name, color = transect))+
-  geom_segment(aes(x = 0, xend = scaled2, yend = name), color = "black", linetype = "dashed", linewidth = 0.2)+
-  geom_segment(aes(x = 0, xend = 1, yend = name), color = "black")+
-  geom_point(size = 3)+
-  #geom_text(aes(x = scaled2, y = name, label = label), color = "black")+
-   xlim(-1, 5)+
- # scale_x_log10()+
-  facet_wrap(~region + site)+
-  theme_bw()+
-  theme(panel.grid = element_blank(),
-        #axis.text.x = element_blank()
-  )
-
-
-data_scaled2 %>%
+gg_cb = 
+  data_scaled2 %>%
+  filter(region == "CB") %>% 
   ggplot(aes(x = scaled2, y = name))+
   geom_segment(aes(x = 0, xend = scaled2, yend = name), color = "black", linetype = "dashed", linewidth = 0.2)+
   geom_segment(aes(x = 0, xend = 1, yend = name), color = "black")+
-  geom_point(data = data_scaled2 %>% filter(transect != "transition"), color = "black",
+  geom_point(data = data_scaled2 %>% filter(transect != "transition") %>% filter(region == "CB"),
+             color = "black",
              size = 1)+
-  geom_point(data = data_scaled2 %>% filter(transect == "transition"), 
-             aes(color = site), size = 3, shape = 21, fill = "white", stroke = 1)+
-  annotate("text", label = "U", x = 0, y = 21.5)+
-  annotate("text", label = "W", x = 1, y = 21.5)+
-  #geom_text(aes(x = scaled2, y = name, label = label), color = "black")+
+  geom_point(data = data_scaled2 %>% filter(transect == "transition")%>% filter(region == "CB"), 
+             aes(shape = site), size = 4, fill = "#FFB200", color = "black", stroke = 0.8)+
+  annotate("text", label = "U", x = 0, y = 21)+
+  annotate("text", label = "W", x = 1, y = 21)+
+  annotate("text", label = "", x = 1, y = 21.5)+
   xlim(-1, 5)+
-  # scale_x_log10()+
+  scale_y_discrete(limits = rev)+
+    scale_shape_manual(breaks = c("CRC", "PTR", "OWC", "GCW", "MSM", "GWI"), values = c(21, 24, 22, 21, 22, 24))+
+    scale_color_manual(breaks = c("CRC", "PTR", "OWC", "GCW", "MSM", "GWI"), values = c('#ED6e85', '#7f4420', '#ffc115', '#90BE6D', '#03045E', '#00B4D8'))+
+    
+  labs(x = "",
+       y = "",
+       shape = "transition soils at")+
   facet_wrap(~region)+
-  theme_bw()+
+  theme_kp()+
   theme(panel.grid = element_blank(),
-        axis.text.x = element_blank()
+        axis.text = element_blank(),
+        legend.position = c(0.8, 0.8),
+        legend.background = element_blank()
   )
+  
+gg_wle = 
+  data_scaled2 %>%
+    filter(region == "WLE") %>% 
+    ggplot(aes(x = scaled2, y = name))+
+    geom_segment(aes(x = 0, xend = scaled2, yend = name), color = "black", linetype = "dashed", linewidth = 0.2)+
+    geom_segment(aes(x = 0, xend = 1, yend = name), color = "black")+
+    geom_point(data = data_scaled2 %>% filter(transect != "transition") %>% filter(region == "WLE"),
+               color = "black",
+               size = 1)+
+    geom_point(data = data_scaled2 %>% filter(transect == "transition")%>% filter(region == "WLE"), 
+               aes(shape = site), size = 4, fill = "#FFB200", color = "black", stroke = 0.8)+
+    annotate("text", label = "U", x = 0, y = 21)+
+    annotate("text", label = "W", x = 1, y = 21)+
+    annotate("text", label = "", x = 1, y = 21.5)+
+    xlim(-1, 5)+
+    scale_y_discrete(limits = rev)+
+    scale_shape_manual(breaks = c("CRC", "PTR", "OWC", "GCW", "MSM", "GWI"), values = c(21, 22, 24, 21, 22, 24))+
+    scale_color_manual(breaks = c("CRC", "PTR", "OWC", "GCW", "MSM", "GWI"), values = c('#ED6e85', '#7f4420', '#ffc115', '#90BE6D', '#03045E', '#00B4D8'))+
+    
+    labs(x = "",
+         y = "",
+         shape = "transition soils at")+
+    facet_wrap(~region)+
+    theme_kp()+
+    theme(panel.grid = element_blank(),
+          axis.text.x = element_blank(),
+          legend.position = c(0.78, 0.2),
+          legend.background = element_blank()
+    )
+
+cowplot::plot_grid(gg_wle, gg_cb, rel_widths = c(1, 0.85))
