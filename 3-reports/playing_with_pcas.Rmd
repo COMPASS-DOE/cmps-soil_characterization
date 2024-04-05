@@ -732,6 +732,107 @@ df_cl %>%
     
 ```
 
+```{r}
+wine.pca <- prcomp(wine[treatments], scale = TRUE)
+
+df.wine.x$groups <- wine.class
+wine$groups <- wine.class
+feature.centroids <- aggregate(wine[treatments], list(Type = wine$groups), mean)
+
+data(wine)
+treatments <- 1:2 #treatments to be considerd for this calculation
+wine.pca <- prcomp(wine[treatments], scale. = TRUE)
+#calculate the centroids for the feature/treatment space and the pca space
+df.wine.x <- as.data.frame(wine.pca$x)
+df.wine.x$groups <- wine.class
+wine$groups <- wine.class
+feature.centroids <- aggregate(wine[treatments], list(Type = wine$groups), mean)
+
+
+
+dist(rbind(feature.centroids[feature.centroids$Type == "barolo",][-1],
+           feature.centroids[feature.centroids$Type == "grignolino",][-1]), method = "euclidean")
+
+
+data.pca = prcomp(data_wide_PCA %>% drop_na() %>% dplyr::select(where(is.numeric)))
+data.feature.centroids <- aggregate(data_wide_PCA %>% drop_na() %>% dplyr::select(where(is.numeric)), 
+                                    list(Type = (data_wide_PCA %>% drop_na())$region), 
+                                    mean, na.action = na.pass)
+
+dist(rbind(data.feature.centroids[data.feature.centroids$Type == "CB",][-1],
+           data.feature.centroids[data.feature.centroids$Type == "WLE",][-1]), method = "euclidean")
+
+
+centroid.pca = fit_pca_function(data_wide_PCA)$pca_int
+centroid.feature = aggregate(data_wide_PCA)
+
+
+data.feature.centroids = 
+  data_combined_subset %>%
+  filter(site == "GWI") %>% 
+  group_by(transect, name) %>% 
+  dplyr::summarise(mean = mean(value, na.rm = T)) %>% 
+  pivot_wider(names_from = "name", values_from = "mean")
+
+dist(rbind(data.feature.centroids[data.feature.centroids$transect == "transition",][-1],
+           data.feature.centroids[data.feature.centroids$transect == "wetland",][-1]), method = "euclidean")
+
+dist(rbind(data.feature.centroids[data.feature.centroids$transect == "upland",][-1],
+           data.feature.centroids[data.feature.centroids$transect == "wetland",][-1]), method = "euclidean")
+
+dist(rbind(data.feature.centroids[data.feature.centroids$transect == "transition",][-1],
+           data.feature.centroids[data.feature.centroids$transect == "upland",][-1]), method = "euclidean")
+
+df = data(iris)
+dist.iris<-vegdist(iris[,1:4],method = "bray") #calculate Bray-Curtis dissim
+dist.iris
+
+#avg distance to group centroids
+permdisp<-betadisper(dist.iris,iris$Species,type="centroid")
+permdisp
+library(usedist)
+dist_between_centroids(dist.iris,1:50, 51:100) #1:50 = group setosa, 51:100 = group versicolor
+
+library(vegan)
+TukeyHSD(permdisp)
+
+
+
+dat.owc = data_wide_PCA %>% filter(site == "OWC") %>% drop_na() 
+dist.owc <- vegdist(dat.owc %>% dplyr::select(where(is.numeric)), 
+                    method = "bray") #calculate Bray-Curtis dissim
+permdisp.owc <- betadisper(dist.owc, dat.owc$transect, type = "centroid")
+TukeyHSD(permdisp.owc)
+
+dat.gcw = data_wide_PCA %>% filter(site == "GCW") %>% drop_na() 
+dist.gcw <- vegdist(dat.gcw %>% dplyr::select(where(is.numeric)), 
+                    method = "bray") #calculate Bray-Curtis dissim
+permdisp.gcw <- betadisper(dist.gcw, dat.gcw$transect, type = "centroid")
+TukeyHSD(permdisp.gcw)
+
+dat.gwi = data_wide_PCA %>% filter(site == "GWI") %>% drop_na() 
+dist.gwi <- vegdist(dat.gwi %>% dplyr::select(where(is.numeric)), 
+                    method = "bray") #calculate Bray-Curtis dissim
+permdisp.gwi <- betadisper(dist.gwi, dat.gcw$transect, type = "centroid")
+TukeyHSD(permdisp.gwi)
+
+
+
+```
+
+```{r}
+library(mosaic)
+x1 <- c(1,0,0); x2 <- c(1,2,3); y1 <- c(3,4,5); y2 <- rnorm(3)
+# projection onto the 1 vector gives the mean vector
+mean(y2)            
+mosaic::project(y2, 1)
+# return the length of the vector, rather than the vector itself
+project(y2, 1, type='length')
+project(y1 ~ x1 + x2) -> pr; pr
+
+project(x, y, type = "length")
+
+```
 
 
 
@@ -744,9 +845,13 @@ cv =
   data_combined %>% 
   group_by(region, site, transect, horizon, analysis, name) %>% 
   dplyr::summarise(cv = 100 * sd(value)/mean(value),
+                   sd = sd(value),
                    n = n(),
                    mean = mean(value)) %>% 
-  filter(!transect %in% "wte")
+  filter(!transect %in% "wte") %>% 
+  filter(!(name == "Al_meq100g" & region == "WLE")) %>% 
+  filter(name != "gwc_perc")
+
 ```
 
 ```{r}
@@ -755,7 +860,7 @@ cv =
   ggplot(aes(x = transect, y = cv))+
   geom_violin(scale = "area", fill = "grey90")+
   geom_jitter(width = 0.1, size = 3, aes(color = site, text = name))+
-   geom_boxplot(width = 0.05, outlier.color = NA)+
+   geom_boxplot(width = 0.05, outlier.color = NA, fill = "white")+
   facet_wrap(~region)+
    theme_kp())  %>% plotly::ggplotly()
 
@@ -765,10 +870,76 @@ cv %>%
   geom_point(width = 0.1, aes(color = transect), 
              position = position_dodge(width = 0.2))+
   expand_limits(y = 0)+
-  facet_wrap(~ name, scales = "free_y")
+  scale_y_log10()+
+  facet_wrap(~ name, 
+             #scales = "free_y"
+             )
+
+cv %>% 
+  filter(!(name == "Al_meq100g" & region == "WLE")) %>% 
+  ggplot(aes(x = name, y = cv))+
+  geom_violin()+
+  geom_point(width = 0.1, aes(color = region), 
+            # position = position_dodge(width = 0.9)
+             )+
+  expand_limits(y = 0)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  facet_grid(transect ~ .)+
+#  scale_y_log10()+
+  NULL
+
+cv %>% 
+  filter(!(name == "Al_meq100g" & region == "WLE")) %>% 
+  ggplot(aes(y = name, x = cv))+
+  geom_violin(aes(color = region))+
+  geom_point(width = 0.1, aes(color = region), 
+             position = position_dodge(width = 0.9)
+             )+
+  expand_limits(x = 0)+
+#  theme(axis.text.x = element_text(angle = 45, hjust = 1))+
+  facet_wrap(~transect)+
+#  scale_y_log10()+
+  NULL
+
+cv %>% 
+  ggplot(aes(x = mean, y = cv, color = region))+
+  geom_point()+
+  facet_wrap(~name, scales = "free_x")
+
 
 
 View(data_combined_wide %>% dplyr::select(region, site, transect, horizon, contains(c("dic", "pH"))))
+```
+
+```{r}
+library(ggwaffle)
+cv %>% 
+  ggplot(aes(x = transect, y = name, fill = cv))+
+  geom_waffle()+
+  geom_text(aes(label = round(cv,2)), color = "black")+
+  scale_fill_gradientn(trans = "log",
+                       colors = PNWColors::pnw_palette("Bay", 12), breaks = c(0, 10, 20, 40, 100, 200))+
+  facet_wrap(~region + site)
+  
+cv[cv == "NaN"] <- NA
+cv = v %>% drop_na()
+
+aov(cv ~ transect + region + name, data = cv) %>% summary()
+
+
+library(nlme)
+nlme::lme(cv ~ transect, random = ~1|name, data = cv %>% drop_na() %>% filter(region == "WLE")) %>% anova()
+nlme::lme(cv ~ region, random = ~1|transect, data = cv %>% drop_na()) %>% anova()
+
+
+cv %>% group_by(region, transect) %>% dplyr::summarise(mean_cv = mean(cv, na.rm = T))
+
+
+a = aov((cv) ~ transect, data = cv %>% filter(region == "CB"))
+agricolae::HSD.test(a, "transect") %>% print()
+
+a = aov((cv) ~ transect, data = cv %>% filter(region == "WLE"))
+agricolae::HSD.test(a, "transect") %>% print()
 ```
 
 
