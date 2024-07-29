@@ -1093,7 +1093,7 @@ compute_euclidean_distance <- function(data_normalized){
 euc <- 
   data_normalized %>% 
   filter(name != "percentOM") %>% 
-  group_by(region, site, name) %>% 
+  group_by(region, site) %>% 
   do(compute_euclidean_distance(.))
 
 
@@ -1186,7 +1186,7 @@ fticr_eucl =
   geom_hline(yintercept = 1.713, linetype = "dashed")+
   
   theme_kp()
-```
+
 
 
 
@@ -1327,19 +1327,19 @@ data_scaled2 =
                                         )))
   
 
-    # data_scaled2 %>%
-    #   ggplot(aes(x = scaled2, y = name, color = transect))+
-    #   geom_segment(aes(x = 0, xend = scaled2, yend = name), color = "black", linetype = "dashed", linewidth = 0.2)+
-    #   geom_segment(aes(x = 0, xend = 1, yend = name), color = "black")+
-    #   geom_point(size = 3)+
-    #   #geom_text(aes(x = scaled2, y = name, label = label), color = "black")+
-    #    xlim(-1, 5)+
-    #  # scale_x_log10()+
-    #   facet_wrap(~region + site)+
-    #   theme_bw()+
-    #   theme(panel.grid = element_blank(),
-    #         #axis.text.x = element_blank()
-    #   )
+     data_scaled2 %>%
+       ggplot(aes(x = scaled2, y = name, color = transect))+
+       geom_segment(aes(x = 0, xend = scaled2, yend = name), color = "black", linetype = "dashed", linewidth = 0.2)+
+       geom_segment(aes(x = 0, xend = 1, yend = name), color = "black")+
+       geom_point(size = 3)+
+       #geom_text(aes(x = scaled2, y = name, label = label), color = "black")+
+        xlim(-1, 5)+
+      # scale_x_log10()+
+       facet_wrap(~region + site)+
+       theme_bw()+
+       theme(panel.grid = element_blank(),
+             #axis.text.x = element_blank()
+       )
 
 gg_cb = 
   data_scaled2 %>%
@@ -1402,3 +1402,191 @@ gg_wle =
     )
 
 cowplot::plot_grid(gg_wle, gg_cb, rel_widths = c(1, 0.85))
+
+
+## stoichiometry ----
+
+cnps = 
+  data_combined_wide %>% 
+  filter(!transect %in% "wte") %>% 
+  mutate(cn = TC_perc/TN_perc,
+         ns = TN_perc/TS_perc,
+         cs = TC_perc/TS_perc,
+         cp = TC_perc/mehlichp_ugg,
+         np = TN_perc/mehlichp_ugg,
+         cnps = ((TC_perc/TN_perc)/mehlichp_ugg)/TS_perc) %>% 
+  reorder_transect()
+
+cnps %>% 
+  ggplot(aes(x = transect, y = cn))+
+  geom_violin()+
+  geom_jitter(width = 0.1)+
+  facet_wrap(~region#+site, 
+             #scales = "free_y"
+             )
+
+cnps %>% 
+  ggplot(aes(x = transect, y = cs))+
+  geom_violin()+
+  geom_jitter(width = 0.1)+
+  facet_wrap(~region#+site, 
+             #scales = "free_y"
+  )
+
+cnps %>% 
+  ggplot(aes(x = transect, y = cp))+
+  geom_violin()+
+  geom_jitter(width = 0.1)+
+  facet_wrap(~region,#+site, 
+             scales = "free_y"
+  )
+
+cnps %>% 
+  ggplot(aes(x = Fe_ugg, y = TC_perc, color = site, shape = transect))+
+  geom_point(size = 5)+
+  facet_wrap(~region)
+
+cnps %>% 
+  filter(transect != "wc") %>% 
+  ggplot(aes(x = Fe_ugg, y = Sulfate_meq100g, color = site))+
+  geom_point(size = 5, aes( shape = transect))+
+  geom_smooth(method = "lm")+
+  facet_wrap(~region+site, scales = "free_y")
+
+
+# permanova
+adonis2(data_combined_wide %>% dplyr::select(is.numeric) ~ (horizon + region + site + transect), na.rm = TRUE, 
+        data = data_combined_wide) 
+
+
+## elevations
+
+steepness_df = read_sheet("https://docs.google.com/spreadsheets/d/1o1hBl0US9mauVZofgENkIwY43xd3FnRJkmAoQQOLsZc/edit?gid=484502135#gid=484502135", sheet = "Sheet2") %>% 
+  mutate_all(as.character())
+
+steepness = 
+  steepness_df %>% 
+  dplyr::select(site, transect, x, y) %>% 
+  mutate(x = as.numeric(x),
+         y = as.numeric(y)) %>% 
+  group_by(site) %>% 
+  mutate(x_scaled = scales::rescale(x),
+         y_scaled = scales::rescale(y),
+         transect_abb = case_when(transect == "Upland" ~ "U",
+                                  transect == "Transition" ~ "T",
+                                  transect == "Wetland" ~ "W"))
+  
+
+steepness %>% 
+  filter(site %in% c("GCW", "MSM", "GWI")) %>% 
+  ggplot(aes(x_scaled, y_scaled))+
+  geom_line()+
+  geom_point()+
+  geom_text(aes(label = transect_abb), nudge_x = 0.01, nudge_y = 0.06)+
+  facet_wrap(~site, nrow = 3)+
+  theme_kp()+
+  theme(axis.text = element_blank())
+
+steepness %>% 
+  filter(site %in% c("GCW", "MSM", "GWI")) %>% 
+  group_by(site) %>% 
+  mutate(x_scaled = scales::rescale(x),
+         y_scaled = scales::rescale(y)) %>% 
+  ggplot(aes(x_scaled, y_scaled, color = site))+
+  geom_line(linewidth = 1)+
+  geom_point(size = 4)+
+#  facet_wrap(~site, nrow = 3)+
+  theme_kp()
+
+
+
+# -------------------------------------------------------------------------
+
+library(ggplot2)
+library(usmap)
+lat 46.907 N, lon 123.976 W
+test_data <- data.frame(lon = c(-123.976), 
+                        lat = c(46.907),
+                        site = c("BC"))
+transformed_data <- usmap_transform(test_data)
+plot_usmap(color = NA, fill = "grey90", alpha = 1) + 
+  geom_point(data = transformed_data, 
+             aes(x = x, y = y, color = site), 
+             #color = "black",
+             size = 7)+
+  # labs(title = "The Three Soils Project")+
+  scale_color_manual(values = PNWColors::pnw_palette("Bay", 3))+
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold",
+                                  hjust = 0.5, size = 15))+
+  NULL
+
+ggsave("map.png", width = 5.5, height = 4.5)
+
+lat 41.376, lon −82.508
+test_data <- data.frame(lon = c(-82.508), 
+                        lat = c(41.376),
+                        site = c("BC"))
+transformed_data <- usmap_transform(test_data)
+plot_usmap(color = "grey70", fill = "grey70", alpha = 1) + 
+  geom_point(data = transformed_data, 
+             aes(x = x, y = y, color = site), 
+             #color = "black",
+             size = 7)+
+  # labs(title = "The Three Soils Project")+
+  scale_color_manual(values = PNWColors::pnw_palette("Bay", 3))+
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold",
+                                  hjust = 0.5, size = 15))+
+  NULL
+
+ggsave("map_anoxia.png", width = 5.5, height = 4.5)
+
+
+
+
+
+states_map <- ggplot2::map_data("state")
+
+
+ggplot(states_map, aes(long, lat, group = group))+
+  geom_polygon(color = "grey", fill = "grey")+
+  geom_point(data = transformed_data, 
+             aes(x = lon, y = lat, 
+                 group = 1), 
+             size = 6, color = "blue")+
+  theme_void()
+ggsave("map_anoxia2.png", width = 8, height = 4.5)
+
+
+
+# -------------------------------------------------------------------------
+
+library(ggplot2)
+library(usmap)
+
+test_data <- data.frame(lon = c(-147.487, -123.690, -81.419), 
+                        lat = c(65.162,46.308, 28.105),
+                        site = c("Alaska", "Washington", "Florida"))
+transformed_data <- usmap_transform(test_data)
+plot_usmap(color = "grey70", fill = "grey70", alpha = 1) + 
+  geom_point(data = transformed_data, 
+             aes(x = x, y = y, color = site), 
+             #color = "black",
+             size = 7)+
+  #  annotate("text", label = "Secret River (SR)", fontface = "bold",
+  #           x = -1606856, y = 411954.3, size=3, hjust="left")+
+  #  annotate("text", label = "Caribou Poker Creeks Research Watershed\n(CPCRW)", 
+  #           x = -1001020, y = -1842646.7, fontface = "bold",
+  #           size=3, hjust="left")+
+  #  annotate("text", label = "Disney Wilderness Preserve (DWP)", fontface = "bold",
+  #           x = 300000, y = -1450000.2, size=3, hjust="left")+
+  #  labs(title = "The Three Soils Project")+
+  scale_color_manual(values = PNWColors::pnw_palette("Bay", 3))+
+  theme(legend.position = "none",
+        plot.title = element_text(face = "bold",
+                                  hjust = 0.5, size = 15))+
+  NULL
+
+ggsave("map_3soils.png", width = 5.5, height = 4.5)
+
