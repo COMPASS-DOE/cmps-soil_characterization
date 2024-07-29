@@ -435,12 +435,12 @@ cowplot::plot_grid(gg_wetland_wle , gg_wetland_cb)
 ## BY SITE
 ```{r}
 
-pca_owc = fit_pca_function(data_wide_PCA %>% filter(site == "OWC")) 
-pca_ptr = fit_pca_function(data_wide_PCA %>% filter(site == "PTR")) 
-pca_crc = fit_pca_function(data_wide_PCA %>% filter(site == "CRC")) 
-pca_gcw = fit_pca_function(data_wide_PCA %>% filter(site == "GCW")) 
-pca_msm = fit_pca_function(data_wide_PCA %>% filter(site == "MSM")) 
-pca_gwi = fit_pca_function(data_wide_PCA %>% filter(site == "GWI")) 
+pca_owc = fit_pca_function(data_wide_PCA2 %>% filter(site == "OWC")) 
+pca_ptr = fit_pca_function(data_wide_PCA2 %>% filter(site == "PTR")) 
+pca_crc = fit_pca_function(data_wide_PCA2 %>% filter(site == "CRC")) 
+pca_gcw = fit_pca_function(data_wide_PCA2 %>% filter(site == "GCW")) 
+pca_msm = fit_pca_function(data_wide_PCA2 %>% filter(site == "MSM")) 
+pca_gwi = fit_pca_function(data_wide_PCA2 %>% filter(site == "GWI")) 
 
 gg_pca_owc = ggbiplot(pca_owc$pca_int, obs.scale = 1, var.scale = 1,
            groups = as.character(pca_owc$grp$transect), 
@@ -649,6 +649,21 @@ pc_region_transect %>%
   geom_vline(xintercept = 0.1, linetype = "dashed")
 
 
+pc_region_transect %>% 
+  mutate(variable = fct_reorder(variable, abs(PC1))) %>% 
+  ggplot(aes(x = abs(PC1), y = variable, color = transect))+
+  geom_point(size = 5)+
+#  scale_colour_manual(values = c("red", "blue"))+
+ # xlim(0, 0.4)+
+  #geom_vline(xintercept = 0)+
+  labs(y = "",
+       x = "|PC1|")+
+  facet_grid(. ~ region)+
+  theme_kp()+
+  geom_vline(xintercept = 0.3, linetype = "dashed")+
+  geom_vline(xintercept = 0.1, linetype = "dashed")
+
+
 
 ```
 
@@ -663,8 +678,8 @@ library(cluster)
 library(factoextra)
 
 
-df = data_wide_PCA %>% filter(region == "CB") %>%   drop_na() %>% dplyr::select(where(is.numeric))
-grp = data_wide_PCA %>% filter(region == "CB")%>% drop_na() %>% dplyr::select(!where(is.numeric))
+df = data_wide_PCA2 %>% filter(region == "WLE") %>%   drop_na() %>% dplyr::select(where(is.numeric))
+grp = data_wide_PCA2 %>% filter(region == "WLE")%>% drop_na() %>% dplyr::select(!where(is.numeric))
 
 fviz_nbclust(df, FUN = hcut, method = "wss")
 fviz_nbclust(df, FUN = hcut, method = "silhouette")
@@ -695,7 +710,7 @@ ggbiplot::ggbiplot(pca_cluster$pca_int, obs.scale = 1, var.scale = 1,
   geom_convexhull(aes(group = pca_cluster$grp$cluster,
                       fill = pca_cluster$grp$cluster), alpha = 0.2)+
   geom_point(size=3,stroke=1, alpha = 1,
-             aes(shape = pca_cluster$grp$site,
+             aes(shape = pca_cluster$grp$transect,
                  color = groups))+ 
   # scale_color_manual(values = c("#16879C", "#BB281E" ))+
   #scale_shape_manual(values = c(21, 19))+
@@ -942,6 +957,98 @@ a = aov((cv) ~ transect, data = cv %>% filter(region == "WLE"))
 agricolae::HSD.test(a, "transect") %>% print()
 ```
 
+
+
+
+---
+
+## PCA on C-normalized data
+
+```{r}
+data_wide_PCA2 = 
+  data_wide_PCA %>% 
+  pivot_longer(cols = c(where(is.numeric), -TC)) %>% 
+  mutate(value = value/TC) %>% 
+  dplyr::select(-TC) %>% 
+  pivot_wider()
+
+pca_all_c = fit_pca_function(data_wide_PCA2)
+
+
+ggbiplot(pca_all_c$pca_int, obs.scale = 1, var.scale = 1,
+         groups = as.character(pca_all_c$grp$region), 
+         ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 1) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(#shape = pca_all_c$grp$site,
+                 color = groups))+ 
+  scale_color_manual(#breaks = c("upland", "transition", "wte", "wc"), 
+                     values = pal_transect)+
+  #scale_shape_manual(values = c(21, 19))+
+  #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
+  xlim(-6,6)+
+  ylim(-4.5,4.5)+
+  labs(shape="",
+       title = "PCA: all, normalized to C",
+       subtitle = "surface horizons")+
+  theme_kp()+
+  theme(legend.position = "top", legend.box = "vertical")+
+  NULL
+
+```
+
+```{r}
+df = data_wide_PCA2 %>%   drop_na() %>% dplyr::select(where(is.numeric))
+grp = data_wide_PCA2 %>% drop_na() %>% dplyr::select(!where(is.numeric))
+
+fviz_nbclust(df, FUN = hcut, method = "wss")
+fviz_nbclust(df, FUN = hcut, method = "silhouette")
+# three clusters
+
+d <- dist(df, method = "euclidean")
+hc1 <- hclust(d, method = "complete" )
+plot(hc1, cex = 0.6, hang = -1)
+hc5 <- hclust(d, method = "ward.D2" )
+sub_grp <- cutree(hc5, k = 3)
+table(sub_grp)
+plot(hc5, cex = 0.6)
+rect.hclust(hc5, k = 3, border = 2:5)
+
+df_cl <- mutate(df, cluster = sub_grp) %>% cbind(grp) %>% mutate(cluster = as.character(cluster))
+count(df_cl,cluster)
+
+
+library(ggConvexHull)
+
+pca_cluster = fit_pca_function(df_cl) 
+
+ggbiplot::ggbiplot(pca_cluster$pca_int, obs.scale = 1, var.scale = 1,
+                   groups = as.character(pca_cluster$grp$cluster), 
+                   ellipse = F, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_convexhull(aes(group = pca_cluster$grp$cluster,
+                      fill = pca_cluster$grp$cluster), alpha = 0.2)+
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(shape = pca_cluster$grp$site,
+                 color = groups))+ 
+  # scale_color_manual(values = c("#16879C", "#BB281E" ))+
+  #scale_shape_manual(values = c(21, 19))+
+  #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
+  # xlim(-4,20)+
+  # ylim(-8,8)+
+  labs(fill="cluster",
+       color = "cluster",
+       shape = "region",
+       title = "Overall PCA, both regions",
+       subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+
+
+df_cl %>% 
+  ggplot(aes(x = transect, y = cluster, color = site))+
+  geom_jitter(width = 0.1, height = 0.1, size = 3)+
+  facet_wrap(~region)+
+  theme_kp()
+```
 
 
 ---
