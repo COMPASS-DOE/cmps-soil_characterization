@@ -210,6 +210,20 @@ pc_all =
   bind_rows(pc_overall, pc_wle, pc_cb) %>% 
   mutate(variable = fct_reorder(variable, (PC1)))
 
+overall = 
+  pc_all %>% 
+  filter(region == "combined") %>% 
+  mutate(variable = fct_reorder(variable, abs(PC1))) %>% 
+  ggplot(aes(x = abs(PC1), y = variable))+
+  geom_point(size = 5, stroke = 1, aes(shape = region, fill = region))+
+  scale_fill_manual(values = c("#16879C", "#BB281E" ))+
+  scale_shape_manual(values = c(23, 21))+
+  
+  xlim(-0.4, 0.4)+
+  geom_vline(xintercept = 0)+
+  labs(y = "")+
+  theme_kp()
+
 non_absolute = 
   pc_all %>% 
   mutate(variable = fct_reorder(variable, (PC1))) %>% 
@@ -293,8 +307,9 @@ ggbiplot::ggbiplot(pca_cluster$pca_int, obs.scale = 1, var.scale = 1,
                       fill = pca_cluster$grp$cluster), alpha = 0.2)+
   geom_point(size=4,stroke=1, alpha = 1,
              aes(shape = pca_cluster$grp$region,
-                 fill = groups), color = "black")+ 
+                 fill = groups))+ 
   scale_shape_manual(values = c(23, 21))+
+  scale_color_manual(values = pnw_palette("Sailboat", 3))+
   scale_fill_manual(values = pnw_palette("Sailboat", 3))+
   labs(fill="cluster",
        color = "cluster",
@@ -307,6 +322,19 @@ ggbiplot::ggbiplot(pca_cluster$pca_int, obs.scale = 1, var.scale = 1,
 ```
 
 ---
+
+
+## 1b. PERMANOVA
+
+```{r}
+library(vegan)
+
+adonis2((data_wide_PCA %>% dplyr::select(where(is.numeric)) %>% drop_na()) ~ 
+         (region + transect + horizon + site)^2, 
+       data = data_wide_PCA %>% drop_na)
+
+```
+
 
 ## 2. Each analyte
 
@@ -464,6 +492,7 @@ data_scaled_NEW %>%
 ```{r analytes, fig.height = 4, fig.width = 4}
 
 data_combined_wide %>% 
+  filter(region == "CB") %>% 
   mutate(transect = factor(transect, levels = c("upland", "transition", "wc"))) %>% 
   ggplot(aes(x = transect, y = Fe))+
   geom_violin(aes(fill = transect), alpha = 0.4)+
@@ -473,10 +502,12 @@ data_combined_wide %>%
             aes(x = x, y = 800, label = label), size = 5)+
   labs(x = "",
        y = "Extractable Fe, μg/g")+
+  facet_wrap(~region)+
   scale_fill_manual(values = pal_transect)+
   theme(legend.position = "none")
 
 data_combined_wide %>% 
+    filter(region == "WLE") %>% 
   mutate(transect = factor(transect, levels = c("upland", "transition", "wc"))) %>% 
   ggplot(aes(x = transect, y = P))+
   geom_violin(aes(fill = transect), alpha = 0.4)+
@@ -486,6 +517,7 @@ data_combined_wide %>%
             aes(x = x, y = 450, label = label), size = 5)+
   labs(x = "",
        y = "Extractable P, μg/g")+
+  facet_wrap(~region)+
   scale_fill_manual(values = pal_transect)+
   theme(legend.position = "none")
 
