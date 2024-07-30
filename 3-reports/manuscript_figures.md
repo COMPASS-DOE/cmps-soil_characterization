@@ -70,7 +70,7 @@ Synpotic Soil Characterization
 
 ### Specific analytes
 
-![](manuscript_figures_files/figure-gfm/analytes-1.png)<!-- -->![](manuscript_figures_files/figure-gfm/analytes-2.png)<!-- -->
+![](manuscript_figures_files/figure-gfm/analytesx-1.png)<!-- -->![](manuscript_figures_files/figure-gfm/analytesx-2.png)<!-- -->
 
 ------------------------------------------------------------------------
 
