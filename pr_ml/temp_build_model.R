@@ -95,7 +95,7 @@ plot_rf_results <- function(var, plot_title) {
   plot_grid(p1, p2, nrow = 1)
 }
 
-plot_rf_results("region")
+plot_rf_results("transect")
 
 
 

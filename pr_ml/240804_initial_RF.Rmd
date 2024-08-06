@@ -25,6 +25,7 @@ We'll construct RF models for
 
 Because the goal is to understand relationships in biogeochemistry and not to predict a specific variable, we will not be splitting data into training and testing datasets. This means we **should not** interpret goodness-of-fit metrics as how well we can "predict" if a sample comes from a given location, but rather how well the variables used as predictors explain the variability in the dataset. This is something of a subtle difference, but I think an important one.
 
+Note that I'm adding a white noise variable to all models. That's there as a guide for interpreting which variables are contributing more to the model than random chance.
 
 ```{r read in data}
 
@@ -53,7 +54,6 @@ df_raw <- read_csv("../1-data/processed/chemistry_combined_PCA.csv") %>%
 df <- df_raw %>% 
   drop_na()
 ```
-
 
 ### Random forest classification model results {.tabset}
 
@@ -109,7 +109,6 @@ make_rf_model <- function(var){
 }
 ```
 
-
 ```{r set up wrapper plotting function}
 
 # Wrapper function for plotting
@@ -144,17 +143,17 @@ plot_rf_results <- function(var, plot_title) {
 
 ```
 
-
 #### Between regions
 
 ```{r}
 plot_rf_results("region")
 ```
 
-**Initial thoughts - Region**
- - looks like region was correctly predicted for all data
- - NO3 as the most important seems sensible, a little surprised it wasn't salt-related though
- - white noise near bottom (transect does not contribute more than random noise to the model so we should ignore it here)
+**Initial thoughts - Region** 
+
+  - looks like region was correctly predicted for all data 
+  - NO3 as the most important seems sensible, a little surprised it wasn't salt-related though 
+  - white noise near bottom (transect does not contribute more than random noise to the model so we should ignore it here)
 
 
 #### Between transect locations
@@ -163,10 +162,11 @@ plot_rf_results("region")
 plot_rf_results("transect")
 ```
 
-**Initial thoughts - Transect**
- - all but one correctly classified (one Transition looked like Upland)
- - sulfate is interesting, maybe the relative transition in redox is more consistent than the relative transition in other things across CB and WLE sites
- - neither horizon nor region is important to this model
+**Initial thoughts - Transect** 
+
+  - all but one correctly classified (one Transition looked like Upland) 
+  - sulfate is interesting, maybe the relative transition in redox is more consistent than the relative transition in other things across CB and WLE sites 
+  - neither horizon nor region is important to this model
 
 
 #### Between sites
@@ -175,18 +175,15 @@ plot_rf_results("transect")
 plot_rf_results("site")
 ```
 
-**Initial thoughts - Site**
- - All correctly identified
+**Initial thoughts - Site** 
+  
+  - All correctly identified
+  - NO3 and TN as top variables followed by region and horizon seems like a nice mix! Much less "one variable to rule them all" vibes
+  - Transect not important to this model
 
-###
+### 
 
 #### A couple quick cautions
 
-  1. I haven't done classification RF before, so 1) there's probably a better way to quantify GOF, and 2) it would be good if we go this direction for me to take a bit of a deep dive into properly constructing and vetting an RF classification model. 
-  2. I'm a little suspicious that the models performed "too" good... I was expecting them to get maybe half of the values right, 100% makes me suspicious. 
-
-
-
-
-
-
+1.  I haven't done classification RF before, so 1) there's probably a better way to quantify GOF, and 2) it would be good if we go this direction for me to take a bit of a deep dive into properly constructing and vetting an RF classification model.
+2.  I'm a little suspicious that the models performed "too" good... I was expecting them to get maybe half of the values right, 100% makes me suspicious.
