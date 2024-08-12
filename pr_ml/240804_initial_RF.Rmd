@@ -187,3 +187,130 @@ plot_rf_results("site")
 
 1.  I haven't done classification RF before, so 1) there's probably a better way to quantify GOF, and 2) it would be good if we go this direction for me to take a bit of a deep dive into properly constructing and vetting an RF classification model.
 2.  I'm a little suspicious that the models performed "too" good... I was expecting them to get maybe half of the values right, 100% makes me suspicious.
+
+
+#### 240808 - adding on: how do models for transect location vary between regions? {.tabset}
+
+```{r set up wrapper plotting function}
+
+make_rf_model_by_subset <- function(var, data){
+  
+  # 1) Dynamically create formula
+  formula <- as.formula(paste(var, "~ ."))
+  
+  # 2) Tune mtry and ntree hyperparameters
+  rf_spec <- rand_forest() %>%
+    set_engine("ranger", importance = "impurity") %>% #using the ranger pkg instead of rf; importance needed for FI
+    set_mode("classification")
+  
+  # 3) Define a recipe
+  recipe <- recipe(formula, data = data) %>%
+    step_integer(all_nominal_predictors()) %>% # integerize all dbl
+    step_corr(all_predictors()) %>% # check correlations between predictors and remove any strong correlations
+    step_normalize(all_predictors(), -all_outcomes()) # normalize non-normally distributed predictors
+  
+  # 4) Define a workflow
+  wf <- workflow() %>%
+    add_model(rf_spec) %>%
+    add_recipe(recipe)
+  
+  # 5) Run the  model
+  rf_model <- wf %>%
+    update_model(rf_spec) %>%
+    fit(data = data)
+  
+  ## Extract predictions
+  predictions <- predict(rf_model, data) %>% rename("predicted" = .pred_class)
+  
+  ### Feature Importance
+  ## Set vectors for renaming stuff
+  var_names <- rf_model$fit$fit$fit$variable.importance
+  
+  ## Convert feature importance to a tibble with variables as a column
+  fi0 <- as.data.frame(var_names) %>%
+    tibble::rownames_to_column() %>%
+    as_tibble() %>% 
+    rename("predictor" = rowname, 
+           "raw_fi" = var_names) %>% 
+    mutate(fi_n = raw_fi / sum(raw_fi))
+  
+  ## Bind predictions to data
+  prediction_df <- bind_cols(data, predictions)
+  
+  ## Return two things: how good the model did and which variables are most important
+  return(list(predictions = prediction_df,
+                feature_importance = fi0))
+}
+
+# Wrapper function for plotting
+plot_rf_results_by_subset <- function(var, data) {
+  
+  # Call the make_rf_model function
+  model_results <- make_rf_model_by_subset(var, data)
+  
+  ## Plot for classification equivalent to goodness-of-fit
+  p1 <- ggplot(model_results$predictions, aes_string(x = var, y = "predicted")) + 
+    geom_jitter(width = 0.2, 
+                height = 0.2,
+                alpha = 0.5) + 
+    ggtitle(paste("Predictions:", var))
+  
+  ## Set up a color palette
+  var_colors <- PNWColors::pnw_palette("Bay", n = length(unique(model_results$feature_importance$predictor)))
+  
+  ## Plot of feature importance
+  p2 <- ggplot(model_results$feature_importance, aes(x = fi_n * 100, 
+                                                     y = reorder(predictor, fi_n), 
+                                                     fill = predictor)) + 
+    geom_col(alpha = 0.8, show.legend = F, width = 0.7) + 
+    scale_fill_manual(values = var_colors) + 
+    labs(x = "Feature Importance (%)", 
+         y = "", fill = "") + 
+    ggtitle(paste("Feature Imp.:", var))
+  
+  ## Combine into a plot
+  plot_grid(p1, p2, nrow = 1)
+}
+
+```
+
+
+##### Transect location for CB
+
+```{r}
+plot_rf_results_by_subset("transect", df %>% filter(region == "CB"))
+```
+
+
+##### Transect location for WLE
+
+```{r}
+plot_rf_results_by_subset("transect", df %>% filter(region == "WLE"))
+```
+
+
+```{r}
+
+both_fi_by_region <- bind_rows(make_rf_model_by_subset("transect", df %>% filter(region == "CB"))$feature_importance %>% mutate(region = "CB"), 
+          make_rf_model_by_subset("transect", df %>% filter(region == "WLE"))$feature_importance %>% mutate(region = "WLE")) 
+
+both_fi_by_region_trim <- both_fi_by_region %>% 
+  group_by(region) %>%
+  filter(fi_n > (fi_n[predictor == "white_noise"])) %>%
+  ungroup()
+
+var_colors <- PNWColors::pnw_palette("Bay", n = length(unique(both_fi_by_region_trim$predictor)))
+
+both_fi_by_region_trim %>% 
+  mutate(fi = fi_n * 100) %>% 
+  ggplot(aes(x = fi_n * 100, 
+             y = reorder(predictor, fi_n), 
+             fill = predictor)) + 
+  geom_col(alpha = 0.8, show.legend = F, width = 0.7) + 
+  scale_fill_manual(values = var_colors) + 
+  facet_wrap(~region, nrow = 1) +
+  labs(x = "Feature Importance (%)", 
+       y = "", fill = "") 
+```
+
+
