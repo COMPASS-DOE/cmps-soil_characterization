@@ -422,15 +422,6 @@ click to open
 
 ## XRD
 
-    ## $gg_bar_xrd
-
-![](characterization_report_files/figure-gfm/xrd-1.png)<!-- -->
-
-    ## 
-    ## $xrd_biplot
-
-![](characterization_report_files/figure-gfm/xrd-2.png)<!-- -->
-
 ------------------------------------------------------------------------
 
 ## Soil Physics
@@ -441,8 +432,6 @@ click to open
 
 ### Texture
 
-![](characterization_report_files/figure-gfm/texture-1.png)<!-- -->
-
 ------------------------------------------------------------------------
 
 ## Session Info
@@ -452,7 +441,7 @@ click to open
 Session Info
 </summary>
 
-Date run: 2023-10-11
+Date run: 2024-08-20
 
     ## R version 4.2.1 (2022-06-23)
     ## Platform: x86_64-apple-darwin17.0 (64-bit)
@@ -475,28 +464,26 @@ Date run: 2023-10-11
     ## [10] survival_3.3-1      mvtnorm_1.1-3       googlesheets4_1.0.1
     ## [13] soilpalettes_0.1.0  PNWColors_0.1.0     magrittr_2.0.3     
     ## [16] lubridate_1.9.2     forcats_1.0.0       stringr_1.5.0      
-    ## [19] dplyr_1.1.0         purrr_1.0.1         readr_2.1.4        
-    ## [22] tidyr_1.3.0         tibble_3.1.8        ggplot2_3.4.3      
+    ## [19] dplyr_1.1.4         purrr_1.0.2         readr_2.1.4        
+    ## [22] tidyr_1.3.1         tibble_3.2.1        ggplot2_3.5.1      
     ## [25] tidyverse_2.0.0     tarchetypes_0.7.2   targets_0.14.0     
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] nlme_3.1-160       fs_1.5.2           latex2exp_0.9.6    tensorA_0.36.2    
-    ##  [5] tools_4.2.1        backports_1.4.1    utf8_1.2.2         R6_2.5.1          
-    ##  [9] mgcv_1.8-40        colorspace_2.0-3   withr_2.5.0        tidyselect_1.2.0  
-    ## [13] gridExtra_2.3      processx_3.7.0     bayesm_3.1-4       compiler_4.2.1    
-    ## [17] compositions_2.0-4 cli_3.6.0          sandwich_3.0-2     labeling_0.4.2    
-    ## [21] scales_1.2.1       DEoptimR_1.0-11    hexbin_1.28.2      robustbase_0.95-0 
-    ## [25] callr_3.7.2        digest_0.6.29      rmarkdown_2.21     pkgconfig_2.0.3   
-    ## [29] htmltools_0.5.3    highr_0.9          fastmap_1.1.0      rlang_1.1.1       
-    ## [33] rstudioapi_0.14    farver_2.1.1       generics_0.1.3     zoo_1.8-11        
-    ## [37] Matrix_1.5-1       Rcpp_1.0.11        munsell_0.5.0      fansi_1.0.3       
-    ## [41] proto_1.0.0        lifecycle_1.0.3    stringi_1.7.8      yaml_2.3.5        
-    ## [45] plyr_1.8.7         grid_4.2.1         parallel_4.2.1     cowplot_1.1.1     
-    ## [49] splines_4.2.1      hms_1.1.2          knitr_1.42         ps_1.7.1          
-    ## [53] pillar_1.8.1       igraph_1.3.4       base64url_1.4      codetools_0.2-18  
-    ## [57] glue_1.6.2         evaluate_0.16      data.table_1.14.4  vctrs_0.5.2       
-    ## [61] tzdb_0.3.0         cellranger_1.1.0   gtable_0.3.0       xfun_0.37         
-    ## [65] ggcorrplot_0.1.4   googledrive_2.0.0  gargle_1.2.0       ggtern_3.4.1      
-    ## [69] cluster_2.1.3      timechange_0.2.0   ellipsis_0.3.2
+    ##  [1] splines_4.2.1     highr_0.9         base64url_1.4     cellranger_1.1.0 
+    ##  [5] yaml_2.3.5        pillar_1.9.0      backports_1.4.1   glue_1.6.2       
+    ##  [9] digest_0.6.29     colorspace_2.0-3  sandwich_3.0-2    cowplot_1.1.1    
+    ## [13] htmltools_0.5.7   Matrix_1.5-1      plyr_1.8.7        pkgconfig_2.0.3  
+    ## [17] ggcorrplot_0.1.4  scales_1.3.0      processx_3.7.0    tzdb_0.4.0       
+    ## [21] timechange_0.2.0  googledrive_2.0.0 mgcv_1.8-40       farver_2.1.1     
+    ## [25] generics_0.1.3    ellipsis_0.3.2    withr_2.5.0       cli_3.6.3        
+    ## [29] evaluate_0.16     ps_1.7.1          fs_1.5.2          fansi_1.0.3      
+    ## [33] nlme_3.1-160      tools_4.2.1       data.table_1.14.4 hms_1.1.2        
+    ## [37] gargle_1.2.0      lifecycle_1.0.3   munsell_0.5.0     cluster_2.1.3    
+    ## [41] callr_3.7.2       compiler_4.2.1    rlang_1.1.4.9000  grid_4.2.1       
+    ## [45] rstudioapi_0.16.0 igraph_1.5.1      labeling_0.4.2    rmarkdown_2.21   
+    ## [49] gtable_0.3.0      codetools_0.2-18  R6_2.5.1          zoo_1.8-11       
+    ## [53] knitr_1.42        fastmap_1.1.0     utf8_1.2.2        stringi_1.7.8    
+    ## [57] parallel_4.2.1    Rcpp_1.0.11       vctrs_0.6.5       tidyselect_1.2.0 
+    ## [61] xfun_0.42
 
 </details>
