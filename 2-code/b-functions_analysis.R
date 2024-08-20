@@ -1306,6 +1306,7 @@ make_summary_tables <- function(data_combined){
   
   hsd_transect_by_site = 
     data_combined_subset %>% 
+    filter(!grepl("DIC", analysis)) %>% 
     group_by(analysis, name, region, site) %>% 
     do(fit_hsd_transect(.))
   
