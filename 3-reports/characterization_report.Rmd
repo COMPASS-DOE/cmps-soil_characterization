@@ -147,7 +147,7 @@ tar_read(gg_by_site_oab)
 
 ## XRD
 ```{r xrd, fig.height=4, fig.width=15}
-tar_read(gg_xrd)
+#tar_read(gg_xrd)
 ```
 
 
@@ -166,7 +166,7 @@ tar_read(gg_wrc)
 
 ### Texture
 ```{r texture}
-tar_read(gg_texture)
+#tar_read(gg_texture)
 ```
 
 
