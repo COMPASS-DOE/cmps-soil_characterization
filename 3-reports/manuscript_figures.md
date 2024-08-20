@@ -70,12 +70,6 @@ Synpotic Soil Characterization
 
 ### Specific analytes
 
-Version 1 - one region only
-
-![](manuscript_figures_files/figure-gfm/analytesx-1.png)<!-- -->![](manuscript_figures_files/figure-gfm/analytesx-2.png)<!-- -->
-
-Version 2 - both regions
-
 ![](manuscript_figures_files/figure-gfm/analytesx-2-1.png)<!-- -->![](manuscript_figures_files/figure-gfm/analytesx-2-2.png)<!-- -->
 
 ------------------------------------------------------------------------
@@ -87,7 +81,7 @@ Version 2 - both regions
 Session Info
 </summary>
 
-Date run: 2024-07-29
+Date run: 2024-08-20
 
     ## R version 4.2.1 (2022-06-23)
     ## Platform: x86_64-apple-darwin17.0 (64-bit)
@@ -104,31 +98,32 @@ Date run: 2024-07-29
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ##  [1] vegan_2.6-4         lattice_0.20-45     permute_0.9-7      
-    ##  [4] ggConvexHull_0.1.0  factoextra_1.0.7    cluster_2.1.3      
-    ##  [7] ggbiplot_0.55       googlesheets4_1.0.1 soilpalettes_0.1.0 
-    ## [10] PNWColors_0.1.0     magrittr_2.0.3      lubridate_1.9.2    
-    ## [13] forcats_1.0.0       stringr_1.5.0       dplyr_1.1.0        
-    ## [16] purrr_1.0.1         readr_2.1.4         tidyr_1.3.0        
-    ## [19] tibble_3.1.8        ggplot2_3.4.3       tidyverse_2.0.0    
+    ##  [1] ggh4x_0.2.8.9000    vegan_2.6-4         lattice_0.20-45    
+    ##  [4] permute_0.9-7       ggConvexHull_0.1.0  factoextra_1.0.7   
+    ##  [7] cluster_2.1.3       ggbiplot_0.55       googlesheets4_1.0.1
+    ## [10] soilpalettes_0.1.0  PNWColors_0.1.0     magrittr_2.0.3     
+    ## [13] lubridate_1.9.2     forcats_1.0.0       stringr_1.5.0      
+    ## [16] dplyr_1.1.4         purrr_1.0.2         readr_2.1.4        
+    ## [19] tidyr_1.3.1         tibble_3.2.1        ggplot2_3.5.1      
+    ## [22] tidyverse_2.0.0    
     ## 
     ## loaded via a namespace (and not attached):
     ##  [1] splines_4.2.1     carData_3.0-5     highr_0.9         base64url_1.4    
-    ##  [5] cellranger_1.1.0  yaml_2.3.5        ggrepel_0.9.3     pillar_1.8.1     
+    ##  [5] cellranger_1.1.0  yaml_2.3.5        ggrepel_0.9.3     pillar_1.9.0     
     ##  [9] backports_1.4.1   glue_1.6.2        digest_0.6.29     ggsignif_0.6.4   
     ## [13] colorspace_2.0-3  Matrix_1.5-1      cowplot_1.1.1     htmltools_0.5.7  
-    ## [17] plyr_1.8.7        pkgconfig_2.0.3   broom_1.0.3       scales_1.2.1     
-    ## [21] processx_3.7.0    tzdb_0.3.0        timechange_0.2.0  googledrive_2.0.0
+    ## [17] plyr_1.8.7        pkgconfig_2.0.3   broom_1.0.6       scales_1.3.0     
+    ## [21] processx_3.7.0    tzdb_0.4.0        timechange_0.2.0  googledrive_2.0.0
     ## [25] mgcv_1.8-40       generics_0.1.3    farver_2.1.1      car_3.1-0        
-    ## [29] ellipsis_0.3.2    ggpubr_0.6.0      withr_2.5.0       cli_3.6.0        
+    ## [29] ellipsis_0.3.2    ggpubr_0.6.0      withr_2.5.0       cli_3.6.3        
     ## [33] evaluate_0.16     ps_1.7.1          fs_1.5.2          fansi_1.0.3      
     ## [37] nlme_3.1-160      MASS_7.3-60       rstatix_0.7.2     tools_4.2.1      
     ## [41] data.table_1.14.4 hms_1.1.2         gargle_1.2.0      lifecycle_1.0.3  
     ## [45] munsell_0.5.0     targets_0.14.0    callr_3.7.2       compiler_4.2.1   
-    ## [49] rlang_1.1.1       grid_4.2.1        rstudioapi_0.14   igraph_1.5.1     
+    ## [49] rlang_1.1.4.9000  grid_4.2.1        rstudioapi_0.16.0 igraph_1.5.1     
     ## [53] labeling_0.4.2    rmarkdown_2.21    gtable_0.3.0      codetools_0.2-18 
     ## [57] abind_1.4-5       R6_2.5.1          knitr_1.42        fastmap_1.1.0    
     ## [61] utf8_1.2.2        stringi_1.7.8     parallel_4.2.1    Rcpp_1.0.11      
-    ## [65] vctrs_0.5.2       tidyselect_1.2.0  xfun_0.42
+    ## [65] vctrs_0.6.5       tidyselect_1.2.0  xfun_0.42
 
 </details>

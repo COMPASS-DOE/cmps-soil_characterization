@@ -450,11 +450,16 @@ data_scaled_NEW %>%
 
 ```
 
-```{r scaled_gg2_split, fig.height = 16, fig.width = 16}
+```{r scaled_gg2_split, fig.height = 16, fig.width = 18}
+library(ggh4x) # for nested facets
+# https://teunbrand.github.io/ggh4x/reference/facet_nested.html
+
 data_scaled_NEW %>% 
   ggplot(aes(x = transect, y = value_scaled, group = site, color = site))+
   geom_line(linewidth = 1) + geom_point(size = 2)+
-  facet_wrap( ~ name + region)+
+#  facet_wrap( ~ name)+
+  facet_nested_wrap(~ name + region, ncol = 8,
+                    nest_line = element_line(colour = "grey"))+ 
   scale_color_manual(breaks = c("CRC", "PTR", "OWC",
                                 "GCW", "MSM", "GWI"),
                      values = c("#d73027", "#fc8d59", "#fdbb84", 
@@ -488,45 +493,6 @@ data_scaled_NEW %>%
 ```
 
 ### Specific analytes
-
-Version 1 - one region only
-
-```{r analytesx, fig.height = 4, fig.width = 4}
-
-data_combined_wide %>% 
-  filter(region == "CB") %>% 
-  mutate(transect = factor(transect, levels = c("upland", "transition", "wc"))) %>% 
-  ggplot(aes(x = transect, y = Fe))+
-  geom_violin(aes(fill = transect), alpha = 0.4)+
-  geom_jitter(width = 0.1)+
-  geom_text(data = tibble(x = c("upland", "transition", "wc"),
-                          label = c("B", "A", "B")),
-            aes(x = x, y = 800, label = label), size = 5)+
-  labs(x = "",
-       y = "Extractable Fe, μg/g")+
-  facet_wrap(~region)+
-  scale_fill_manual(values = pal_transect)+
-  theme(legend.position = "none")
-
-data_combined_wide %>% 
-    filter(region == "WLE") %>% 
-  mutate(transect = factor(transect, levels = c("upland", "transition", "wc"))) %>% 
-  ggplot(aes(x = transect, y = P))+
-  geom_violin(aes(fill = transect), alpha = 0.4)+
-  geom_jitter(width = 0.1)+
-  geom_text(data = tibble(x = c("upland", "transition", "wc"),
-                          label = c("B", "A", "B")),
-            aes(x = x, y = 450, label = label), size = 5)+
-  labs(x = "",
-       y = "Extractable P, μg/g")+
-  facet_wrap(~region)+
-  scale_fill_manual(values = pal_transect)+
-  theme(legend.position = "none")
-
-```
-
-
-Version 2 - both regions
 
 ```{r analytesx-2, fig.height = 4, fig.width = 8}
 data_combined_wide %>% 
