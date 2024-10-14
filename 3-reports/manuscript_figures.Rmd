@@ -26,7 +26,7 @@ theme_set(theme_kp())
 targets::tar_load(c(data_combined, sample_key))
 ```
 
-```{r data_processing_functions}
+```{r data_processing}
 make_data_subset = function(data_combined){
   
  # data_combined_subset = 
@@ -47,9 +47,7 @@ make_data_wide = function(data_combined_subset, sample_key){
     force()
   
 }
-```
 
-```{r data_processing, eval=TRUE}
 
 data_combined_subset = make_data_subset(data_combined)
 
@@ -257,7 +255,7 @@ pc_all %>%
 
 ```{r cluster_calc, include=FALSE}
 
-library(cluster)
+#library(cluster)
 library(factoextra)
 
 
