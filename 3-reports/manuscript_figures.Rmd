@@ -70,6 +70,66 @@ print("df created: `data_combined_wide`, `data_wide_PCA`")
 
 ---
 
+## 0. Correlations
+
+```{r gg_corr, fig.height=8, fig.width=8}
+
+fit_correlations_function = function(dat, TITLE){
+  num = 
+    dat %>%       
+    dplyr::select(where(is.numeric)) %>%
+    drop_na()
+  
+  num_clean = 
+    num %>% 
+    rownames_to_column("row") %>% 
+    pivot_longer(-row) %>% 
+    separate(name, sep = "_", into = c("name")) %>% 
+    pivot_wider() %>% 
+    dplyr::select(-row)
+  
+  
+  m = cor(num_clean)
+  m = round(m, 1)
+  
+  p.mat <- ggcorrplot::cor_pmat(num_clean)
+  ggcorrplot::ggcorrplot(m, type = "lower",
+                         hc.order = TRUE,
+                         p.mat = p.mat,
+                         outline.color = "black",
+                         lab = TRUE, 
+                         insig = "blank",
+                         #colors = c("#E46726", "white", "#6D9EC1"),
+  ) +
+    scale_fill_gradient2(low = "orangered2", mid = "white", high = "turquoise4", limit = c(-1, 1), midpoint = 0)+
+    theme(legend.position = "none")
+  
+}
+
+corr_all = fit_correlations_function(dat = data_wide_PCA)
+#corr_wle = fit_correlations_function(dat = data_wide_PCA %>% filter(region == "WLE"), TITLE = "WLE" )
+#corr_cb = fit_correlations_function(dat = data_wide_PCA %>% filter(region == "CB"), TITLE = "CB")
+
+corr_all
+```
+
+Highly correlated variables include:
+
+- (+) TC & WEOC, TN
+- (+) TS & Chloride, Sulfate, Na, CEC
+- (+) CEC & TS, Na, K, Mg, SpConductance
+- (+) Na & SpConductance, TS, K, Mg
+- (+) Chloride & Sulfate, TS, CEC, SpConductance, Na
+- (-) pH & WEOC, Al
+- (-) Ca and Al
+
+---
+
+# VERSION 1: ALL ANALYTES
+
+<details>
+  <summary> Click to Open </summary>
+  
 ## 1. PCAs
 
 ```{r pca_function}
@@ -490,7 +550,413 @@ data_scaled_NEW %>%
 
 ```
 
-### Specific analytes
+
+</details>
+
+
+# VERSION 2: DROPPING CORRELATED ANALYTES
+
+### Overall PCAs
+
+```{r drop}
+# drop correlated analytes
+
+data_wide_PCA2 = data_wide_PCA %>% 
+  dplyr::select(-c(TN, CEC, K, Mg, Sulfate, NO3N, pH, spConductance))
+```
+
+
+
+```{r v2-pca_input}
+pca_overall = fit_pca_function(data_wide_PCA2) 
+pca_overall_wle = fit_pca_function(dat = data_wide_PCA2 %>% filter(region == "WLE"))
+pca_overall_cb = fit_pca_function(data_wide_PCA2 %>% filter(region == "CB"))
+```
+
+```{r v2-pca_gg, fig.width=10, fig.height=6}
+## PCA plots overall
+#gg_pca_overall = 
+ggbiplot(pca_overall$pca_int, obs.scale = 1, var.scale = 1,
+         groups = as.character(pca_overall$grp$region), 
+         ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=4,stroke=1, alpha = 1,
+             aes(shape = pca_overall$grp$region,
+                 fill = groups))+ 
+  scale_color_manual(values = c("#16879C", "#BB281E"))+
+  scale_fill_manual(values = c("#16879C", "#BB281E"))+
+  scale_shape_manual(values = c(23, 21))+
+  labs(shape="",
+       title = "Overall PCA, both regions",
+       subtitle = "Surface horizons only")+
+  theme_kp()+
+  guides(fill = "none")+
+  NULL
+
+```
+
+```{r v2-pca_gg_regions, fig.width=10, fig.height=6}
+
+gg_pca_wle = 
+  ggbiplot(pca_overall_wle$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_overall_wle$grp$transect), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 1) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(shape = pca_overall_wle$grp$site,
+                 color = groups))+ 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+                     values = pal_transect)+
+#  xlim(-6,6)+
+#  ylim(-4.5,4.5)+
+  labs(shape="",
+       title = "PCA: WLE",
+       subtitle = "surface horizons")+
+  theme_kp()+
+  theme(legend.position = "top", legend.box = "vertical")+
+  NULL
+
+gg_pca_cb = 
+  ggbiplot(pca_overall_cb$pca_int, obs.scale = 1, var.scale = 1,
+           groups = as.character(pca_overall_cb$grp$transect), 
+           ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_point(size=3,stroke=1, alpha = 1,
+             aes(shape = pca_overall_cb$grp$site,
+                 color = groups))+ 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+                     values = pal_transect)+
+#  xlim(-5.5,7.5)+
+#  ylim(-5,5)+
+  labs(shape="",
+       title = "PCA: CB",
+       subtitle = "surface horizons")+
+  theme_kp()+
+  theme(legend.position = "top", legend.box = "vertical")+
+  NULL
+
+gg_pca_regions = cowplot::plot_grid(gg_pca_wle , gg_pca_cb)
+gg_pca_regions
+
+```
+
+
+### Drivers and loadings
+
+```{r v2-pc_loadings}
+get_pc_values = function(dat){
+  
+  pca = fit_pca_function(dat)
+  
+  x = pca$pca_int$rotation
+  x2 = 
+    x %>% 
+    as.data.frame() %>% 
+    dplyr::select(PC1) %>% 
+    arrange(desc(PC1)) %>% 
+    rownames_to_column("variable") %>% 
+    mutate(variable = fct_reorder(variable, (PC1)))
+
+  x2
+}
+
+pc_overall = get_pc_values(data_wide_PCA2) %>% mutate(region = "combined")
+pc_wle = get_pc_values(data_wide_PCA2 %>% filter(region == "WLE")) %>% mutate(region = "WLE")
+pc_cb = get_pc_values(data_wide_PCA2 %>% filter(region == "CB")) %>% mutate(region = "CB")
+
+```
+
+```{r v2-pc_gg, fig.height=8, fig.width=6}
+
+pc_all = 
+  bind_rows(pc_overall, pc_wle, pc_cb) %>% 
+  mutate(variable = fct_reorder(variable, (PC1)))
+
+overall = 
+  pc_all %>% 
+  filter(region == "combined") %>% 
+  mutate(variable = fct_reorder(variable, abs(PC1))) %>% 
+  ggplot(aes(x = abs(PC1), y = variable))+
+  geom_point(size = 5, stroke = 1, aes(shape = region, fill = region))+
+  scale_fill_manual(values = c("#16879C", "#BB281E" ))+
+  scale_shape_manual(values = c(23, 21))+
+  
+  xlim(-0.4, 0.4)+
+  geom_vline(xintercept = 0)+
+  labs(y = "")+
+  theme_kp()
+
+non_absolute = 
+  pc_all %>% 
+  mutate(variable = fct_reorder(variable, (PC1))) %>% 
+  filter(region != "combined") %>% 
+  ggplot(aes(x = PC1, y = variable))+
+  geom_point(size = 5, stroke = 1, aes(shape = region, fill = region))+
+  scale_fill_manual(values = c("#16879C", "#BB281E" ))+
+  scale_shape_manual(values = c(23, 21))+
+  
+  xlim(-0.4, 0.4)+
+  geom_vline(xintercept = 0)+
+  labs(y = "")+
+  theme_kp()
+
+pc_all %>% 
+  filter(region != "combined") %>% 
+  mutate(variable = fct_reorder(variable, abs(PC1))) %>% 
+  ggplot(aes(x = abs(PC1), y = variable))+
+  geom_point(size = 5, stroke = 1, aes(shape = region, fill = region))+
+  scale_fill_manual(values = c("#16879C", "#BB281E" ))+
+  scale_shape_manual(values = c(23, 21))+
+  labs(y = "",
+       x = "|PC1|")+
+  theme_kp()
+
+```
+
+
+
+### Clustering
+
+```{r v2-cluster_calc, include=FALSE}
+
+#library(cluster)
+library(factoextra)
+
+
+df = data_wide_PCA2 %>%   drop_na() %>% dplyr::select(where(is.numeric))
+grp = data_wide_PCA2 %>% drop_na() %>% dplyr::select(!where(is.numeric))
+
+fviz_nbclust(df, FUN = hcut, method = "wss")
+fviz_nbclust(df, FUN = hcut, method = "silhouette")
+# three clusters
+
+d <- dist(df, method = "euclidean")
+hc1 <- hclust(d, method = "complete" )
+plot(hc1, cex = 0.6, hang = -1)
+hc5 <- hclust(d, method = "ward.D2" )
+sub_grp <- cutree(hc5, k = 3)
+table(sub_grp)
+plot(hc5, cex = 0.6)
+rect.hclust(hc5, k = 3, border = 2:5)
+
+df_cl <- mutate(df, cluster = sub_grp) %>% cbind(grp) %>% mutate(cluster = as.character(cluster))
+count(df_cl,cluster)
+
+```
+
+```{r v2-cluster_gg}
+df_cl %>%
+  ggplot(aes(y = cluster, x = site))+
+  geom_point(aes(color = transect, shape = transect),
+             size = 4, stroke = 1,
+             position = position_jitterdodge(jitter.width = 0.0, jitter.height = 0.1, 
+                                             dodge.width = 0.4))+
+  scale_color_manual(values = pal_transect)
+
+```
+
+### PCA with clusters
+
+```{r v2-cluster_pca, fig.width=10, fig.height=6}
+library(ggConvexHull)
+
+pca_cluster = fit_pca_function(df_cl) 
+
+ggbiplot::ggbiplot(pca_cluster$pca_int, obs.scale = 1, var.scale = 1,
+                   groups = as.character(pca_cluster$grp$cluster), 
+                   ellipse = F, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_convexhull(aes(group = pca_cluster$grp$cluster,
+                      fill = pca_cluster$grp$cluster), alpha = 0.2)+
+  geom_point(size=4,stroke=1, alpha = 1,
+             aes(shape = pca_cluster$grp$region,
+                 fill = groups))+ 
+  scale_shape_manual(values = c(23, 21))+
+  scale_color_manual(values = pnw_palette("Sailboat", 3))+
+  scale_fill_manual(values = pnw_palette("Sailboat", 3))+
+  labs(fill="cluster",
+       color = "cluster",
+       shape = "region",
+       title = "Overall PCA, both regions",
+       subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+  
+```
+
+---
+
+
+## 1b. PERMANOVA
+
+```{r}
+library(vegan)
+
+adonis2((data_wide_PCA2 %>% dplyr::select(where(is.numeric)) %>% drop_na()) ~ 
+         (region + transect + horizon + site)^2, 
+       data = data_wide_PCA2 %>% drop_na)
+
+```
+
+
+## 2. Each analyte
+
+### Normalized values - v1
+
+```{r v2-scaled_gg1, fig.height = 8, fig.width = 7, eval=FALSE}
+data_long = 
+  data_combined_wide %>% 
+  rename(Cl = Chloride,
+         SO4 = Sulfate) %>% 
+  mutate(transect = case_when(transect == "wc" ~ "wetland", TRUE ~ transect)) %>% 
+  pivot_longer(cols = -c(sample_label, region, site, transect, tree_number, horizon)) %>% 
+  filter(!is.na(value))
+
+data_scaling_max_min = 
+  data_long %>% 
+  filter(transect != "transition") %>% 
+  group_by(region, site, transect, horizon, name) %>% 
+  dplyr::summarise(value = mean(value)) %>% 
+  group_by(region, site, horizon, name) %>% 
+  dplyr::summarise(max = max(value, na.rm = T),
+                   min = min(value, na.rm = T))
+
+data_scaled2 = 
+  data_long %>% 
+  group_by(region, site, transect, horizon, name) %>% 
+  dplyr::summarise(value = mean(value)) %>% 
+  left_join(data_scaling_max_min) %>% 
+  mutate(scaled = (value - min) / (max - min)) %>% 
+  dplyr::select(region, site, transect, horizon, name, scaled) %>%
+  pivot_wider(names_from = "transect", values_from = "scaled") %>% 
+  mutate(correction = case_when(upland < wetland ~ 1,
+                                upland > wetland ~ -1)) %>% 
+  pivot_longer(cols = c(upland, wetland, transition), names_to = "transect", values_to = "scaled") %>% 
+  mutate(scaled = scaled * correction,
+         scaled = case_when(transect == "upland" ~ 0,
+                            transect == "wetland" ~ 1,
+                            TRUE ~ scaled),
+         scaled2 = case_when(scaled > 4 ~ 4,
+                             scaled < -1 ~ -1,
+                             TRUE ~ scaled),
+         label = case_when(scaled > 4 | scaled < -1 ~ round(scaled,1))) %>% 
+  # order analytes
+  mutate(name = factor(name, levels = c("TC", "TN", "TS", "SOM",
+                                        "pH", "spConductance",
+                                        "WEOC", "DIC",
+                                        "Fe", "P",
+                                        "Ca", "Mg", "Na", "K", "Al", "CEC",
+                                        "NH4N", "NO3N", "Cl", "SO4")),
+         site = factor(site, levels = c("CRC", "PTR", "OWC",
+                                        "GCW", "MSM", "GWI")))
+
+data_scaled2 %>%
+  ggplot(aes(x = scaled2, y = name))+
+  geom_segment(aes(x = 0, xend = scaled2, yend = name), 
+               color = "black", linetype = "dashed", linewidth = 0.2)+
+  geom_segment(aes(x = 0, xend = 1, yend = name), color = "black")+
+  geom_point(data = data_scaled2 %>% filter(transect != "transition"),
+             color = "black",
+             size = 1)+
+  geom_point(data = data_scaled2 %>% filter(transect == "transition"), 
+             size = 4, aes(color = site), stroke = 1, shape = 21, fill = "white")+
+  annotate("text", label = "U", x = 0, y = 21)+
+  annotate("text", label = "W", x = 1, y = 21)+
+  annotate("text", label = "", x = 1, y = 21.5)+
+  xlim(-1, 5)+
+  scale_y_discrete(limits = rev)+
+  scale_shape_manual(breaks = c("CRC", "PTR", "OWC", "GCW", "MSM", "GWI"), 
+                     values = c(21, 22, 24, 21, 22, 24))+
+  labs(x = "",
+       y = "",
+       shape = "transition soils at")+
+  facet_wrap(~region)+
+  theme_kp()+
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_blank(),
+        legend.position = "right",
+        legend.background = element_blank()
+  )
+
+```
+
+### Normalized values - v2
+
+```{r v2-scaled_gg2, fig.height = 8, fig.width = 8}
+data_long_all = 
+  data_combined_wide %>% 
+  dplyr::select(-c(TN, CEC, K, Mg, Sulfate, NO3N, pH, spConductance, SOM, DIC, Al)) %>% 
+  mutate(transect = case_when(transect == "wc" ~ "wetland", TRUE ~ transect)) %>% 
+  pivot_longer(cols = -c(sample_label, region, site, transect, tree_number, horizon)) %>% 
+  filter(!is.na(value))
+
+data_scaled_NEW = 
+  data_long_all %>% 
+  group_by(region, site, horizon, transect, name) %>% 
+  dplyr::summarise(value_scaled = median(value)) %>% 
+  group_by(region, site, horizon, name) %>% 
+  dplyr::mutate(value_scaled = scales::rescale(value_scaled)) %>% 
+  mutate(transect = factor(transect, levels = c("upland", "transition", "wetland"))) %>% 
+  mutate(name = factor(name, levels = c("TC", "TS", "WEOC",
+                                        "Ca", "Na", "Chloride",
+                                        "NH4N", "Fe", "P"))) 
+
+data_scaled_NEW %>% 
+  ggplot(aes(x = transect, y = value_scaled, group = site, color = site))+
+  geom_line(linewidth = 1) + geom_point(size = 2)+
+  facet_wrap( ~ name)+
+  scale_color_manual(breaks = c("CRC", "PTR", "OWC",
+                                "GCW", "MSM", "GWI"),
+                     values = c("#d73027", "#fc8d59", "#fdbb84", 
+                                "#74a9cf", "#2b8cbe", "#045a8d"))+
+  scale_x_discrete(labels = c("U", "T" , "W" ))+
+  labs(x = "Transect", y = "Normalized concentration")+
+  theme_kp()+
+  theme(axis.text.y = element_blank(),
+        panel.grid = element_blank())
+
+```
+
+```{r v2-scaled_gg2_split, fig.height = 10, fig.width = 14}
+library(ggh4x) # for nested facets
+# https://teunbrand.github.io/ggh4x/reference/facet_nested.html
+
+data_scaled_NEW %>% 
+  ggplot(aes(x = transect, y = value_scaled, group = site, color = site))+
+  geom_line(linewidth = 1) + geom_point(size = 2)+
+#  facet_wrap( ~ name)+
+  facet_nested_wrap(~ name + region, ncol = 6,
+                    nest_line = element_line(colour = "grey"))+ 
+  scale_color_manual(breaks = c("CRC", "PTR", "OWC",
+                                "GCW", "MSM", "GWI"),
+                     values = c("#d73027", "#fc8d59", "#fdbb84", 
+                                "#74a9cf", "#2b8cbe", "#045a8d"))+
+  scale_x_discrete(labels = c("U", "T" , "W" ))+
+  labs(x = "Transect", y = "Normalized concentration")+
+  theme_kp()+
+  theme(axis.text.y = element_blank(),
+        panel.grid = element_blank())
+```
+
+
+
+### GWI only
+
+```{r v2-scaled_gg2_gwi, fig.height = 8, fig.width = 8}
+data_scaled_NEW %>% 
+  filter(site == "GWI") %>% 
+  ggplot(aes(x = transect, y = value_scaled, group = site, color = site))+
+  geom_line(linewidth = 1) + geom_point(size = 2)+
+  facet_wrap( ~ name )+
+  scale_color_manual(breaks = c("CRC", "PTR", "OWC",
+                                "GCW", "MSM", "GWI"),
+                     values = c("#d73027", "#fc8d59", "#fdbb84", 
+                                "#74a9cf", "#2b8cbe", "#045a8d"))+
+  scale_x_discrete(labels = c("U", "T" , "W" ))+
+  labs(x = "Transect", y = "Normalized concentration")+
+  theme(axis.text.y = element_blank(),
+        panel.grid = element_blank())
+
+```
+
+
+# Specific analytes
 
 ```{r analytesx-2, fig.height = 4, fig.width = 8}
 data_combined_wide %>% 
@@ -515,6 +981,7 @@ data_combined_wide %>%
   scale_fill_manual(values = pal_transect)+
   theme(legend.position = "none")
 ```
+
 
 
 ---
