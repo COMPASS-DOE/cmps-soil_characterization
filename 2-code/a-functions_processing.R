@@ -976,6 +976,35 @@ process_xrd = function(xrd_data, sample_key){
   # processed2 %>% write.csv("XRD_processed_2023-01-06.csv", row.names = F)
 }
 
+xrd_surface = function(){
+  
+  xrd_processed_surface = xrd_processed %>% subset_surface_horizons(.)
+  xrd_summary = 
+    xrd_processed_surface %>% 
+    dplyr::select(-c(tree_number)) %>% 
+    pivot_longer(-c(sample_label, region, site, transect, horizon),
+                 names_to = "mineral",
+                 values_to = "percentage") %>% 
+    group_by(region, site, transect, horizon, mineral) %>% 
+    dplyr::summarise(mean = mean(percentage),
+                     n = n(),
+                     se = sd(percentage)/sqrt(n()),
+                     summary = paste(round(mean, 2),
+                                      "\u00b1",
+                                      round(se, 2))) %>% 
+    dplyr::select(-mean, -n, -se) %>% 
+    reorder_horizon() %>% 
+    reorder_transect() %>% 
+    reorder_site() %>% 
+    arrange(region, site, transect)
+  
+  xrd_summary_wide = 
+    xrd_summary %>% 
+    pivot_wider(names_from = "transect", values_from = "summary")
+  
+}
+
+
 
 #
 # Combined chemistry data -------------------------------------------------
