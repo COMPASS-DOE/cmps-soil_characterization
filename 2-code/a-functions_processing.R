@@ -891,7 +891,8 @@ compute_texture = function(){
   hydrometer_data_processed = 
     hydrometer_df %>% 
     mutate_at(vars(contains(c("wt", "reading"))), as.numeric) %>% 
-    mutate(wt_dry_soil_g = (wt_jar_soil_g - wt_half_gallon_jar_g) + (wt_sieve_soil_53um_g - wt_sieve_g))
+    mutate(wt_dry_soil_g = (wt_jar_soil_g - wt_half_gallon_jar_g) + (wt_sieve_soil_53um_g - wt_sieve_g)) %>% 
+    filter(!grepl("skip", notes))
   
   #
   # II. COMPUTING PERCENT SAND-SILT-CLAY -----------------------------------
@@ -935,6 +936,31 @@ compute_texture = function(){
     
   }
   soil_texture = compute_soil_texture(dat = hydrometer_data_processed) %>% rename(sample_label = sample_id)
+  
+}
+
+texture_summary = function(){
+  texture = 
+    soil_texture %>% 
+    left_join(sample_key) %>% 
+    mutate_at(vars(contains("percent")), round, 2)
+  
+  texture_summary = 
+    texture %>% 
+    subset_surface_horizons(.) %>% 
+    pivot_longer(cols = contains("percent"), names_to = "class") %>% 
+    filter(!is.na(value)) %>% 
+    group_by(region, site, transect, horizon, class) %>% 
+    dplyr::summarize(mean = mean(value),
+                     n = n(),
+                     se = sd(value)/sqrt(n()),
+                     summary = paste(round(mean, 2), "\u00b1", round(se, 2))) %>% 
+    dplyr::select(-mean, -n, -se) %>% 
+    reorder_site() %>% 
+    reorder_transect() %>% 
+    arrange(site, transect) %>% 
+    pivot_wider(names_from = "transect", values_from = "summary")
+    
   
 }
 
