@@ -1,0 +1,34 @@
+region,site_id,site_cat,zone,zone_num,lat,long,dem_tile,dist,dist_corrected,distance to water,elev,elev_fromwetland
+Chesapeake Bay,Sweet Hall Marsh,synoptic,Wetland,3,37.566587,-76.897031,cb/Chesapeake_Bay_CoNED_K_04.tif,0,0,,0.19412291,0
+Chesapeake Bay,Sweet Hall Marsh,synoptic,Transition,2,37.568826,-76.896438,cb/Chesapeake_Bay_CoNED_K_04.tif,253.95,253.95,,0.525308132,0.331185222
+Chesapeake Bay,Sweet Hall Marsh,synoptic,Upland,1,37.570689,-76.895726,cb/Chesapeake_Bay_CoNED_K_04.tif,470.07,470.07,,0.726908922,0.532786012
+,,,,,,,,,,,,
+Chesapeake Bay,Moneystump Swamp,,water edge,,38.427590,-76.228660,,,,0,0.292810053,
+Chesapeake Bay,Moneystump Swamp,synoptic,Wetland,3,38.430762,-76.228614,cb/Chesapeake_Bay_CoNED_H_07.tif,0,0,265,0.292810053,0
+Chesapeake Bay,Moneystump Swamp,synoptic,Transition,2,38.430909,-76.227681,cb/Chesapeake_Bay_CoNED_H_07.tif,83.06,83.06,348.06,0.476162761,0.183352709
+Chesapeake Bay,Moneystump Swamp,synoptic,Upland,1,38.431376,-76.226581,cb/Chesapeake_Bay_CoNED_H_07.tif,192.18,192.18,458,0.680754006,0.387943953
+,,,,,,,,,,,,
+Chesapeake Bay,Goodwin Islands,,water edge,,37.218400,-76.411850,,,,0,0.679172575,
+Chesapeake Bay,Goodwin Islands,synoptic,Wetland,3,37.218901,-76.410094,cb/Chesapeake_Bay_CoNED_M_06.tif,0,0,164.86,0.679172575,0
+Chesapeake Bay,Goodwin Islands,synoptic,Transition,2,37.219377,-76.409241,cb/Chesapeake_Bay_CoNED_M_06.tif,92.3,92.3,257.16,0.790806055,0.11163348
+Chesapeake Bay,Goodwin Islands,synoptic,Upland,1,37.219244,-76.408673,cb/Chesapeake_Bay_CoNED_M_06.tif,144.82,131.7,296.56,1.032942653,0.353770077
+,,,,,,,,,,,,
+Chesapeake Bay,GCReW,,water edge,,38.875790,-76.550160,,,,0,0.241999656,
+Chesapeake Bay,GCReW,synoptic,Wetland,3,38.874957,-76.549978,cb/Chesapeake_Bay_CoNED_F_06.tif,0,0,42.67,0.241999656,0
+Chesapeake Bay,GCReW,synoptic,Transition,2,38.874473,-76.551469,cb/Chesapeake_Bay_CoNED_F_06.tif,140.08,140.08,182.75,1.214899778,0.972900122
+Chesapeake Bay,GCReW,synoptic,Upland,1,38.874076,-76.552129,cb/Chesapeake_Bay_CoNED_F_06.tif,212.33,212.33,255,7.092357159,6.850357503
+,,,,,,,,,,,,
+Lake Erie,Portage River,,water edge,,41.501980,-83.043070,,,,0,573.6900024,
+Lake Erie,Portage River,synoptic,Wetland,3,41.501740,-83.043720,le/N1815665.img,0,0,58.08,573.6900024,0
+Lake Erie,Portage River,synoptic,Transition,2,41.502723,-83.045662,le/N1815665.img,641.3,195.2,253.28,575.5700073,1.88
+Lake Erie,Portage River,synoptic,Upland,1,41.501480,-83.046110,le/N1815665.img,1110.54,201.12,259.2,576.4099731,2.72
+,,,,,,,,,,,,
+Lake Erie,Old Woman Creek,,water edge,,41.376520,-82.509300,,,,0,573.3699951,
+Lake Erie,Old Woman Creek,synoptic,Wetland,3,41.376445,-82.509024,le/mosaic_BN19650622_BN19650622.tif,0,0,24.13,573.3699951,0
+Lake Erie,Old Woman Creek,synoptic,Transition,2,41.376017,-82.507507,le/mosaic_BN19650622_BN19650622.tif,444.58,135.5,159.63,574.8900146,1.52
+Lake Erie,Old Woman Creek,synoptic,Upland,1,41.376180,-82.506850,le/mosaic_BN19650622_BN19650622.tif,634.42,183.77,207.9,589.710022,16.34002686
+,,,,,,,,,,,,
+Lake Erie,Crane Creek,synoptic,Wetland,3,41.62185,-83.2389,le/N1765710.img,0,0,,574.3300171,0
+Lake Erie,Crane Creek,synoptic,Transition,2,41.62192,-83.23815,le/N1765710.img,206.64,63,,574.49,0.16
+Lake Erie,Crane Creek,synoptic,Upland,1,41.61524,-83.22889,le/N1765710.img,3718.87,1110,,574.8800049,0.55
+,,,,,,,,,,,,
