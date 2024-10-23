@@ -1092,14 +1092,16 @@ gg_fe = plot_transect_as_x(data_combined_wide %>% rename(value = Fe),
 gg_p = plot_transect_as_x(data_combined_wide %>% rename(value = P),
                    YLAB = "Extractable P, μg/g")
 
-gg_weoc = plot_transect_as_x(data_combined_wide %>% rename(value = WEOC),
-                   YLAB = "Water-Extractable Organic C, μg/g")
+gg_tc = plot_transect_as_x(data_combined_wide %>% rename(value = TC),
+                   YLAB = "Total Carbon, %")
 
 
+cowplot::plot_grid(gg_tc, gg_fe, ncol = 1)
 
-cowplot::plot_grid(gg_fe, gg_p, ncol = 1)
+```
 
-
+```{r analytesx-4, fig.height = 15, fig.width = 8}
+cowplot::plot_grid(gg_tc, gg_fe, gg_p, ncol = 1)
 ```
 
 

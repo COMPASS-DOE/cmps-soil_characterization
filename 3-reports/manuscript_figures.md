@@ -154,6 +154,8 @@ Click to Open
 
 ![](manuscript_figures_files/figure-gfm/analytesx-3-1.png)<!-- -->
 
+![](manuscript_figures_files/figure-gfm/analytesx-4-1.png)<!-- -->
+
 ## Chesapeake-only plots for GWI
 
 ![](manuscript_figures_files/figure-gfm/analytes-gwi-1.png)<!-- -->
