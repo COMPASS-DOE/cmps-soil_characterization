@@ -1104,6 +1104,54 @@ cowplot::plot_grid(gg_fe, gg_p, ncol = 1)
 
 
 
+## Chesapeake-only plots for GWI
+```{r analytes-gwi, fig.height = 10, fig.width = 5}
+
+# plot Specific Conductance
+gg_spc =
+  data_combined_subset %>% filter(grepl("spCond", name)) %>% filter(region == "CB") %>% 
+  ggplot(aes(x = transect, y = value)) +
+    # plot points
+    geom_point(aes(group = site, color = site),
+               size = 2.5, stroke = 1, position = position_dodge(width = 0.4))+
+    scale_alpha_manual(values = c(1, 0.3))+
+    scale_color_manual(breaks = c("CRC", "PTR", "OWC", "GCW", "MSM", "GWI"), 
+                       values = c('#ED6e85', '#7f4420', '#ffc115', '#90BE6D', '#03045E', '#00B4D8'))+
+  #  facet_wrap(~region, labeller = as_labeller(c("CB" = "Chesapeake Bay", "WLE" = "Lake Erie")))+
+    theme_kp()+
+    labs(x = "",
+         y = "Specific Conductance, mS/cm",
+         shape = "Site",
+         color = "Site")+
+    theme(legend.position = c(0.2, 0.8), legend.box = "vertical")+
+    NULL
+
+
+# plot Chloride
+gg_cl = 
+  data_combined_subset %>% filter(grepl("Chloride", name)) %>% filter(region == "CB") %>% 
+  ggplot(aes(x = transect, y = value)) +
+    # plot points
+    geom_point(aes(group = site, color = site),
+               size = 2.5, stroke = 1, position = position_dodge(width = 0.4))+
+    scale_alpha_manual(values = c(1, 0.3))+
+    scale_color_manual(breaks = c("CRC", "PTR", "OWC", "GCW", "MSM", "GWI"), 
+                       values = c('#ED6e85', '#7f4420', '#ffc115', '#90BE6D', '#03045E', '#00B4D8'))+
+  #  facet_wrap(~region, labeller = as_labeller(c("CB" = "Chesapeake Bay", "WLE" = "Lake Erie")))+
+    theme_kp()+
+    labs(x = "",
+         y = "Chloride, meq/100g",
+         shape = "Site",
+         color = "Site")+
+    theme(legend.position = c(0.2, 0.8), legend.box = "vertical")+
+    NULL
+
+
+cowplot::plot_grid(gg_spc, gg_cl, ncol = 1)
+
+```
+
+
 ---
 
 ## Session Info 
