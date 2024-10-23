@@ -152,7 +152,11 @@ Click to Open
 
 # Specific analytes
 
-![](manuscript_figures_files/figure-gfm/analytesx-2-1.png)<!-- -->![](manuscript_figures_files/figure-gfm/analytesx-2-2.png)<!-- -->
+![](manuscript_figures_files/figure-gfm/analytesx-3-1.png)<!-- -->
+
+## Chesapeake-only plots for GWI
+
+![](manuscript_figures_files/figure-gfm/analytes-gwi-1.png)<!-- -->
 
 ------------------------------------------------------------------------
 
@@ -163,7 +167,7 @@ Click to Open
 Session Info
 </summary>
 
-Date run: 2024-10-14
+Date run: 2024-10-23
 
     ## R version 4.2.1 (2022-06-23)
     ## Platform: x86_64-apple-darwin17.0 (64-bit)
@@ -180,32 +184,35 @@ Date run: 2024-10-14
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ##  [1] ggh4x_0.2.8.9000    vegan_2.6-4         lattice_0.20-45    
-    ##  [4] permute_0.9-7       ggConvexHull_0.1.0  factoextra_1.0.7   
-    ##  [7] ggbiplot_0.55       googlesheets4_1.0.1 soilpalettes_0.1.0 
-    ## [10] PNWColors_0.1.0     magrittr_2.0.3      lubridate_1.9.2    
-    ## [13] forcats_1.0.0       stringr_1.5.0       dplyr_1.1.4        
-    ## [16] purrr_1.0.2         readr_2.1.4         tidyr_1.3.1        
-    ## [19] tibble_3.2.1        ggplot2_3.5.1       tidyverse_2.0.0    
+    ##  [1] multcomp_1.4-25     TH.data_1.1-1       MASS_7.3-60        
+    ##  [4] survival_3.3-1      mvtnorm_1.1-3       ggh4x_0.2.8.9000   
+    ##  [7] vegan_2.6-4         lattice_0.20-45     permute_0.9-7      
+    ## [10] ggConvexHull_0.1.0  factoextra_1.0.7    ggbiplot_0.55      
+    ## [13] googlesheets4_1.0.1 soilpalettes_0.1.0  PNWColors_0.1.0    
+    ## [16] magrittr_2.0.3      lubridate_1.9.2     forcats_1.0.0      
+    ## [19] stringr_1.5.0       dplyr_1.1.4         purrr_1.0.2        
+    ## [22] readr_2.1.4         tidyr_1.3.1         tibble_3.2.1       
+    ## [25] ggplot2_3.5.1       tidyverse_2.0.0    
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] splines_4.2.1     carData_3.0-5     highr_0.9         base64url_1.4    
-    ##  [5] cellranger_1.1.0  yaml_2.3.5        ggrepel_0.9.3     pillar_1.9.0     
-    ##  [9] backports_1.4.1   glue_1.6.2        digest_0.6.29     ggsignif_0.6.4   
-    ## [13] colorspace_2.0-3  Matrix_1.5-1      cowplot_1.1.1     htmltools_0.5.7  
-    ## [17] plyr_1.8.7        pkgconfig_2.0.3   ggcorrplot_0.1.4  broom_1.0.6      
-    ## [21] scales_1.3.0      processx_3.7.0    tzdb_0.4.0        timechange_0.2.0 
-    ## [25] googledrive_2.0.0 mgcv_1.8-40       generics_0.1.3    farver_2.1.1     
-    ## [29] car_3.1-0         ellipsis_0.3.2    ggpubr_0.6.0      withr_2.5.0      
-    ## [33] cli_3.6.3         evaluate_0.16     ps_1.7.1          fs_1.5.2         
-    ## [37] fansi_1.0.3       nlme_3.1-160      MASS_7.3-60       rstatix_0.7.2    
-    ## [41] tools_4.2.1       data.table_1.14.4 hms_1.1.2         gargle_1.2.0     
-    ## [45] lifecycle_1.0.3   munsell_0.5.0     cluster_2.1.3     targets_0.14.0   
-    ## [49] callr_3.7.2       compiler_4.2.1    rlang_1.1.4.9000  grid_4.2.1       
-    ## [53] rstudioapi_0.16.0 igraph_1.5.1      labeling_0.4.2    rmarkdown_2.21   
-    ## [57] gtable_0.3.0      codetools_0.2-18  abind_1.4-5       reshape2_1.4.4   
-    ## [61] R6_2.5.1          knitr_1.42        fastmap_1.1.0     utf8_1.2.2       
-    ## [65] stringi_1.7.8     parallel_4.2.1    Rcpp_1.0.11       vctrs_0.6.5      
-    ## [69] tidyselect_1.2.0  xfun_0.42
+    ##  [1] nlme_3.1-160      fs_1.5.2          targets_0.14.0    tools_4.2.1      
+    ##  [5] backports_1.4.1   utf8_1.2.2        R6_2.5.1          mgcv_1.8-40      
+    ##  [9] colorspace_2.0-3  withr_2.5.0       tidyselect_1.2.0  processx_3.7.0   
+    ## [13] compiler_4.2.1    cli_3.6.3         sandwich_3.0-2    labeling_0.4.2   
+    ## [17] scales_1.3.0      callr_3.7.2       digest_0.6.29     minqa_1.2.4      
+    ## [21] rmarkdown_2.21    pkgconfig_2.0.3   htmltools_0.5.7   lme4_1.1-31      
+    ## [25] fastmap_1.1.0     highr_0.9         rlang_1.1.4.9000  rstudioapi_0.16.0
+    ## [29] farver_2.1.1      generics_0.1.3    zoo_1.8-11        car_3.1-0        
+    ## [33] Matrix_1.5-1      Rcpp_1.0.11       munsell_0.5.0     fansi_1.0.3      
+    ## [37] abind_1.4-5       lifecycle_1.0.3   stringi_1.7.8     yaml_2.3.5       
+    ## [41] carData_3.0-5     plyr_1.8.7        grid_4.2.1        parallel_4.2.1   
+    ## [45] ggrepel_0.9.3     cowplot_1.1.1     splines_4.2.1     hms_1.1.2        
+    ## [49] knitr_1.42        ps_1.7.1          pillar_1.9.0      igraph_1.5.1     
+    ## [53] ggpubr_0.6.0      boot_1.3-28       ggsignif_0.6.4    base64url_1.4    
+    ## [57] reshape2_1.4.4    codetools_0.2-18  glue_1.6.2        evaluate_0.16    
+    ## [61] data.table_1.14.4 nloptr_2.0.3      vctrs_0.6.5       tzdb_0.4.0       
+    ## [65] cellranger_1.1.0  gtable_0.3.0      xfun_0.42         broom_1.0.6      
+    ## [69] rstatix_0.7.2     ggcorrplot_0.1.4  googledrive_2.0.0 gargle_1.2.0     
+    ## [73] cluster_2.1.3     timechange_0.2.0  ellipsis_0.3.2
 
 </details>
