@@ -576,7 +576,7 @@ pca_overall_cb = fit_pca_function(data_wide_PCA2 %>% filter(region == "CB"))
 ```{r v2-pca_gg, fig.width=10, fig.height=6}
 ## PCA plots overall
 #gg_pca_overall = 
-ggbiplot(pca_overall$pca_int, obs.scale = 1, var.scale = 1,
+ggbiplot(pca_overall$pca_int, obs.scale = 1, var.scale = 1, varname.size = 5,
          groups = as.character(pca_overall$grp$region), 
          ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
   geom_point(size=4,stroke=1, alpha = 1,
@@ -594,10 +594,10 @@ ggbiplot(pca_overall$pca_int, obs.scale = 1, var.scale = 1,
 
 ```
 
-```{r v2-pca_gg_regions, fig.width=10, fig.height=6}
+```{r v2-pca_gg_regions, fig.width=12, fig.height=7}
 
 gg_pca_wle = 
-  ggbiplot(pca_overall_wle$pca_int, obs.scale = 1, var.scale = 1,
+  ggbiplot(pca_overall_wle$pca_int, obs.scale = 1, var.scale = 1, varname.size = 5,
            groups = as.character(pca_overall_wle$grp$transect), 
            ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 1) +
   geom_point(size=3,stroke=1, alpha = 1,
@@ -605,17 +605,16 @@ gg_pca_wle =
                  color = groups))+ 
   scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
                      values = pal_transect)+
-#  xlim(-6,6)+
-#  ylim(-4.5,4.5)+
+  xlim(-3, 5)+
+  ylim(-2.5, 3.5)+
   labs(shape="",
-       title = "PCA: WLE",
-       subtitle = "surface horizons")+
+       title = "PCA: WLE")+
   theme_kp()+
   theme(legend.position = "top", legend.box = "vertical")+
   NULL
 
 gg_pca_cb = 
-  ggbiplot(pca_overall_cb$pca_int, obs.scale = 1, var.scale = 1,
+  ggbiplot(pca_overall_cb$pca_int, obs.scale = 1, var.scale = 1, varname.size = 5,
            groups = as.character(pca_overall_cb$grp$transect), 
            ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
   geom_point(size=3,stroke=1, alpha = 1,
@@ -623,16 +622,15 @@ gg_pca_cb =
                  color = groups))+ 
   scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
                      values = pal_transect)+
-#  xlim(-5.5,7.5)+
-#  ylim(-5,5)+
+  xlim(-5.5, 3)+
+  ylim(-3, 3.5)+
   labs(shape="",
-       title = "PCA: CB",
-       subtitle = "surface horizons")+
+       title = "PCA: CB")+
   theme_kp()+
   theme(legend.position = "top", legend.box = "vertical")+
   NULL
 
-gg_pca_regions = cowplot::plot_grid(gg_pca_wle , gg_pca_cb)
+gg_pca_regions = cowplot::plot_grid(gg_pca_wle , gg_pca_cb, nrow = 1)
 gg_pca_regions
 
 ```
@@ -759,7 +757,7 @@ library(ggConvexHull)
 
 pca_cluster = fit_pca_function(df_cl) 
 
-ggbiplot::ggbiplot(pca_cluster$pca_int, obs.scale = 1, var.scale = 1,
+ggbiplot::ggbiplot(pca_cluster$pca_int, obs.scale = 1, var.scale = 1, varname.size = 5,
                    groups = as.character(pca_cluster$grp$cluster), 
                    ellipse = F, circle = FALSE, var.axes = TRUE, alpha = 0) +
   geom_convexhull(aes(group = pca_cluster$grp$cluster,
@@ -958,7 +956,7 @@ data_scaled_NEW %>%
 
 # Specific analytes
 
-```{r analytesx-2, fig.height = 4, fig.width = 8}
+```{r analytesx-2, fig.height = 4, fig.width = 8, eval=FALSE}
 data_combined_wide %>% 
   mutate(transect = factor(transect, levels = c("upland", "transition", "wc"))) %>% 
   ggplot(aes(x = transect, y = Fe))+
