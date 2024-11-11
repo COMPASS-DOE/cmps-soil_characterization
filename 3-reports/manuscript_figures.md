@@ -7,6 +7,12 @@ Synpotic Soil Characterization
 
 ------------------------------------------------------------------------
 
+## Site Map
+
+![](manuscript_figures_files/figure-gfm/map-1.png)<!-- -->
+
+------------------------------------------------------------------------
+
 ## 0. Correlations
 
 ![](manuscript_figures_files/figure-gfm/gg_corr-1.png)<!-- -->
@@ -169,7 +175,7 @@ Click to Open
 Session Info
 </summary>
 
-Date run: 2024-10-31
+Date run: 2024-11-11
 
     ## R version 4.2.1 (2022-06-23)
     ## Platform: x86_64-apple-darwin17.0 (64-bit)
@@ -189,32 +195,35 @@ Date run: 2024-10-31
     ##  [1] multcomp_1.4-25     TH.data_1.1-1       MASS_7.3-60        
     ##  [4] survival_3.3-1      mvtnorm_1.1-3       ggh4x_0.2.8.9000   
     ##  [7] vegan_2.6-4         lattice_0.20-45     permute_0.9-7      
-    ## [10] ggConvexHull_0.1.0  factoextra_1.0.7    ggbiplot_0.55      
-    ## [13] googlesheets4_1.0.1 soilpalettes_0.1.0  PNWColors_0.1.0    
-    ## [16] magrittr_2.0.3      lubridate_1.9.2     forcats_1.0.0      
-    ## [19] stringr_1.5.0       dplyr_1.1.4         purrr_1.0.2        
-    ## [22] readr_2.1.4         tidyr_1.3.1         tibble_3.2.1       
-    ## [25] ggplot2_3.5.1       tidyverse_2.0.0    
+    ## [10] ggConvexHull_0.1.0  factoextra_1.0.7    ggspatial_1.1.9    
+    ## [13] sf_1.0-8            ggbiplot_0.55       googlesheets4_1.0.1
+    ## [16] soilpalettes_0.1.0  PNWColors_0.1.0     magrittr_2.0.3     
+    ## [19] lubridate_1.9.2     forcats_1.0.0       stringr_1.5.0      
+    ## [22] dplyr_1.1.4         purrr_1.0.2         readr_2.1.4        
+    ## [25] tidyr_1.3.1         tibble_3.2.1        ggplot2_3.5.1      
+    ## [28] tidyverse_2.0.0    
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] nlme_3.1-160      fs_1.5.2          targets_0.14.0    tools_4.2.1      
-    ##  [5] backports_1.4.1   utf8_1.2.2        R6_2.5.1          mgcv_1.8-40      
-    ##  [9] colorspace_2.0-3  withr_2.5.0       tidyselect_1.2.0  processx_3.7.0   
-    ## [13] compiler_4.2.1    cli_3.6.3         sandwich_3.0-2    labeling_0.4.2   
-    ## [17] scales_1.3.0      callr_3.7.2       digest_0.6.29     minqa_1.2.4      
-    ## [21] rmarkdown_2.21    pkgconfig_2.0.3   htmltools_0.5.7   lme4_1.1-31      
-    ## [25] fastmap_1.1.0     highr_0.9         rlang_1.1.4.9000  rstudioapi_0.16.0
-    ## [29] farver_2.1.1      generics_0.1.3    zoo_1.8-11        car_3.1-0        
-    ## [33] Matrix_1.5-1      Rcpp_1.0.11       munsell_0.5.0     fansi_1.0.3      
-    ## [37] abind_1.4-5       lifecycle_1.0.3   stringi_1.7.8     yaml_2.3.5       
-    ## [41] carData_3.0-5     plyr_1.8.7        grid_4.2.1        parallel_4.2.1   
-    ## [45] ggrepel_0.9.3     cowplot_1.1.1     splines_4.2.1     hms_1.1.2        
-    ## [49] knitr_1.42        ps_1.7.1          pillar_1.9.0      igraph_1.5.1     
-    ## [53] ggpubr_0.6.0      boot_1.3-28       ggsignif_0.6.4    base64url_1.4    
-    ## [57] reshape2_1.4.4    codetools_0.2-18  glue_1.6.2        evaluate_0.16    
-    ## [61] data.table_1.14.4 nloptr_2.0.3      vctrs_0.6.5       tzdb_0.4.0       
-    ## [65] cellranger_1.1.0  gtable_0.3.0      xfun_0.42         broom_1.0.6      
-    ## [69] rstatix_0.7.2     ggcorrplot_0.1.4  googledrive_2.0.0 gargle_1.2.0     
-    ## [73] cluster_2.1.3     timechange_0.2.0  ellipsis_0.3.2
+    ##  [1] googledrive_2.0.0  minqa_1.2.4        colorspace_2.0-3   ggsignif_0.6.4    
+    ##  [5] ellipsis_0.3.2     class_7.3-20       fs_1.5.2           rstudioapi_0.16.0 
+    ##  [9] proxy_0.4-27       ggpubr_0.6.0       farver_2.1.1       ggrepel_0.9.3     
+    ## [13] fansi_1.0.3        codetools_0.2-18   splines_4.2.1      knitr_1.42        
+    ## [17] nloptr_2.0.3       broom_1.0.6        cluster_2.1.3      targets_0.14.0    
+    ## [21] compiler_4.2.1     backports_1.4.1    ggcorrplot_0.1.4   Matrix_1.5-1      
+    ## [25] fastmap_1.1.0      gargle_1.2.0       cli_3.6.3          s2_1.1.0          
+    ## [29] htmltools_0.5.7    tools_4.2.1        igraph_1.5.1       gtable_0.3.0      
+    ## [33] glue_1.6.2         reshape2_1.4.4     wk_0.6.0           Rcpp_1.0.11       
+    ## [37] carData_3.0-5      cellranger_1.1.0   vctrs_0.6.5        nlme_3.1-160      
+    ## [41] xfun_0.42          ps_1.7.1           lme4_1.1-31        timechange_0.2.0  
+    ## [45] lifecycle_1.0.3    rstatix_0.7.2      zoo_1.8-11         scales_1.3.0      
+    ## [49] hms_1.1.2          parallel_4.2.1     sandwich_3.0-2     yaml_2.3.5        
+    ## [53] stringi_1.7.8      highr_0.9          e1071_1.7-11       boot_1.3-28       
+    ## [57] rlang_1.1.4.9000   pkgconfig_2.0.3    evaluate_0.16      labeling_0.4.2    
+    ## [61] cowplot_1.1.1      processx_3.7.0     tidyselect_1.2.0   plyr_1.8.7        
+    ## [65] R6_2.5.1           generics_0.1.3     base64url_1.4      DBI_1.1.3         
+    ## [69] pillar_1.9.0       withr_2.5.0        mgcv_1.8-40        units_0.8-0       
+    ## [73] abind_1.4-5        car_3.1-0          KernSmooth_2.23-20 utf8_1.2.2        
+    ## [77] tzdb_0.4.0         rmarkdown_2.21     grid_4.2.1         data.table_1.14.4 
+    ## [81] callr_3.7.2        digest_0.6.29      classInt_0.4-7     munsell_0.5.0
 
 </details>
