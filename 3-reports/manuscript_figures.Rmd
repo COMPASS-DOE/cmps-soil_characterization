@@ -729,37 +729,46 @@ gg_pca_wle =
   ggbiplot(pca_overall_wle$pca_int, obs.scale = 1, var.scale = 1, varname.size = 5,
            groups = as.character(pca_overall_wle$grp$transect), 
            ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 1) +
-  geom_point(size=3,stroke=1, alpha = 1,
+  geom_point(size=5,stroke=1, alpha = 1,
              aes(shape = pca_overall_wle$grp$site,
-                 color = groups))+ 
+                 fill = groups), 
+             stroke = 1)+ 
   scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
                      values = pal_transect)+
+  scale_fill_manual(breaks = c("upland", "transition", "wte", "wc"), 
+                    values = pal_transect)+
+  scale_shape_manual(values = c(21, 24, 22))+
   xlim(-3, 5)+
   ylim(-2.5, 3.5)+
-  labs(shape="",
-       title = "PCA: WLE")+
+  labs(shape="", fill = "", color = "")+ 
   theme_kp()+
   theme(legend.position = "top", legend.box = "vertical")+
+  guides(fill = guide_legend(override.aes = list(alpha=1, shape = 21, size = 3)))+
   NULL
 
 gg_pca_cb = 
   ggbiplot(pca_overall_cb$pca_int, obs.scale = 1, var.scale = 1, varname.size = 5,
            groups = as.character(pca_overall_cb$grp$transect), 
            ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
-  geom_point(size=3,stroke=1, alpha = 1,
+  geom_point(size=5,stroke=1, alpha = 1,
              aes(shape = pca_overall_cb$grp$site,
-                 color = groups))+ 
+                 fill = groups), 
+             stroke = 1)+ 
   scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
                      values = pal_transect)+
-  xlim(-5.5, 3)+
-  ylim(-3, 3.5)+
-  labs(shape="",
-       title = "PCA: CB")+
+  scale_fill_manual(breaks = c("upland", "transition", "wte", "wc"), 
+                    values = pal_transect)+
+  scale_shape_manual(values = c(21, 24, 22))+
+  xlim(-5, 3)+
+  ylim(-2.5, 3.5)+
+  labs(shape="", fill = "", color = "")+ 
   theme_kp()+
   theme(legend.position = "top", legend.box = "vertical")+
+  guides(fill = guide_legend(override.aes = list(alpha=1, shape = 21, size = 3)))+
   NULL
 
-gg_pca_regions = cowplot::plot_grid(gg_pca_wle , gg_pca_cb, nrow = 1)
+gg_pca_regions = cowplot::plot_grid(gg_pca_wle , gg_pca_cb, nrow = 1,
+                                    labels = c("A: WLE", "B: CB"))
 gg_pca_regions
 
 ```
@@ -899,10 +908,10 @@ ggbiplot::ggbiplot(pca_cluster$pca_int, obs.scale = 1, var.scale = 1, varname.si
   scale_fill_manual(values = pnw_palette("Sailboat", 3))+
   labs(fill="cluster",
        color = "cluster",
-       shape = "region",
-       title = "Overall PCA, both regions",
-       subtitle = "Surface horizons only")+
+       shape = "region")+
   theme_kp()+
+  theme(legend.position = c(0.8, 0.75))+
+  guides(fill = guide_legend(override.aes = list(shape = 21)))+
   NULL
   
 ```
