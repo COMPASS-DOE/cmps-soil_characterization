@@ -960,12 +960,13 @@ data_scaled_NEW %>%
 data_combined_wide %>% 
   mutate(transect = factor(transect, levels = c("upland", "transition", "wc"))) %>% 
   ggplot(aes(x = transect, y = Fe))+
-  geom_violin(aes(fill = transect), alpha = 0.4)+
+  geom_violin(aes(fill = region), alpha = 0.6)+
   geom_jitter(width = 0.1)+
   labs(x = "",
        y = "Extractable Fe, μg/g")+
   facet_wrap(~region)+
-  scale_fill_manual(values = pal_transect)+
+#  scale_fill_manual(values = c("darkblue", "red"))+
+  scale_fill_manual(values = pnw_palette("Bay", 2))+
   theme(legend.position = "none")
 
 data_combined_wide %>% 
@@ -1028,35 +1029,6 @@ plot_transect_as_x = function(data, YLAB = "", TITLE = "", SUBTITLE = "", SCALES
   #
   # graphs ----
   
-  ##  ggplot(data,
-  ##         aes(x = transect,
-  ##             y = value
-  ##             #shape = horizon,
-  ##             #alpha = horizon
-  ##         )) +
-  ##    # plot points
-  ##    geom_point(aes(group = site,
-  ##                   color = site),
-  ##               size = 2.5, stroke = 1,
-  ##               position = position_dodge(width = 0.4))+
-  ##    # plot HSD letters
-  ##    geom_text(data = lme_for_graphs, aes(y = y, label = groups), size = 5)+
-  ##    scale_alpha_manual(values = c(1, 0.3))+
-  ##    scale_color_manual(breaks = c("CRC", "PTR", "OWC", "GCW", "MSM", "GWI"), values = c('#ED6e85', '#7f4420', '#ffc115', '#90BE6D', '#03045E', '#00B4D8'))+
-  ##    facet_wrap(~region, 
-  ##               labeller = as_labeller(c("CB" = "Chesapeake Bay", "WLE" = "Lake Erie")))+
-  ##    theme_kp()+
-  ##    labs(x = "",
-  ##        # y = YLAB,
-  ##        # title = TITLE,
-  ##        # subtitle = SUBTITLE,
-  ##         shape = "Site",
-  ##         alpha = "Horizon",
-  ##         color = "Site")+
-  ##    theme(legend.position = "right", legend.box = "vertical")+
-  ##    NULL
-  
-  
   ggplot(data,
          aes(x = transect,
              y = value
@@ -1065,13 +1037,13 @@ plot_transect_as_x = function(data, YLAB = "", TITLE = "", SUBTITLE = "", SCALES
          )) +
     # plot points
     
-    geom_violin(aes(fill = transect), alpha = 0.4)+
+    geom_violin(aes(fill = region), alpha = 0.4)+
     geom_jitter(width = 0.1)+
     geom_text(data = lme_for_graphs, aes(y = y, label = groups), size = 5)+
     labs(x = "",
          y = "Extractable P, μg/g")+
     facet_wrap(~region)+
-    scale_fill_manual(values = pal_transect)+
+    scale_fill_manual(values = pnw_palette("Bay", 2))+
     labs(x = "",
          y = YLAB,
          title = TITLE,
@@ -1096,7 +1068,7 @@ gg_tc = plot_transect_as_x(data_combined_wide %>% rename(value = TC),
                    YLAB = "Total Carbon, %")
 
 
-cowplot::plot_grid(gg_tc, gg_fe, ncol = 1)
+cowplot::plot_grid(gg_fe, gg_p, ncol = 1)
 
 ```
 
