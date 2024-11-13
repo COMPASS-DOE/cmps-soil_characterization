@@ -236,8 +236,8 @@ fit_correlations_function = function(dat, TITLE){
 }
 
 corr_all = fit_correlations_function(dat = data_wide_PCA)
-#corr_wle = fit_correlations_function(dat = data_wide_PCA %>% filter(region == "WLE"), TITLE = "WLE" )
-#corr_cb = fit_correlations_function(dat = data_wide_PCA %>% filter(region == "CB"), TITLE = "CB")
+#corr_wle = fit_correlations_function(dat = data_wide_PCA %>% filter(region == "Erie"), TITLE = "Erie" )
+#corr_cb = fit_correlations_function(dat = data_wide_PCA %>% filter(region == "Chesapeake"), TITLE = "Chesapeake")
 
 corr_all
 ```
@@ -297,8 +297,8 @@ fit_pca_function = function(dat){
 
 ```{r pca_input}
 pca_overall = fit_pca_function(data_wide_PCA) 
-pca_overall_wle = fit_pca_function(dat = data_wide_PCA %>% filter(region == "WLE"))
-pca_overall_cb = fit_pca_function(data_wide_PCA %>% filter(region == "CB"))
+pca_overall_wle = fit_pca_function(dat = data_wide_PCA %>% filter(region == "Erie"))
+pca_overall_cb = fit_pca_function(data_wide_PCA %>% filter(region == "Chesapeake"))
 ```
 
 ```{r pca_gg, fig.width=10, fig.height=6}
@@ -331,12 +331,12 @@ gg_pca_wle =
   geom_point(size=3,stroke=1, alpha = 1,
              aes(shape = pca_overall_wle$grp$site,
                  color = groups))+ 
-  scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
                      values = pal_transect)+
   xlim(-6,6)+
   ylim(-4.5,4.5)+
   labs(shape="",
-       title = "PCA: WLE",
+       title = "PCA: Erie",
        subtitle = "surface horizons")+
   theme_kp()+
   theme(legend.position = "top", legend.box = "vertical")+
@@ -349,12 +349,12 @@ gg_pca_cb =
   geom_point(size=3,stroke=1, alpha = 1,
              aes(shape = pca_overall_cb$grp$site,
                  color = groups))+ 
-  scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
                      values = pal_transect)+
   xlim(-5.5,7.5)+
   ylim(-5,5)+
   labs(shape="",
-       title = "PCA: CB",
+       title = "PCA: Chesapeake",
        subtitle = "surface horizons")+
   theme_kp()+
   theme(legend.position = "top", legend.box = "vertical")+
@@ -386,8 +386,8 @@ get_pc_values = function(dat){
 }
 
 pc_overall = get_pc_values(data_wide_PCA) %>% mutate(region = "combined")
-pc_wle = get_pc_values(data_wide_PCA %>% filter(region == "WLE")) %>% mutate(region = "WLE")
-pc_cb = get_pc_values(data_wide_PCA %>% filter(region == "CB")) %>% mutate(region = "CB")
+pc_wle = get_pc_values(data_wide_PCA %>% filter(region == "Erie")) %>% mutate(region = "Erie")
+pc_cb = get_pc_values(data_wide_PCA %>% filter(region == "Chesapeake")) %>% mutate(region = "Chesapeake")
 
 ```
 
@@ -532,7 +532,6 @@ data_long =
   data_combined_wide %>% 
   rename(Cl = Chloride,
          SO4 = Sulfate) %>% 
-  mutate(transect = case_when(transect == "wc" ~ "wetland", TRUE ~ transect)) %>% 
   pivot_longer(cols = -c(sample_label, region, site, transect, tree_number, horizon)) %>% 
   filter(!is.na(value))
 
@@ -609,7 +608,6 @@ data_scaled2 %>%
 ```{r scaled_gg2, fig.height = 8, fig.width = 8}
 data_long_all = 
   data_combined_wide %>% 
-  mutate(transect = case_when(transect == "wc" ~ "wetland", TRUE ~ transect)) %>% 
   pivot_longer(cols = -c(sample_label, region, site, transect, tree_number, horizon)) %>% 
   filter(!is.na(value))
 
@@ -698,8 +696,8 @@ data_wide_PCA2 = data_wide_PCA %>%
 
 ```{r v2-pca_input}
 pca_overall = fit_pca_function(data_wide_PCA2) 
-pca_overall_wle = fit_pca_function(dat = data_wide_PCA2 %>% filter(region == "WLE"))
-pca_overall_cb = fit_pca_function(data_wide_PCA2 %>% filter(region == "CB"))
+pca_overall_wle = fit_pca_function(dat = data_wide_PCA2 %>% filter(region == "Erie"))
+pca_overall_cb = fit_pca_function(data_wide_PCA2 %>% filter(region == "Chesapeake"))
 ```
 
 ```{r v2-pca_gg, fig.width=10, fig.height=6}
@@ -733,9 +731,9 @@ gg_pca_wle =
              aes(shape = pca_overall_wle$grp$site,
                  fill = groups), 
              stroke = 1)+ 
-  scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
                      values = pal_transect)+
-  scale_fill_manual(breaks = c("upland", "transition", "wte", "wc"), 
+  scale_fill_manual(breaks = c("upland", "transition", "wte", "wetland"), 
                     values = pal_transect)+
   scale_shape_manual(values = c(21, 24, 22))+
   xlim(-3, 5)+
@@ -754,9 +752,9 @@ gg_pca_cb =
              aes(shape = pca_overall_cb$grp$site,
                  fill = groups), 
              stroke = 1)+ 
-  scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
                      values = pal_transect)+
-  scale_fill_manual(breaks = c("upland", "transition", "wte", "wc"), 
+  scale_fill_manual(breaks = c("upland", "transition", "wte", "wetland"), 
                     values = pal_transect)+
   scale_shape_manual(values = c(21, 24, 22))+
   xlim(-5, 3)+
@@ -768,7 +766,7 @@ gg_pca_cb =
   NULL
 
 gg_pca_regions = cowplot::plot_grid(gg_pca_wle , gg_pca_cb, nrow = 1,
-                                    labels = c("A: WLE", "B: CB"))
+                                    labels = c("A: Erie", "B: Chesapeake"))
 gg_pca_regions
 
 ```
@@ -794,8 +792,8 @@ get_pc_values = function(dat){
 }
 
 pc_overall = get_pc_values(data_wide_PCA2) %>% mutate(region = "combined")
-pc_wle = get_pc_values(data_wide_PCA2 %>% filter(region == "WLE")) %>% mutate(region = "WLE")
-pc_cb = get_pc_values(data_wide_PCA2 %>% filter(region == "CB")) %>% mutate(region = "CB")
+pc_wle = get_pc_values(data_wide_PCA2 %>% filter(region == "Erie")) %>% mutate(region = "Erie")
+pc_cb = get_pc_values(data_wide_PCA2 %>% filter(region == "Chesapeake")) %>% mutate(region = "Chesapeake")
 
 ```
 
@@ -940,7 +938,6 @@ data_long =
   data_combined_wide %>% 
   rename(Cl = Chloride,
          SO4 = Sulfate) %>% 
-  mutate(transect = case_when(transect == "wc" ~ "wetland", TRUE ~ transect)) %>% 
   pivot_longer(cols = -c(sample_label, region, site, transect, tree_number, horizon)) %>% 
   filter(!is.na(value))
 
@@ -1018,7 +1015,6 @@ data_scaled2 %>%
 data_long_all = 
   data_combined_wide %>% 
   dplyr::select(-c(TN, CEC, K, Mg, Sulfate, NO3N, pH, spConductance, SOM, DIC, Al)) %>% 
-  mutate(transect = case_when(transect == "wc" ~ "wetland", TRUE ~ transect)) %>% 
   pivot_longer(cols = -c(sample_label, region, site, transect, tree_number, horizon)) %>% 
   filter(!is.na(value))
 
@@ -1131,7 +1127,7 @@ data_scaled_NEW %>%
 
 ```{r analytesx-2, fig.height = 4, fig.width = 8, eval=FALSE}
 data_combined_wide %>% 
-  mutate(transect = factor(transect, levels = c("upland", "transition", "wc"))) %>% 
+  mutate(transect = factor(transect, levels = c("upland", "transition", "wetland"))) %>% 
   ggplot(aes(x = transect, y = Fe))+
   geom_violin(aes(fill = region), alpha = 0.6)+
   geom_jitter(width = 0.1)+
@@ -1143,7 +1139,7 @@ data_combined_wide %>%
   theme(legend.position = "none")
 
 data_combined_wide %>% 
-  mutate(transect = factor(transect, levels = c("upland", "transition", "wc"))) %>% 
+  mutate(transect = factor(transect, levels = c("upland", "transition", "wetland"))) %>% 
   ggplot(aes(x = transect, y = P))+
   geom_violin(aes(fill = transect), alpha = 0.4)+
   geom_jitter(width = 0.1)+
@@ -1160,7 +1156,7 @@ data_combined_wide %>%
 
 plot_transect_as_x = function(data, YLAB = "", TITLE = "", SUBTITLE = "", SCALES = "free_x"){
   
-  data = data %>% mutate(transect = factor(transect, levels = c("upland", "transition", "wc"))) %>% 
+  data = data %>% mutate(transect = factor(transect, levels = c("upland", "transition", "wetland"))) %>% 
     filter(!is.na(value))
   
   fit_lme_hsd_transect = function(dat){
@@ -1256,7 +1252,7 @@ cowplot::plot_grid(gg_tc, gg_fe, gg_p, ncol = 1)
 
 # plot Specific Conductance
 gg_spc =
-  data_combined_subset %>% filter(grepl("spCond", name)) %>% filter(region == "CB") %>% 
+  data_combined_subset %>% filter(grepl("spCond", name)) %>% filter(region == "Chesapeake") %>% 
   ggplot(aes(x = transect, y = value)) +
     # plot points
     geom_point(aes(group = site, color = site),
@@ -1264,7 +1260,6 @@ gg_spc =
     scale_alpha_manual(values = c(1, 0.3))+
     scale_color_manual(breaks = c("CRC", "PTR", "OWC", "GCW", "MSM", "GWI"), 
                        values = c('#ED6e85', '#7f4420', '#ffc115', '#90BE6D', '#03045E', '#00B4D8'))+
-  #  facet_wrap(~region, labeller = as_labeller(c("CB" = "Chesapeake Bay", "WLE" = "Lake Erie")))+
     theme_kp()+
     labs(x = "",
          y = "Specific Conductance, mS/cm",
@@ -1276,7 +1271,7 @@ gg_spc =
 
 # plot Chloride
 gg_cl = 
-  data_combined_subset %>% filter(grepl("Chloride", name)) %>% filter(region == "CB") %>% 
+  data_combined_subset %>% filter(grepl("Chloride", name)) %>% filter(region == "Chesapeake") %>% 
   ggplot(aes(x = transect, y = value)) +
     # plot points
     geom_point(aes(group = site, color = site),
@@ -1284,7 +1279,6 @@ gg_cl =
     scale_alpha_manual(values = c(1, 0.3))+
     scale_color_manual(breaks = c("CRC", "PTR", "OWC", "GCW", "MSM", "GWI"), 
                        values = c('#ED6e85', '#7f4420', '#ffc115', '#90BE6D', '#03045E', '#00B4D8'))+
-  #  facet_wrap(~region, labeller = as_labeller(c("CB" = "Chesapeake Bay", "WLE" = "Lake Erie")))+
     theme_kp()+
     labs(x = "",
          y = "Chloride, meq/100g",

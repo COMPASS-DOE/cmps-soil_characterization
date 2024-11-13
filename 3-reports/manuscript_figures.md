@@ -152,6 +152,8 @@ Click to Open
 
 ![](manuscript_figures_files/figure-gfm/v2-scaled_gg2_split-1.png)<!-- -->
 
+![](manuscript_figures_files/figure-gfm/v2-scaled_gg2_split-NEW-1.png)<!-- -->
+
 ### GWI only
 
 ![](manuscript_figures_files/figure-gfm/v2-scaled_gg2_gwi-1.png)<!-- -->
@@ -175,7 +177,7 @@ Click to Open
 Session Info
 </summary>
 
-Date run: 2024-11-11
+Date run: 2024-11-13
 
     ## R version 4.2.1 (2022-06-23)
     ## Platform: x86_64-apple-darwin17.0 (64-bit)
