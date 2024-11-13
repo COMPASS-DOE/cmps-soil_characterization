@@ -20,7 +20,7 @@ reorder_horizon = function(dat){
 }
 reorder_transect = function(dat){
   dat %>% 
-    mutate(transect = factor(transect, levels = c("upland", "transition", "wte", "wc", "wetland")))
+    mutate(transect = factor(transect, levels = c("upland", "transition", "wte", "wetland")))
 }
 reorder_site = function(dat){
   dat %>% 
@@ -65,14 +65,14 @@ process_loi = function(loi_data){
   
   loi_data %>%
     janitor::clean_names() %>% 
-    mutate(region = case_when(grepl("WLE", source) ~ "WLE",
-                              grepl("CB", source) ~ "CB")) %>% 
+    mutate(region = case_when(grepl("WLE", source) ~ "Erie",
+                              grepl("CB", source) ~ "Chesapeake")) %>% 
     mutate(label = case_when((customer_id >= 129 & customer_id <= 214) ~ paste0("COMPASS_May22_", customer_id),
                              customer_id >= 215 ~ paste0("COMPASS_Aug22_", customer_id)),
-           sample_label = case_when(region == "WLE" ~ sample_label,
-                                    region == "CB" ~ label)) %>% 
-    mutate(percentOM = case_when(region == "CB" ~ percent_om,
-                                  region == "WLE" ~ 100*(wt_tray_drysoil_g - wt_tray_combustedsoil_g)/(wt_tray_drysoil_g - wt_tray_g)),
+           sample_label = case_when(region == "Erie" ~ sample_label,
+                                    region == "Chesapeake" ~ label)) %>% 
+    mutate(percentOM = case_when(region == "Chesapeake" ~ percent_om,
+                                  region == "Erie" ~ 100*(wt_tray_drysoil_g - wt_tray_combustedsoil_g)/(wt_tray_drysoil_g - wt_tray_g)),
            percentOM = round(percentOM, 2)) %>%
     dplyr::select(sample_label, percentOM) %>% 
     mutate(analysis = "LOI") %>% 
@@ -390,8 +390,8 @@ process_icp = function(icp_data, analysis_key, moisture_processed, subsampling){
 import_iron = function(FILEPATH){
   
   # import map
-  cb = read_sheet("1pzvGUvjK6qV8BVYSfoc2cid88dx3v7ZOD7TnYFgyWbc", sheet = "cb") %>% mutate_all(as.character) %>% mutate(region = "CB")
-  wle = read_sheet("1pzvGUvjK6qV8BVYSfoc2cid88dx3v7ZOD7TnYFgyWbc", sheet = "wle") %>% mutate_all(as.character) %>% mutate(region = "WLE")
+  cb = read_sheet("1pzvGUvjK6qV8BVYSfoc2cid88dx3v7ZOD7TnYFgyWbc", sheet = "cb") %>% mutate_all(as.character) %>% mutate(region = "Chesapeake")
+  wle = read_sheet("1pzvGUvjK6qV8BVYSfoc2cid88dx3v7ZOD7TnYFgyWbc", sheet = "wle") %>% mutate_all(as.character) %>% mutate(region = "Erie")
   ferrozine_map = bind_rows(cb, wle)
   
   # import data files (plate reader)
@@ -427,6 +427,7 @@ process_iron = function(ferrozine_map, ferrozine_data, moisture_processed, subsa
            well_position = paste0(x_1, name),
            region = str_extract(source, regex("cb|wle", ignore_case = TRUE)),
            region = toupper(region),
+           region = recode(region, "WLE" = "Erie", "CB" = "Chesapeake"),
            tray_number = str_extract(source, "tray|plate[1-9]+"),
            tray_number = parse_number(tray_number),
            absorbance_562 = as.numeric(absorbance_562)) %>% 
@@ -832,7 +833,7 @@ import_wrc_data = function(FILEPATH){
   ))
   
 }
-#wrc_data = import_wrc_data(FILEPATH = "1-data/wrc")
+#wrc_data = import_wrc_data(FILEPATH = "1-data/raw/wrc")
 process_wrc = function(wrc_data){
   
 wrc_processed <- 
@@ -845,9 +846,9 @@ wrc_processed <-
     mutate(transect = tolower(transect),
            kpa_eval = round((10^pf_eval)/10,2),
            kpa_fit = round((10^pf_fit)/10,2)) %>% 
-    mutate(transect = recode(transect, "wetland" = "wc"),
-           region = case_when(site %in% c("CRC", "OWC", "PTR") ~ "WLE",
-                              site %in% c("MSM", "GWI", "GCW") ~ "CB")) %>% 
+    mutate(
+           region = case_when(site %in% c("CRC", "OWC", "PTR") ~ "Erie",
+                              site %in% c("MSM", "GWI", "GCW") ~ "Chesapeake")) %>% 
     reorder_transect()
   
 }
@@ -1050,7 +1051,6 @@ combine_data = function(moisture_processed, pH_processed, tctnts_data_samples, l
     pivot_longer(-c(sample_label, analysis)) %>% 
     drop_na() %>% 
     left_join(sample_key) %>% 
-    mutate(transect = recode(transect, "wc" = "wetland")) %>% 
     reorder_transect() %>% 
     reorder_horizon() %>% 
     reorder_site() %>% 
@@ -1065,7 +1065,7 @@ subset_surface_horizons = function(data_combined_all_horizons){
   
   data_combined_surface_only = 
     data_combined_all_horizons %>% 
-    mutate(surface = case_when(region == "WLE" & horizon == "A" ~ "surface",
+    mutate(surface = case_when(region == "Erie" & horizon == "A" ~ "surface",
                                (site == "MSM" | site == "GWI") & horizon == "O" ~ "surface",
                                site == "GCW" & horizon == "A" ~ "surface")) %>% 
     filter(surface == "surface") %>% 

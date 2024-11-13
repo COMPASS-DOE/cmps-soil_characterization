@@ -398,8 +398,8 @@ compute_overall_pca = function(data_combined, sample_key){
   
   ## PCA input files ----
   pca_overall = fit_pca_function(data_combined_wide_NO_DIC) 
-  pca_overall_wle = fit_pca_function(data_combined_wide_NO_DIC %>% filter(region == "WLE"))
-  pca_overall_cb = fit_pca_function(data_combined_wide_NO_DIC %>% filter(region == "CB"))
+  pca_overall_wle = fit_pca_function(data_combined_wide_NO_DIC %>% filter(region == "Erie"))
+  pca_overall_cb = fit_pca_function(data_combined_wide_NO_DIC %>% filter(region == "Chesapeake"))
   
   
   ## PCA plots overall ----
@@ -429,14 +429,14 @@ compute_overall_pca = function(data_combined, sample_key){
     geom_point(size=3,stroke=1, alpha = 1,
                aes(shape = pca_overall_wle$grp$site,
                    color = groups))+ 
-    scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+    scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
                        values = pal_transect)+
     #scale_shape_manual(values = c(21, 19))+
     #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
     xlim(-6,6)+
     ylim(-4.5,4.5)+
     labs(shape="",
-         title = "PCA: WLE",
+         title = "PCA: Erie",
          subtitle = "surface horizons")+
     theme_kp()+
     theme(legend.position = "top", legend.box = "vertical")+
@@ -449,14 +449,14 @@ compute_overall_pca = function(data_combined, sample_key){
     geom_point(size=3,stroke=1, alpha = 1,
                aes(shape = pca_overall_cb$grp$site,
                    color = groups))+ 
-    scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+    scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
                        values = pal_transect)+
     #scale_shape_manual(values = c(21, 19))+
     #scale_shape_manual(values = c(21, 21, 19), name = "", guide = "none")+
     xlim(-5.5,7.5)+
     ylim(-5,5)+
     labs(shape="",
-         title = "PCA: CB",
+         title = "PCA: Chesapeake",
          subtitle = "surface horizons")+
     theme_kp()+
     theme(legend.position = "top", legend.box = "vertical")+
@@ -517,8 +517,8 @@ compute_correlations = function(data_combined, sample_key){
   }
 
   corr_all = fit_correlations_function(dat = data_combined_wide_NO_IC, TITLE = "all")
-  corr_wle = fit_correlations_function(dat = data_combined_wide_NO_IC %>% filter(region == "WLE"), TITLE = "WLE" )
-  corr_cb = fit_correlations_function(dat = data_combined_wide_NO_IC %>% filter(region == "CB"), TITLE = "CB")
+  corr_wle = fit_correlations_function(dat = data_combined_wide_NO_IC %>% filter(region == "Erie"), TITLE = "Erie" )
+  corr_cb = fit_correlations_function(dat = data_combined_wide_NO_IC %>% filter(region == "Chesapeake"), TITLE = "Chesapeake")
   
   corr_regions = cowplot::plot_grid(corr_wle, corr_cb)
   list(corr_all = corr_all,
@@ -574,8 +574,7 @@ plot_transect_as_x = function(data, YLAB, TITLE = "", SUBTITLE = "", SCALES = "f
     scale_alpha_manual(values = c(1, 0.3))+
     scale_color_manual(values = c("grey60", "black"))+
     scale_shape_manual(breaks = c("CRC", "PTR", "OWC", "MSM", "GWI", "GCW"), values = c(1,2,3,4,5,6))+
-    facet_wrap(~region, scales = SCALES,
-               labeller = as_labeller(c("CB" = "Chesapeake Bay", "WLE" = "Lake Erie")))+
+    facet_wrap(~region, scales = SCALES)+
     theme_kp()+
     labs(x = "",
          y = YLAB,
@@ -1166,26 +1165,26 @@ plot_ions_piper = function(dic_processed, ions_processed){
     geom_point(aes(x,y, 
                    color = transect, shape = site), 
                size = 3, stroke = 1,
-               data=piper_data2 %>% filter(region == "WLE"))+
+               data=piper_data2 %>% filter(region == "Erie"))+
     scale_color_manual(values = pal_transect)+
     scale_shape_manual(breaks = c("CRC", "PTR", "OWC", "MSM", "GWI", "GCW"), values = c(1,2,3,4,5,6))+
     labs(title = "Piper Plot using water-extractable ions",
-         subtitle = "WLE region")
+         subtitle = "Erie region")
   
   ggplot_piper() + 
     geom_point(aes(x,y, 
                    color = transect, shape = site), 
                size = 3, stroke = 1,
-               data=piper_data2 %>% filter(region == "CB"))+
+               data=piper_data2 %>% filter(region == "Chesapeake"))+
     scale_color_manual(values = rev(soilpalettes::soil_palette("redox2", 3)))+
     scale_shape_manual(breaks = c("CRC", "PTR", "OWC", "MSM", "GWI", "GCW"), values = c(1,2,3,4,5,6))+
     labs(title = "Piper Plot using water-extractable ions",
-         subtitle = "CB region")
+         subtitle = "Chesapeake region")
 
     
   # pca ----
   # 
-  ions_pca = fit_pca_function(ions_processed %>% dplyr::select(sample_label, ends_with("ppm"), -Bromide_ppm) %>% left_join(sample_key) %>% filter(region == "WLE"))
+  ions_pca = fit_pca_function(ions_processed %>% dplyr::select(sample_label, ends_with("ppm"), -Bromide_ppm) %>% left_join(sample_key) %>% filter(region == "Erie"))
 
   ggbiplot(ions_pca$pca_int, obs.scale = 1, var.scale = 1,
            groups = as.character(ions_pca$grp$transect), 
@@ -1193,10 +1192,10 @@ plot_ions_piper = function(dic_processed, ions_processed){
     geom_point(size=3,stroke=1, alpha = 1,
                aes(shape = ions_pca$grp$region,
                    color = groups))+ 
-    scale_color_manual(breaks = c("upland", "transition", "wte", "wc"), 
+    scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
                        values = pal_transect)+
     labs(shape="",
-         title = "PCA: CB",
+         title = "PCA: Chesapeake",
          subtitle = "surface horizons")+
     theme_kp()+
     theme(legend.position = "top", legend.box = "vertical")+
@@ -1214,7 +1213,7 @@ plot_wrc = function(wrc_processed){
   
   wrc_processed %>% 
     filter(kpa_fit >= 0 | kpa_eval >= 0) %>% 
-    mutate(region = factor(region, levels = c("WLE", "CB"))) %>% 
+    mutate(region = factor(region, levels = c("Erie", "Chesapeake"))) %>% 
     ggplot(aes(y = water_content_vol_percent, color = transect))+
     geom_line(aes(x = kpa_fit))+
     geom_point(aes(x = kpa_eval), shape = 1)+
@@ -1240,7 +1239,7 @@ plot_texture = function(texture_processed, sample_key){
   data(USDA)
   
   gg_texture = 
-    ggtern(data = texture %>% filter(region == "CB"),
+    ggtern(data = texture %>% filter(region == "Chesapeake"),
            aes(x = percent_sand, y = percent_clay, z = percent_silt)) +
     geom_polygon(data = USDA, 
                  aes(x = Sand, y = Clay, z = Silt, group = Label),
@@ -1254,7 +1253,7 @@ plot_texture = function(texture_processed, sample_key){
     facet_wrap(~ site + horizon)+
     NULL
   
-  ggtern(data = texture %>% filter(region == "CB" & site == "MSM"),
+  ggtern(data = texture %>% filter(region == "Chesapeake" & site == "MSM"),
          aes(x = percent_sand, y = percent_clay, z = percent_silt)) +
     geom_polygon(data = USDA, 
                  aes(x = Sand, y = Clay, z = Silt, group = Label),
@@ -1480,7 +1479,7 @@ fit_betadispers = function(){
   
   
   
-  g = data_combined_wide_NO_IC %>% drop_na() %>% filter(region == "CB")
+  g = data_combined_wide_NO_IC %>% drop_na() %>% filter(region == "Chesapeake")
   g_data = g %>% dplyr::select(where(is.numeric)) 
   g_matrix = as.matrix(g_data)
   g_sample = g %>% dplyr::select(where(is.character)) 
@@ -1543,8 +1542,7 @@ plot_site_as_color = function(data, YLAB = "", TITLE = "", SUBTITLE = "", SCALES
     geom_text(data = lme_for_graphs, aes(y = y, label = groups), size = 5)+
     scale_alpha_manual(values = c(1, 0.3))+
     scale_color_manual(breaks = c("CRC", "PTR", "OWC", "GCW", "MSM", "GWI"), values = c('#ED6e85', '#7f4420', '#ffc115', '#90BE6D', '#03045E', '#00B4D8'))+
-    facet_wrap(~region, scales = SCALES,
-               labeller = as_labeller(c("CB" = "Chesapeake Bay", "WLE" = "Lake Erie")))+
+    facet_wrap(~region, scales = SCALES)+
     theme_kp()+
     labs(x = "",
          y = YLAB,
@@ -1562,7 +1560,7 @@ make_graphs_by_transect_SITE_AS_COLOR = function(data_combined){
   data_combined_subset = make_data_subset(data_combined)
   
   mehlich_p = data_combined_subset %>% filter(name == "mehlichp_ugg")
-  gg_wle_mehlich = plot_site_as_color(data = mehlich_p %>% filter(region == "WLE"), YLAB = "Extractable P, μg/g")
+  gg_wle_mehlich = plot_site_as_color(data = mehlich_p %>% filter(region == "Erie"), YLAB = "Extractable P, μg/g")
   
   
   icp <- 
@@ -1571,8 +1569,8 @@ make_graphs_by_transect_SITE_AS_COLOR = function(data_combined){
     mutate(name = str_remove(name, "_meq100g"), 
            name = recode(name, "cec" = "CEC"),
            name = factor(name, levels = c("CEC", "Ca", "Na", "K"))) %>% filter(!is.na(name))
-  gg_wle_icp = plot_site_as_color(data = icp %>% filter(region == "WLE"), YLAB = "meq/100g") + facet_wrap(~name, scales = "free_y")
-  gg_cb_icp = plot_site_as_color(data = icp %>% filter(region == "CB"), YLAB = "meq/100g") + facet_wrap(~name, scales = "free_y")
+  gg_wle_icp = plot_site_as_color(data = icp %>% filter(region == "Erie"), YLAB = "meq/100g") + facet_wrap(~name, scales = "free_y")
+  gg_cb_icp = plot_site_as_color(data = icp %>% filter(region == "Chesapeake"), YLAB = "meq/100g") + facet_wrap(~name, scales = "free_y")
   
   
   ions <- 
@@ -1581,16 +1579,16 @@ make_graphs_by_transect_SITE_AS_COLOR = function(data_combined){
     filter(grepl("Chloride|Sulfate", name)) %>% 
     mutate(name = str_remove(name, "_meq100g"))
   
-  gg_wle_anions = plot_site_as_color(data = ions %>% filter(region == "WLE"), YLAB = "meq/100g") + facet_wrap(~name, scales = "free_y")
-  gg_cb_anions = plot_site_as_color(data = ions %>% filter(region == "CB"), YLAB = "meq/100g") + facet_wrap(~name, scales = "free_y")
+  gg_wle_anions = plot_site_as_color(data = ions %>% filter(region == "Erie"), YLAB = "meq/100g") + facet_wrap(~name, scales = "free_y")
+  gg_cb_anions = plot_site_as_color(data = ions %>% filter(region == "Chesapeake"), YLAB = "meq/100g") + facet_wrap(~name, scales = "free_y")
   
 
   ferrozine <- data_combined_subset %>% filter(analysis == "Ferrozine")
-  gg_cb_fe <- plot_site_as_color(data = ferrozine %>% filter(region == "CB"), YLAB = "Extractable Fe, μg/g")
+  gg_cb_fe <- plot_site_as_color(data = ferrozine %>% filter(region == "Chesapeake"), YLAB = "Extractable Fe, μg/g")
   
   
   pH <- data_combined_subset %>% filter(analysis == "PH")
-  gg_cb_spcond <- plot_site_as_color(data = pH %>% filter(grepl("spCond", name)) %>% filter(region == "CB"), 
+  gg_cb_spcond <- plot_site_as_color(data = pH %>% filter(grepl("spCond", name)) %>% filter(region == "Chesapeake"), 
                                      YLAB = "Specific Conductance mS/cm")
  
   
