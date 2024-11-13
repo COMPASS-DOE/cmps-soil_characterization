@@ -23,7 +23,9 @@ sample_key_subset =
   dplyr::select(sample_label, region, site, transect, tree_number, horizon) %>% 
   filter(!is.na(sample_label)) %>% 
   mutate(transect = tolower(transect),
-         site = recode(site, "PR" = "PTR", "CC" = "CRC", "GCREW" = "GCW"))
+         transect = recode(transect, "wc" = "wetland"),
+         site = recode(site, "PR" = "PTR", "CC" = "CRC", "GCREW" = "GCW"),
+         region = recode(region, "WLE" = "Erie", "CB" = "Chesapeake"))
 sample_key_subset[sample_key_subset == "NULL"] <- NA
 
 ## export
@@ -51,9 +53,4 @@ analysis_key[analysis_key == "NULL"] <- NA
 ## export
 analysis_key %>% write.csv("1-data/analysis_key.csv", row.names = F, na = "")
 
-
 #
-
-# download data files -----------------------------------------------------
-
-
