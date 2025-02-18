@@ -16,7 +16,7 @@ theme_kp <- function() {  # this for all the elements common across plots
           panel.border = element_rect(color="black",linewidth=1, fill = NA),
           
           plot.title = element_text(hjust = 0, size = 14),
-          axis.text = element_text(size = 12, color = "black"),
+          axis.text = element_text(size = 14, color = "black"),
           axis.title = element_text(size = 14, face = "bold", color = "black"),
           
           # formatting for facets
@@ -24,8 +24,8 @@ theme_kp <- function() {  # this for all the elements common across plots
           strip.background = element_rect(colour="white", fill="white"), #facet formatting
           panel.spacing.x = unit(1, "lines"), #facet spacing for x axis
           panel.spacing.y = unit(1.5, "lines"), #facet spacing for x axis
-          strip.text.x = element_text(size=12, face="bold"), #facet labels
-          strip.text.y = element_text(size=12, face="bold", angle = 270) #facet labels
+          strip.text.x = element_text(size=14, face="bold"), #facet labels
+          strip.text.y = element_text(size=14, face="bold", angle = 270) #facet labels
     )
 }
 theme_set(theme_kp())
