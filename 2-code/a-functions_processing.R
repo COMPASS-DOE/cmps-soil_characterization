@@ -1,4 +1,14 @@
+# SOIL CHARACTERIZATION FOR WLE AND CB SITES
 
+## a-functions_processing.R
+## Use these functions to import and process data files.
+## Some files are on Google Drive, others are local, as .csv/.xlsx.
+## These functions are called in the _targets.R file.
+
+## KFP
+
+######################## ####
+######################## ####
 
 
 # import function(s) ------------------------------------------------------
@@ -8,9 +18,7 @@ import_gsheet = function(dat){
   googlesheets4::read_sheet(dat) %>% mutate_all(as.character)
 }
 
-
 #
-
 # refactor/reorder functions ----------------------------------------------
 ## functions to set the order of factors
 
@@ -27,7 +35,7 @@ reorder_site = function(dat){
     mutate(site = factor(site, levels = c("CRC", "PTR", "OWC", "GCW", "MSM", "GWI")))
 }
 
-
+#
 # Chemistry data ----------------------------------------------------------
 
 ## Moisture
@@ -45,9 +53,6 @@ process_moisture = function(moisture_dat){
            gwc_perc = round(gwc_perc, 2)) %>% 
     dplyr::select(sample_label, gwc_perc) %>% 
     mutate(analysis = "GWC")
-  
-  
-  #
 }
 
 
@@ -106,8 +111,8 @@ import_tctn_data = function(FILEPATH){
              TN_perc = `N  [%]`) %>% 
       ## this is a ONE-TIME CORRECTION because of the way the sample names were entered
       mutate(Name = str_replace(Name, "TCTN_CMPS_KFP_0", "COMPASS_Dec2021_")) %>% 
-      #mutate(source = rep(path, nrow(.))) %>% 
       force()
+    
     df}))
   
 }
@@ -120,15 +125,10 @@ import_ts_data = function(FILEPATH){
       dplyr::select(Name, `S  [%]`, Memo) %>% 
       rename(TS_perc = `S  [%]`) %>% 
       mutate(Name = str_replace(Name, "DEC", "Dec")) %>% 
-      #mutate(source = rep(path, nrow(.))) %>% 
       force()
     df}))
   
 }
-
-# tctn_data = import_tctn_data(FILEPATH = "1-data/tctnts")
-# ts_data = import_ts_data(FILEPATH = "1-data/tctnts")
-
 process_tctnts = function(tctn_data, ts_data){
   
   tctn_samples = 
@@ -176,7 +176,7 @@ process_weoc = function(weoc_data, analysis_key, moisture_processed, subsampling
     dplyr::select(`Sample Name`, `Result(NPOC)`) %>% 
     rename(analysis_ID = `Sample Name`,
            npoc_mgL = `Result(NPOC)`) %>% 
-    # keep only sampple rows 
+    # keep only sample rows 
     filter(grepl("DOC_", analysis_ID)) %>% 
     # join the analysis key to get the sample_label
     left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label, NPOC_dilution)) %>%
@@ -203,6 +203,7 @@ process_weoc = function(weoc_data, analysis_key, moisture_processed, subsampling
   npoc_samples
 }
 
+
 # TIC
 import_dic_data = function(FILEPATH){
   
@@ -213,7 +214,6 @@ import_dic_data = function(FILEPATH){
   
   
 }
-#dic_data = import_dic_data(FILEPATH = "1-data/dic")
 process_dic = function(dic_data, analysis_key, moisture_processed, subsampling){
   
   dic_processed = 
@@ -222,7 +222,7 @@ process_dic = function(dic_data, analysis_key, moisture_processed, subsampling){
     dplyr::select(sample_name, result_ic) %>% 
     rename(analysis_ID = sample_name,
            tic_mgL = result_ic) %>% 
-    # keep only sampple rows 
+    # keep only sample rows 
     filter(grepl("DOC_", analysis_ID)) %>% 
     # join the analysis key to get the sample_label
     left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) 
@@ -253,13 +253,10 @@ process_dic = function(dic_data, analysis_key, moisture_processed, subsampling){
   
   dic_samples
   
-  ##    mutate(Bicarbonate_ppm = tic_mgL * 5) %>% 
-  ##    dplyr::select(sample_label, Bicarbonate_ppm) %>% 
-  ##    left_join(sample_key)
-  
 }
 
-# DIN
+
+# DIN -- NH4N and NO3N
 import_din_data = function(FILEPATH){
   
   filePaths_din <- list.files(path = FILEPATH, pattern = "din", full.names = TRUE)
@@ -310,6 +307,7 @@ process_din = function(din_data, analysis_key, moisture_processed, subsampling){
   din_samples
 }
 
+
 # ICP
 import_icp_data = function(FILEPATH){
   
@@ -319,7 +317,6 @@ import_icp_data = function(FILEPATH){
     df}))
   
 }
-
 process_icp = function(icp_data, analysis_key, moisture_processed, subsampling){
   
   icp_processed = 
@@ -520,8 +517,6 @@ import_mehlich = function(FILEPATH){
   list(mehlich_map = mehlich_map,
        mehlich_data = mehlich_data)
 }
-#mehlich_map = import_mehlich(FILEPATH)$mehlich_map
-#mehlich_data = import_mehlich(FILEPATH)$mehlich_data
 process_mehlich = function(mehlich_map, mehlich_data, moisture_processed, subsampling){
   
   # clean the map
@@ -629,6 +624,7 @@ process_mehlich = function(mehlich_map, mehlich_data, moisture_processed, subsam
   
 }
 
+
 # Ions (IC)
 import_ions = function(FILEPATH){
   
@@ -649,7 +645,6 @@ import_ions = function(FILEPATH){
   
   ions
 }
-#ions_data = import_ions(FILEPATH = "1-data/ions")
 process_ions = function(ions_data, analysis_key, sample_key, moisture_processed, subsampling){
   
   ions = 
@@ -713,26 +708,10 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
     bind_rows(samples_dilutions_non_gcw, dilutions_gcw) %>% 
     mutate(dilution_factor = replace_na(dilution_factor, 1))
   
-##   high_samples = 
-##     samples2 = 
-##     samples %>% 
-##     left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) %>%
-##     filter(grepl("COMPASS_", sample_label)) %>% 
-##     # do blank/dilution correction
-##     left_join(dilutions, by = "sample_label") %>% 
-##     mutate(dilution_factor = replace_na(dilution_factor, 1),
-##            ppm_dil_corrected = ppm * dilution_factor,
-##            ppm_dil_corrected = round(ppm_dil_corrected, 2)) %>% 
-##     left_join(standards_max) %>% 
-##     mutate(HIGH = ppm > max) %>% 
-##     filter(HIGH)
-#  high_samples %>% distinct(sample_label) 
-#  high_samples %>% write.csv("high.csv")
-  
   samples2 = 
     all_samples_with_dilutions %>% 
     dplyr::select(-source) %>% 
-    mutate(#analysis_ID_OLD = analysis_ID,
+    mutate(
            analysis_ID = str_remove(analysis_ID, "_[0-9]{2}x")) %>% 
     left_join(analysis_key %>% dplyr::select(analysis_ID, sample_label)) %>%
     filter(grepl("COMPASS_", sample_label)) %>% 
@@ -754,7 +733,6 @@ process_ions = function(ions_data, analysis_key, sample_key, moisture_processed,
            WSOC_mL = as.numeric(WSOC_mL)) %>% 
     drop_na()
       
-     
   samples3 = 
     samples2 %>% 
     left_join(subsampling2) %>% 
@@ -833,7 +811,6 @@ import_wrc_data = function(FILEPATH){
   ))
   
 }
-#wrc_data = import_wrc_data(FILEPATH = "1-data/raw/wrc")
 process_wrc = function(wrc_data){
   
 wrc_processed <- 
@@ -852,7 +829,6 @@ wrc_processed <-
     reorder_transect()
   
 }
-
 import_wrc_parameters = function(FILEPATH){
   
   filePaths_wrc <- list.files(path = FILEPATH, pattern = "xlsx", full.names = TRUE, recursive = FALSE)
@@ -896,7 +872,7 @@ compute_texture = function(){
     filter(!grepl("skip", notes))
   
   #
-  # II. COMPUTING PERCENT SAND-SILT-CLAY -----------------------------------
+  # II. COMPUTING PERCENT SAND-SILT-CLAY ------
   
   ## This function will use the equations provided in Gee & Bauder
   ## to compute % sand, clay, silt
@@ -939,7 +915,6 @@ compute_texture = function(){
   soil_texture = compute_soil_texture(dat = hydrometer_data_processed) %>% rename(sample_label = sample_id)
   
 }
-
 texture_summary = function(){
   texture = 
     soil_texture %>% 
@@ -975,7 +950,6 @@ import_xrd = function(FILEPATH){
     df %>% filter(!grepl("-", File))
     }))
 }
-#xrd_data = import_xrd(FILEPATH = "1-data/xrd")
 process_xrd = function(xrd_data, sample_key){
   
   processed = 
@@ -1002,7 +976,6 @@ process_xrd = function(xrd_data, sample_key){
   
   # processed2 %>% write.csv("XRD_processed_2023-01-06.csv", row.names = F)
 }
-
 xrd_surface = function(){
   
   xrd_processed_surface = xrd_processed %>% subset_surface_horizons(.)
@@ -1030,7 +1003,6 @@ xrd_surface = function(){
     pivot_wider(names_from = "transect", values_from = "summary")
   
 }
-
 
 
 #
