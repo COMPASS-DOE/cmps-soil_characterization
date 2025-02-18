@@ -11,6 +11,8 @@ Synpotic Soil Characterization
 
 ![](manuscript_figures_files/figure-gfm/map-1.png)<!-- -->
 
+![](manuscript_figures_files/figure-gfm/map-poster-1.png)<!-- -->
+
 ------------------------------------------------------------------------
 
 ## 0. Correlations
@@ -107,6 +109,8 @@ Click to Open
 
 ![](manuscript_figures_files/figure-gfm/v2-pca_gg_regions-1.png)<!-- -->
 
+![](manuscript_figures_files/figure-gfm/v2-pca_gg_regions-poster-1.png)<!-- -->![](manuscript_figures_files/figure-gfm/v2-pca_gg_regions-poster-2.png)<!-- -->
+
 ### Drivers and loadings
 
 ![](manuscript_figures_files/figure-gfm/v2-pc_gg-1.png)<!-- -->
@@ -177,7 +181,7 @@ Click to Open
 Session Info
 </summary>
 
-Date run: 2024-11-13
+Date run: 2024-12-03
 
     ## R version 4.2.1 (2022-06-23)
     ## Platform: x86_64-apple-darwin17.0 (64-bit)
