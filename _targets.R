@@ -1,7 +1,5 @@
 # Created by use_targets().
-# Follow the comments below to fill in this target script.
-# Then follow the manual to check and run the pipeline:
-#   https://books.ropensci.org/targets/walkthrough.html#inspect-the-pipeline # nolint
+# https://books.ropensci.org/targets/walkthrough.html#inspect-the-pipeline # nolint
 
 # Load packages required to define the pipeline:
 library(targets)
@@ -11,13 +9,7 @@ library(tarchetypes) # Load other packages as needed. # nolint
 tar_option_set(
   packages = c("tibble", "tidyverse"), # packages that your targets need to run
   format = "rds" # default storage format
-  # Set other options as needed.
 )
-
-# tar_make_clustermq() configuration (okay to leave alone):
-
-# tar_make_future() configuration (okay to leave alone):
-# Install packages {{future}}, {{future.callr}}, and {{future.batchtools}} to allow use_targets() to configure tar_make_future() options.
 
 # Load the R scripts with your custom functions:
 source("2-code/0-packages.R")
@@ -25,7 +17,6 @@ source("2-code/0-packages.R")
 source("2-code/a-functions_processing.R")
 source("2-code/b-functions_analysis.R")
 source("2-code/c-functions_fticrrr.R")
-# source("other_functions.R") # Source other scripts as needed. # nolint
 
 # Replace the target list below with your own:
 list(
@@ -52,52 +43,30 @@ list(
   tar_target(weoc_processed, process_weoc(weoc_data, analysis_key, moisture_processed, subsampling)),
   tar_target(dic_data, import_dic_data(FILEPATH = "1-data/raw/dic")),
   tar_target(dic_processed, process_dic(dic_data, analysis_key, moisture_processed, subsampling)),
-  #tar_target(din_data, readxl::read_xlsx("1-data/raw/din/223013 Patel Final Report.xlsx", sheet = "NO3-N and NH4-N data")),
   tar_target(din_data, import_din_data("1-data/raw/din")),
   tar_target(din_processed, process_din(din_data, analysis_key, moisture_processed, subsampling)),
   tar_target(icp_data, import_icp_data(FILEPATH = "1-data/raw/icp")),
   tar_target(icp_processed, process_icp(icp_data, analysis_key, moisture_processed, subsampling)),
-  #tar_target(cec_processed, compute_cec(icp_processed)),
   tar_target(ferrozine_data, import_iron(FILEPATH = "1-data/raw/iron-ferrozine")$ferrozine_data),
   tar_target(ferrozine_map, import_iron(FILEPATH = "1-data/raw/iron-ferrozine")$ferrozine_map),
   tar_target(ferrozine_processed, process_iron(ferrozine_map, ferrozine_data, moisture_processed, subsampling)),
   tar_target(mehlich_map, import_mehlich(FILEPATH = "1-data/raw/phosphorus-mehlich")$mehlich_map),
   tar_target(mehlich_data, import_mehlich(FILEPATH = "1-data/raw/phosphorus-mehlich")$mehlich_data),
   tar_target(mehlich_processed, process_mehlich(mehlich_map, mehlich_data, moisture_processed, subsampling)),
-##  tar_target(icr_report, import_fticr_data(FILEPATH = "1-data/raw/icr")),
-##  tar_target(icr_meta, make_fticr_meta(icr_report)$meta2),
-##  tar_target(icr_data_long, make_fticr_data(icr_report, analysis_key, sample_key)$data_long_blank_corrected),
-##  tar_target(icr_data_trt, make_fticr_data(icr_report, analysis_key, sample_key)$data_long_trt),
-##  tar_target(icr_relabund_samples, compute_icr_relabund(icr_data_long, icr_meta)),
   tar_target(ions_data, import_ions(FILEPATH = "1-data/raw/ions")),
   tar_target(ions_processed, process_ions(ions_data, analysis_key, sample_key, moisture_processed, subsampling)$samples3),
   tar_target(ions_processed_meq, process_ions(ions_data, analysis_key, sample_key, moisture_processed, subsampling)$samples_meq),
+  
+  # mineralogy and physics
   tar_target(xrd_data, import_xrd(FILEPATH = "1-data/raw/xrd")),
   tar_target(xrd_processed, process_xrd(xrd_data, sample_key)),
   tar_target(wrc_data, import_wrc_data(FILEPATH = "1-data/raw/wrc")),
   tar_target(wrc_processed, process_wrc(wrc_data)),
-  #tar_target(hydrometer_data, "1-data/particle_size.csv", format = "file"),
-  #tar_target(hydrometer_df, read.csv(hydrometer_data)),
   tar_target(texture_processed, compute_texture()),
-  tar_target(gg_wrc, plot_wrc(wrc_processed)),
-#  tar_target(gg_texture, plot_texture(texture_processed, sample_key)),
-  
-  # analysis - graphs
-  ## tar_target(gg_moisture, plot_moisture(moisture_processed, sample_key)),
-  ## tar_target(gg_loi, plot_loi(loi_processed, sample_key)),
-  ## tar_target(gg_pH, plot_pH(pH_processed, sample_key)),
-  ## tar_target(gg_sp_cond, plot_sp_cond(pH_processed, sample_key)),
-  ## tar_target(gg_tctnts, plot_tctnts(tctnts_data_samples, sample_key)),
-  ## tar_target(gg_weoc, plot_weoc(weoc_processed, sample_key)),
-  ## tar_target(gg_din, plot_din(din_processed, sample_key)),
-  ## tar_target(gg_icp, plot_icp(icp_processed, sample_key)),
-  ## tar_target(gg_ferrozine, plot_ferrozine(ferrozine_processed, sample_key)),
-  ## tar_target(gg_mehlich, plot_mehlich(mehlich_processed, sample_key)),
-##   tar_target(gg_icr_vankrevelen, plot_vankrevelen(icr_data_trt, icr_meta)),
-##   tar_target(gg_icr_unique, plot_vankrevelen_unique(icr_data_trt, icr_meta)),
-##   tar_target(gg_icr_pca, compute_icr_pca(icr_relabund_samples, sample_key)),
-  ## tar_target(gg_ions, plot_ions(ions_processed, sample_key)),
-  
+  # bulk density
+  # particle density
+  # tar_target(gg_wrc, plot_wrc(wrc_processed)),
+
   # combined data
   tar_target(data_combined_all_horizons, combine_data(moisture_processed, pH_processed, tctnts_data_samples, loi_processed,
                                          weoc_processed, dic_processed, din_processed, icp_processed,
@@ -123,10 +92,7 @@ list(
     write.csv(data_combined, "1-data/processed/chemistry_combined_surface_horizon.csv", row.names = FALSE)
     write.csv(data_combined_all_horizons, "1-data/processed/chemistry_combined_all_horizons.csv", row.names = FALSE)
     write.csv(data_combined_wide, "1-data/processed/chemistry_combined_wide.csv", row.names = FALSE)
-##    write.csv(icr_meta, "1-data/processed/icr_meta.csv", row.names = FALSE)
-##    crunch::write.csv.gz(icr_data_long, "1-data/processed/icr_long_all_samples.csv.gz", row.names = FALSE)
-##    crunch::write.csv.gz(icr_data_trt, "1-data/processed/icr_long_treatments.csv.gz", row.names = FALSE)
-    
+
   }, format = "file"),
    
    
