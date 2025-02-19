@@ -1064,11 +1064,95 @@ make_data_wide_processing = function(data_combined, sample_key){
 
 # -------------------------------------------------------------------------
 
+make_data_subset = function(data_combined){
+  
+  # data_combined_subset = 
+  data_combined %>% 
+    filter(!transect %in% "wte") %>% 
+    #filter(!grepl("Bromide|Fluoride|Nitrate|Calcium|Magnesium|Potassium|Sodium|Phosphate|Ammonia", name, ignore.case = TRUE)) %>% 
+    force()
+}
+make_data_wide = function(data_combined_subset, sample_key){
+  
+  #data_combined_wide = 
+  data_combined_subset %>% 
+    dplyr::select(sample_label, analysis, name, value) %>% 
+    separate(name, sep = "_", into = "variable", remove = F) %>% 
+    #mutate(name = paste0(variable, " (", analysis, ")")) %>% 
+    dplyr::select(sample_label, variable, value) %>% 
+    pivot_wider(names_from = "variable") %>% 
+    left_join(sample_key) %>% 
+    filter(!grepl("016", sample_label)) %>% # this one sample is very weird
+    dplyr::select(sample_label, region, site, transect, tree_number, horizon, everything()) %>% 
+    force()
+  
+}
+
+#
 # make summary tables ----
 make_summary_tables <- function(data_combined){
   
   data_combined_subset = make_data_subset(data_combined)
   
+  # functions - stats ----
+  fit_lme_transect = function(dat){
+    
+    a = nlme::lme(value ~ transect, 
+                  random =~1|site, 
+                  data = dat) %>% 
+      anova()
+    
+    a %>% 
+      as.data.frame() %>% 
+      rownames_to_column("variable") %>% 
+      filter(variable == "transect") %>%
+      rename(p_value = `p-value`) %>% 
+      dplyr::select(p_value) %>% 
+      mutate(p_value = round(p_value, 3))
+    
+  }
+  fit_lme_hsd_transect = function(dat){
+    # this function will assign post-hoc HSD letters to the transect
+    # use lme4::lmer -> multcomp::glht -> multcomp::cld
+    
+    lmer = lme4::lmer(value ~ transect + (1|site), data = dat)
+    h = summary(glht(lmer, linfct = mcp(transect = "Tukey")), test = adjusted("holm"))
+    x = cld(h, decreasing = TRUE) # decreasing order of HSD letters
+    x$mcletters$monospacedLetters %>% # sigh
+      as.data.frame() %>% 
+      rownames_to_column("transect") %>% 
+      rename(groups = ".") %>% 
+      mutate(groups = str_remove_all(groups, " "),
+             groups = toupper(groups))
+    
+  }
+  fit_aov_site = function(dat){
+    # a = 
+    aov(value ~ site, data = dat) %>% broom::tidy() %>% filter(term == "site") %>% 
+      rename(p_value = `p.value`) %>% 
+      dplyr::select(p_value)%>% 
+      mutate(p_value = round(p_value, 3))
+  }
+  fit_hsd_site = function(dat){
+    a = aov(value ~ site, data = dat)
+    h = agricolae::HSD.test(a, "site")
+    h$groups %>% 
+      as.data.frame() %>% 
+      rownames_to_column("site") %>% 
+      dplyr::select(site, groups) %>% 
+      mutate(groups = tolower(groups))
+  }
+  fit_hsd_transect = function(dat){
+    a = aov(value ~ transect, data = dat)
+    h = agricolae::HSD.test(a, "transect")
+    h$groups %>% 
+      as.data.frame() %>% 
+      rownames_to_column("transect") %>% 
+      dplyr::select(transect, groups) %>% 
+      mutate(groups = str_replace_all(groups, c("a" = "α", "b" = "β", "c" = "ψ")))
+  }
+  
+  #
   # get all the hsd letters for all combinations ----
   hsd_transect_overall = 
     data_combined_subset %>% 
@@ -1089,6 +1173,7 @@ make_summary_tables <- function(data_combined){
   
   # calculate summaries by transect and by site ----
   # include the hsd letters
+  
   ## totals by transect
   data_combined_summary <- 
     data_combined_subset %>% 
@@ -1169,6 +1254,6 @@ make_summary_tables <- function(data_combined){
   
 }
 # summary_table = make_summary_tables(data_combined)
-# write.xlsx(summary_table, "summary_tables.xlsx")
+# openxlsx::write.xlsx(summary_table, "summary_tables.xlsx")
 
 
