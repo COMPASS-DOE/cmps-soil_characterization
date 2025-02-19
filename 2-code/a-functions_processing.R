@@ -1060,3 +1060,115 @@ make_data_wide_processing = function(data_combined, sample_key){
     force()
   
 }
+
+
+# -------------------------------------------------------------------------
+
+# make summary tables ----
+make_summary_tables <- function(data_combined){
+  
+  data_combined_subset = make_data_subset(data_combined)
+  
+  # get all the hsd letters for all combinations ----
+  hsd_transect_overall = 
+    data_combined_subset %>% 
+    group_by(analysis, name, region) %>% 
+    do(fit_lme_hsd_transect(.))
+  
+  hsd_site_by_transect = 
+    data_combined_subset %>% 
+    filter(!grepl("DIC", analysis)) %>% 
+    group_by(analysis, name, region, transect) %>% 
+    do(fit_hsd_site(.))
+  
+  hsd_transect_by_site = 
+    data_combined_subset %>% 
+    filter(!grepl("DIC", analysis)) %>% 
+    group_by(analysis, name, region, site) %>% 
+    do(fit_hsd_transect(.))
+  
+  # calculate summaries by transect and by site ----
+  # include the hsd letters
+  ## totals by transect
+  data_combined_summary <- 
+    data_combined_subset %>% 
+    group_by(analysis, name, region, transect) %>% 
+    dplyr::summarise(mean = mean(value),
+                     mean = round(mean, 2),
+                     sd = sd(value),
+                     se = sd/sqrt(n()),
+                     se = round(se, 2)) %>% 
+    left_join(hsd_transect_overall) %>% 
+    mutate(#region_transect = paste0(region, "_", transect),
+      mean_se = paste(mean, "\u00b1", se, groups),
+      site = "MEAN") %>% 
+    ungroup() %>% 
+    #dplyr::select(-c(region, transect, mean, sd, se)) %>% 
+    #pivot_wider(names_from = region_transect, values_from = mean_se) %>% 
+    force()
+  
+  ## by site-transect
+  data_combined_summary_site <- 
+    data_combined_subset %>% 
+    group_by(analysis, name, region, site, transect) %>% 
+    dplyr::summarise(mean = mean(value),
+                     mean = round(mean, 2),
+                     sd = sd(value),
+                     se = sd/sqrt(n()),
+                     se = round(se, 2)) %>% 
+    left_join(hsd_site_by_transect %>% rename(group1 = groups)) %>% 
+    left_join(hsd_transect_by_site %>% rename(group2 = groups)) %>% 
+    mutate(# region_site_transect = paste0(region, "_", site, "_", transect),
+      mean_se = paste(mean, "\u00b1", se, group1, group2)) %>% 
+    ungroup() %>% 
+    #dplyr::select(-c(region, transect, site, mean, sd, se)) %>% 
+    #pivot_wider(names_from = region_site_transect, values_from = mean_se) %>% 
+    force()
+  
+  # combine the site and transect summaries ----
+  # then split into different groups based on analysis
+  data_summary_ALL = 
+    data_combined_summary_site %>% 
+    dplyr::select(analysis, name, region, site, transect, mean_se) %>% 
+    bind_rows(data_combined_summary %>% dplyr::select(analysis, name, region, site, transect, mean_se)) %>% 
+    #mutate(site = site %>% forcats::fct_relevel("MEAN", after = Inf)) %>% 
+    mutate(site = factor(site, levels = c("CRC", "PTR", "OWC", "MSM", "GWI", "GCW", "MEAN"))) %>% 
+    reorder_site() %>% reorder_transect() %>% 
+    arrange(region, analysis, name, site, transect)
+  
+  summary_BULK = 
+    data_summary_ALL %>% 
+    filter(grepl("TCTNTS|PH|LOI", analysis, ignore.case = TRUE)) %>% 
+    pivot_wider(names_from = "transect", values_from = "mean_se")
+  
+  summary_ICP = 
+    data_summary_ALL %>% 
+    filter(analysis == "ICP") %>% 
+    pivot_wider(names_from = "transect", values_from = "mean_se")
+  
+  summary_IC = 
+    data_summary_ALL %>% 
+    filter(analysis == "IC") %>% 
+    pivot_wider(names_from = "transect", values_from = "mean_se")
+  
+  summary_NUTRIENTS = 
+    data_summary_ALL %>% 
+    filter(grepl("ferrozine|mehlich|din", analysis, ignore.case = TRUE)) %>% 
+    pivot_wider(names_from = "transect", values_from = "mean_se")
+  
+  summary_DOC_DIC = 
+    data_summary_ALL %>% 
+    filter(grepl("npoc|dic", analysis, ignore.case = TRUE)) %>% 
+    pivot_wider(names_from = "transect", values_from = "mean_se")
+  
+  list(summary_BULK = summary_BULK,
+       summary_ICP = summary_ICP,
+       summary_IC = summary_IC,
+       summary_NUTRIENTS = summary_NUTRIENTS,
+       summary_DOC_DIC = summary_DOC_DIC)
+  
+}
+# summary_table = make_summary_tables(data_combined)
+# write.xlsx(summary_table, "summary_tables.xlsx")
+
+
