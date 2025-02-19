@@ -64,8 +64,8 @@ list(
   tar_target(wrc_processed, process_wrc(wrc_data)),
   tar_target(texture_processed, compute_texture()),
   # bulk density
-  # particle density
-  # tar_target(gg_wrc, plot_wrc(wrc_processed)),
+  tar_target(pd_data, read_sheet("https://docs.google.com/spreadsheets/d/1wHmiOvxa2SQhiGLIiUkNqiDpJQk__XjfrmA1fyuVYEA/")),
+  tar_target(pd_processed, process_pd(pd_data)),
 
   # combined data
   tar_target(data_combined_all_horizons, combine_data(moisture_processed, pH_processed, tctnts_data_samples, loi_processed,
@@ -75,17 +75,17 @@ list(
   tar_target(data_combined, subset_surface_horizons(data_combined_all_horizons)),
   tar_target(data_combined_wide, make_data_wide_processing(data_combined, sample_key)),
 
-  tar_target(analysis_completion_matrix, compute_analysis_matrix(data_combined)),
-  tar_target(gg_pca_all, compute_overall_pca(data_combined, sample_key)),
-  tar_target(gg_correlations, compute_correlations(data_combined, sample_key)),
-  
-  tar_target(gg_by_transect_colorsites, make_graphs_by_transect_SITE_AS_COLOR(data_combined)),
-  tar_target(gg_by_transect, make_graphs_by_transect(data_combined)),
-  tar_target(gg_by_site_oa, make_graphs_by_site(data_combined %>% filter(horizon != "B"))),
-  tar_target(gg_by_site_oab, make_graphs_by_site(data_combined_all_horizons)),
-  tar_target(gg_xrd, plot_xrd(xrd_processed)),
-  
-  tar_target(summary_tables, make_summary_tables(data_combined)),
+##  tar_target(analysis_completion_matrix, compute_analysis_matrix(data_combined)),
+##  tar_target(gg_pca_all, compute_overall_pca(data_combined, sample_key)),
+##  tar_target(gg_correlations, compute_correlations(data_combined, sample_key)),
+##  
+##  tar_target(gg_by_transect_colorsites, make_graphs_by_transect_SITE_AS_COLOR(data_combined)),
+##  tar_target(gg_by_transect, make_graphs_by_transect(data_combined)),
+##  tar_target(gg_by_site_oa, make_graphs_by_site(data_combined %>% filter(horizon != "B"))),
+##  tar_target(gg_by_site_oab, make_graphs_by_site(data_combined_all_horizons)),
+##  tar_target(gg_xrd, plot_xrd(xrd_processed)),
+##  
+##  tar_target(summary_tables, make_summary_tables(data_combined)),
   
   # export
   tar_target(export, {
@@ -93,10 +93,10 @@ list(
     write.csv(data_combined_all_horizons, "1-data/processed/chemistry_combined_all_horizons.csv", row.names = FALSE)
     write.csv(data_combined_wide, "1-data/processed/chemistry_combined_wide.csv", row.names = FALSE)
 
-  }, format = "file"),
+  }, format = "file")
    
    
    # report  
-   tar_render(report, path = "3-reports/characterization_report.Rmd")
+#   tar_render(report, path = "3-reports/characterization_report.Rmd")
   
 )

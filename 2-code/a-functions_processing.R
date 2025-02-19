@@ -1005,6 +1005,29 @@ xrd_surface = function(){
 }
 
 
+## bulk density
+
+
+## particle density
+process_pd = function(pd_data){
+  
+  ## formula for PD = wt of soil/vol of soil
+  ## wt soil = wt of pyc+od - wt of pyc
+  ## vol soil = vol of pyc - vol of water
+  ## -- vol of water = wt pycn+sample+water - wt pycn+sample / ρ (ρ = 0.998 g/cm3)
+  
+#  pd2 = 
+    pd_data %>% 
+    filter(is.na(skip)) %>% 
+    dplyr::select(site, transect, contains("pycnometer"), estimated_volume_mL, actual_volume_mL) %>% 
+    mutate(pd_gcm3 = (pycnometer_sample_od_wt_g - pycnometer_tare_wt_g)/ (actual_volume_mL - ((pycnometer_sample_final_wt_g - pycnometer_sample_od_wt_g)/0.998)),
+           pd_gcm3 = round(pd_gcm3, 2)) %>% 
+    dplyr::select(site, transect, pd_gcm3) %>% 
+    force()
+  
+}  
+  
+
 #
 # Combined chemistry data -------------------------------------------------
 combine_data = function(moisture_processed, pH_processed, tctnts_data_samples, loi_processed, 
