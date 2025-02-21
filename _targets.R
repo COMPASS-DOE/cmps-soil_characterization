@@ -75,17 +75,6 @@ list(
                                          sample_key)),
   tar_target(data_combined, subset_surface_horizons(data_combined_all_horizons)),
   tar_target(data_combined_wide, make_data_wide_processing(data_combined, sample_key)),
-
-##  tar_target(analysis_completion_matrix, compute_analysis_matrix(data_combined)),
-##  tar_target(gg_pca_all, compute_overall_pca(data_combined, sample_key)),
-##  tar_target(gg_correlations, compute_correlations(data_combined, sample_key)),
-##  
-##  tar_target(gg_by_transect_colorsites, make_graphs_by_transect_SITE_AS_COLOR(data_combined)),
-##  tar_target(gg_by_transect, make_graphs_by_transect(data_combined)),
-##  tar_target(gg_by_site_oa, make_graphs_by_site(data_combined %>% filter(horizon != "B"))),
-##  tar_target(gg_by_site_oab, make_graphs_by_site(data_combined_all_horizons)),
-##  tar_target(gg_xrd, plot_xrd(xrd_processed)),
-##  
   tar_target(summary_tables, make_summary_tables(data_combined, pd_processed, xrd_processed, texture_processed, wrc_parameters)),
   
   # export
@@ -97,10 +86,11 @@ list(
 # PD
 # BD
 # WRC
-  }, format = "file")
+  }, format = "file"),
    
    
    # report  
 #   tar_render(report, path = "3-reports/characterization_report.Rmd")
-  
+   tar_render(report, path = "3-reports/manuscript_figures.Rmd")
+
 )
