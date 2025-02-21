@@ -861,7 +861,7 @@ import_wrc_parameters = function(FILEPATH){
 
 
 # soil texture
-compute_texture = function(){
+compute_texture = function(sample_key){
   
   hydrometer_df = googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/13yOYC7vVzVzatXgJUaey2RYdmsJnfnmLmnVWVt4mOXo/edit#gid=0")
   
@@ -912,34 +912,15 @@ compute_texture = function(){
       dplyr::select(sample_id, starts_with("percent_"))
     
   }
-  soil_texture = compute_soil_texture(dat = hydrometer_data_processed) %>% rename(sample_label = sample_id)
   
-}
-texture_summary = function(){
-  texture = 
-    soil_texture %>% 
+  soil_texture = 
+    compute_soil_texture(dat = hydrometer_data_processed) %>% 
+    rename(sample_label = sample_id) %>% 
     left_join(sample_key) %>% 
-    mutate_at(vars(contains("percent")), round, 2)
-  
-  texture_summary = 
-    texture %>% 
-    subset_surface_horizons(.) %>% 
-    pivot_longer(cols = contains("percent"), names_to = "class") %>% 
-    filter(!is.na(value)) %>% 
-    group_by(region, site, transect, horizon, class) %>% 
-    dplyr::summarize(mean = mean(value),
-                     n = n(),
-                     se = sd(value)/sqrt(n()),
-                     summary = paste(round(mean, 2), "\u00b1", round(se, 2))) %>% 
-    dplyr::select(-mean, -n, -se) %>% 
-    reorder_site() %>% 
-    reorder_transect() %>% 
-    arrange(site, transect) %>% 
-    pivot_wider(names_from = "transect", values_from = "summary")
-    
+    mutate_at(vars(contains("percent")), round, 2) %>% 
+    dplyr::select(sample_label, region, site, transect, tree_number, horizon, everything())
   
 }
-
 
 ## XRD
 import_xrd = function(FILEPATH){
@@ -976,33 +957,6 @@ process_xrd = function(xrd_data, sample_key){
   
   # processed2 %>% write.csv("XRD_processed_2023-01-06.csv", row.names = F)
 }
-xrd_surface = function(){
-  
-  xrd_processed_surface = xrd_processed %>% subset_surface_horizons(.)
-  xrd_summary = 
-    xrd_processed_surface %>% 
-    dplyr::select(-c(tree_number)) %>% 
-    pivot_longer(-c(sample_label, region, site, transect, horizon),
-                 names_to = "mineral",
-                 values_to = "percentage") %>% 
-    group_by(region, site, transect, horizon, mineral) %>% 
-    dplyr::summarise(mean = mean(percentage),
-                     n = n(),
-                     se = sd(percentage)/sqrt(n()),
-                     summary = paste(round(mean, 2),
-                                      "\u00b1",
-                                      round(se, 2))) %>% 
-    dplyr::select(-mean, -n, -se) %>% 
-    reorder_horizon() %>% 
-    reorder_transect() %>% 
-    reorder_site() %>% 
-    arrange(region, site, transect)
-  
-  xrd_summary_wide = 
-    xrd_summary %>% 
-    pivot_wider(names_from = "transect", values_from = "summary")
-  
-}
 
 
 ## bulk density
@@ -1019,10 +973,10 @@ process_pd = function(pd_data){
 #  pd2 = 
     pd_data %>% 
     filter(is.na(skip)) %>% 
-    dplyr::select(site, transect, contains("pycnometer"), estimated_volume_mL, actual_volume_mL) %>% 
-    mutate(pd_gcm3 = (pycnometer_sample_od_wt_g - pycnometer_tare_wt_g)/ (actual_volume_mL - ((pycnometer_sample_final_wt_g - pycnometer_sample_od_wt_g)/0.998)),
-           pd_gcm3 = round(pd_gcm3, 2)) %>% 
-    dplyr::select(site, transect, pd_gcm3) %>% 
+    dplyr::select(region, site, transect, contains("pycnometer"), estimated_volume_mL, actual_volume_mL) %>% 
+    mutate(particle_density_gcm3 = (pycnometer_sample_od_wt_g - pycnometer_tare_wt_g)/ (actual_volume_mL - ((pycnometer_sample_final_wt_g - pycnometer_sample_od_wt_g)/0.998)),
+           particle_density_gcm3 = round(particle_density_gcm3, 2)) %>% 
+    dplyr::select(region, site, transect, particle_density_gcm3) %>% 
     force()
   
 }  
@@ -1113,8 +1067,9 @@ make_data_wide = function(data_combined_subset, sample_key){
 
 #
 # make summary tables ----
-make_summary_tables <- function(data_combined){
+make_summary_tables <- function(data_combined, xrd_processed){
   
+  # CHEMISTRY ----
   data_combined_subset = make_data_subset(data_combined)
   
   # functions - stats ----
@@ -1269,11 +1224,74 @@ make_summary_tables <- function(data_combined){
     filter(grepl("npoc|dic", analysis, ignore.case = TRUE)) %>% 
     pivot_wider(names_from = "transect", values_from = "mean_se")
   
+  
+  # NON-CHEMISTRY ----
+  
+  # summary_BD
+  summary_PD = 
+    pd_processed %>% 
+    group_by(region, site, transect) %>% 
+    dplyr::summarise(mean = mean(particle_density_gcm3),
+                     n = n(),
+                     se = sd(particle_density_gcm3)/sqrt(n()),
+                     summary = paste(round(mean, 2),
+                                     "\u00b1",
+                                     round(se, 2))) %>% 
+    dplyr::select(-mean, -n, -se) %>% 
+   # reorder_horizon() %>% 
+    reorder_transect() %>% 
+    reorder_site() %>% 
+    arrange(region, site, transect) %>% 
+    pivot_wider(names_from = "transect", values_from = "summary")
+  
+  # summary_WRC
+  
+  summary_texture = 
+    soil_texture %>% 
+    subset_surface_horizons(.) %>% 
+    pivot_longer(cols = contains("percent"), names_to = "class") %>% 
+    filter(!is.na(value)) %>% 
+    group_by(region, site, transect, horizon, class) %>% 
+    dplyr::summarize(mean = mean(value),
+                     n = n(),
+                     se = sd(value)/sqrt(n()),
+                     summary = paste(round(mean, 2), "\u00b1", round(se, 2))) %>% 
+    dplyr::select(-mean, -n, -se) %>% 
+    reorder_site() %>% 
+    reorder_transect() %>% 
+    arrange(site, transect) %>% 
+    filter(transect != "wte") %>% 
+    pivot_wider(names_from = "transect", values_from = "summary")
+  
+  summary_XRD = 
+    xrd_processed %>% subset_surface_horizons(.) %>% 
+    dplyr::select(-c(tree_number)) %>% 
+    pivot_longer(-c(sample_label, region, site, transect, horizon),
+                 names_to = "mineral",
+                 values_to = "percentage") %>% 
+    group_by(region, site, transect, horizon, mineral) %>% 
+    dplyr::summarise(mean = mean(percentage),
+                     n = n(),
+                     se = sd(percentage)/sqrt(n()),
+                     summary = paste(round(mean, 2),
+                                     "\u00b1",
+                                     round(se, 2))) %>% 
+    dplyr::select(-mean, -n, -se) %>% 
+    reorder_horizon() %>% 
+    reorder_transect() %>% 
+    reorder_site() %>% 
+    arrange(region, site, transect) %>% 
+    pivot_wider(names_from = "transect", values_from = "summary")
+  
+  
+  
   list(summary_BULK = summary_BULK,
        summary_ICP = summary_ICP,
        summary_IC = summary_IC,
        summary_NUTRIENTS = summary_NUTRIENTS,
-       summary_DOC_DIC = summary_DOC_DIC)
+       summary_DOC_DIC = summary_DOC_DIC,
+       summary_texture = summary_texture,
+       summary_XRD = summary_XRD)
   
 }
 # summary_table = make_summary_tables(data_combined)
