@@ -1273,7 +1273,8 @@ make_summary_tables <- function(data_combined,
     pivot_wider(names_from = "transect", values_from = "summary")
   
   summary_XRD = 
-    xrd_processed %>% subset_surface_horizons(.) %>% 
+    xrd_processed %>% 
+    subset_surface_horizons(.) %>% 
     dplyr::select(-c(tree_number)) %>% 
     pivot_longer(-c(sample_label, region, site, transect, horizon),
                  names_to = "mineral",
@@ -1290,7 +1291,8 @@ make_summary_tables <- function(data_combined,
     reorder_transect() %>% 
     reorder_site() %>% 
     arrange(region, site, transect) %>% 
-    pivot_wider(names_from = "transect", values_from = "summary")
+    filter(transect != "wte") %>% 
+    pivot_wider(names_from = "mineral", values_from = "summary")
   
   summary_wrc = wrc_parameters
   
@@ -1300,12 +1302,12 @@ make_summary_tables <- function(data_combined,
        summary_NUTRIENTS = summary_NUTRIENTS,
        summary_DOC_DIC = summary_DOC_DIC,
        summary_texture = summary_texture,
-       summary_PD = summary_PD,
+#       summary_PD = summary_PD,
        summary_wrc = summary_wrc,
        summary_XRD = summary_XRD)
   
 }
-# summary_table = make_summary_tables(data_combined)
+# summary_tables = make_summary_tables(data_combined)
 # openxlsx::write.xlsx(summary_tables, "summary_tables.xlsx")
 
 
