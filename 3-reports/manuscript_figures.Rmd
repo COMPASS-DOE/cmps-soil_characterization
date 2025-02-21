@@ -195,7 +195,7 @@ base_plot +
 # save figure 1300 x 950
 ```
 
-```{r map-poster, fig.height = 9.5, fig.width = 13}
+```{r map-poster, fig.height = 9.5, fig.width = 13, eval=FALSE}
 
 library(sf) # for map
 library(ggspatial) # for north arrow
@@ -426,7 +426,78 @@ pca_overall_wle = fit_pca_function(dat = data_wide_PCA %>% filter(region == "Eri
 pca_overall_cb = fit_pca_function(data_wide_PCA %>% filter(region == "Chesapeake"))
 ```
 
-```{r pca_gg, fig.width=10, fig.height=6}
+
+
+### PCA with clusters
+
+
+```{r cluster_calc, include=FALSE}
+
+#library(cluster)
+library(factoextra)
+
+
+df = data_wide_PCA %>%   drop_na() %>% dplyr::select(where(is.numeric))
+grp = data_wide_PCA %>% drop_na() %>% dplyr::select(!where(is.numeric))
+
+fviz_nbclust(df, FUN = hcut, method = "wss")
+fviz_nbclust(df, FUN = hcut, method = "silhouette")
+# three clusters
+
+d <- dist(df, method = "euclidean")
+hc1 <- hclust(d, method = "complete" )
+plot(hc1, cex = 0.6, hang = -1)
+hc5 <- hclust(d, method = "ward.D2" )
+sub_grp <- cutree(hc5, k = 3)
+table(sub_grp)
+plot(hc5, cex = 0.6)
+rect.hclust(hc5, k = 3, border = 2:5)
+
+df_cl <- mutate(df, cluster = sub_grp) %>% cbind(grp) %>% mutate(cluster = as.character(cluster))
+count(df_cl,cluster)
+
+```
+
+```{r cluster_gg, eval=FALSE}
+df_cl %>%
+  ggplot(aes(y = cluster, x = site))+
+  geom_point(aes(color = transect, shape = transect),
+             size = 4, stroke = 1,
+             position = position_jitterdodge(jitter.width = 0.0, jitter.height = 0.1, 
+                                             dodge.width = 0.4))+
+  scale_color_manual(values = pal_transect)
+
+```
+
+
+
+```{r cluster_pca, fig.width=10, fig.height=6}
+library(ggConvexHull)
+
+pca_cluster = fit_pca_function(df_cl) 
+
+ggbiplot::ggbiplot(pca_cluster$pca_int, obs.scale = 1, var.scale = 1,
+                   groups = as.character(pca_cluster$grp$cluster), 
+                   ellipse = F, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_convexhull(aes(group = pca_cluster$grp$cluster,
+                      fill = pca_cluster$grp$cluster), alpha = 0.2)+
+  geom_point(size=4,stroke=1, alpha = 1,
+             aes(shape = pca_cluster$grp$region,
+                 fill = groups))+ 
+  scale_shape_manual(values = c(23, 21))+
+  scale_color_manual(values = pnw_palette("Sailboat", 3))+
+  scale_fill_manual(values = pnw_palette("Sailboat", 3))+
+  labs(fill="cluster",
+       color = "cluster",
+       shape = "region",
+       title = "Overall PCA, both regions",
+       subtitle = "Surface horizons only")+
+  theme_kp()+
+  NULL
+  
+```
+
+```{r pca_gg, fig.width=10, fig.height=6, eval=FALSE}
 ## PCA plots overall
 #gg_pca_overall = 
 ggbiplot(pca_overall$pca_int, obs.scale = 1, var.scale = 1,
@@ -565,74 +636,6 @@ pc_all %>%
 
 
 
-### Clustering
-
-```{r cluster_calc, include=FALSE}
-
-#library(cluster)
-library(factoextra)
-
-
-df = data_wide_PCA %>%   drop_na() %>% dplyr::select(where(is.numeric))
-grp = data_wide_PCA %>% drop_na() %>% dplyr::select(!where(is.numeric))
-
-fviz_nbclust(df, FUN = hcut, method = "wss")
-fviz_nbclust(df, FUN = hcut, method = "silhouette")
-# three clusters
-
-d <- dist(df, method = "euclidean")
-hc1 <- hclust(d, method = "complete" )
-plot(hc1, cex = 0.6, hang = -1)
-hc5 <- hclust(d, method = "ward.D2" )
-sub_grp <- cutree(hc5, k = 3)
-table(sub_grp)
-plot(hc5, cex = 0.6)
-rect.hclust(hc5, k = 3, border = 2:5)
-
-df_cl <- mutate(df, cluster = sub_grp) %>% cbind(grp) %>% mutate(cluster = as.character(cluster))
-count(df_cl,cluster)
-
-```
-
-```{r cluster_gg}
-df_cl %>%
-  ggplot(aes(y = cluster, x = site))+
-  geom_point(aes(color = transect, shape = transect),
-             size = 4, stroke = 1,
-             position = position_jitterdodge(jitter.width = 0.0, jitter.height = 0.1, 
-                                             dodge.width = 0.4))+
-  scale_color_manual(values = pal_transect)
-
-```
-
-### PCA with clusters
-
-```{r cluster_pca, fig.width=10, fig.height=6}
-library(ggConvexHull)
-
-pca_cluster = fit_pca_function(df_cl) 
-
-ggbiplot::ggbiplot(pca_cluster$pca_int, obs.scale = 1, var.scale = 1,
-                   groups = as.character(pca_cluster$grp$cluster), 
-                   ellipse = F, circle = FALSE, var.axes = TRUE, alpha = 0) +
-  geom_convexhull(aes(group = pca_cluster$grp$cluster,
-                      fill = pca_cluster$grp$cluster), alpha = 0.2)+
-  geom_point(size=4,stroke=1, alpha = 1,
-             aes(shape = pca_cluster$grp$region,
-                 fill = groups))+ 
-  scale_shape_manual(values = c(23, 21))+
-  scale_color_manual(values = pnw_palette("Sailboat", 3))+
-  scale_fill_manual(values = pnw_palette("Sailboat", 3))+
-  labs(fill="cluster",
-       color = "cluster",
-       shape = "region",
-       title = "Overall PCA, both regions",
-       subtitle = "Surface horizons only")+
-  theme_kp()+
-  NULL
-  
-```
-
 ---
 
 
@@ -650,9 +653,7 @@ adonis2((data_wide_PCA %>% dplyr::select(where(is.numeric)) %>% drop_na()) ~
 
 ## 2. Each analyte
 
-### Normalized values - v1
-
-```{r scaled_gg1, fig.height = 8, fig.width = 7}
+```{r scaled_gg1, fig.height = 8, fig.width = 7, eval=FALSE}
 data_long = 
   data_combined_wide %>% 
   rename(Cl = Chloride,
@@ -825,26 +826,76 @@ pca_overall_wle = fit_pca_function(dat = data_wide_PCA2 %>% filter(region == "Er
 pca_overall_cb = fit_pca_function(data_wide_PCA2 %>% filter(region == "Chesapeake"))
 ```
 
-```{r v2-pca_gg, fig.width=10, fig.height=6}
-## PCA plots overall
-#gg_pca_overall = 
-ggbiplot(pca_overall$pca_int, obs.scale = 1, var.scale = 1, varname.size = 5,
-         groups = as.character(pca_overall$grp$region), 
-         ellipse = TRUE, circle = FALSE, var.axes = TRUE, alpha = 0) +
+### PCA with clusters
+
+```{r v2-cluster_pca, fig.width=10, fig.height=6}
+library(ggConvexHull)
+
+pca_cluster = fit_pca_function(df_cl) 
+
+ggbiplot::ggbiplot(pca_cluster$pca_int, obs.scale = 1, var.scale = 1, varname.size = 5,
+                   groups = as.character(pca_cluster$grp$cluster), 
+                   ellipse = F, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_convexhull(aes(group = pca_cluster$grp$cluster,
+                      fill = pca_cluster$grp$cluster), alpha = 0.2)+
   geom_point(size=4,stroke=1, alpha = 1,
-             aes(shape = pca_overall$grp$region,
+             aes(shape = pca_cluster$grp$region,
                  fill = groups))+ 
-  scale_color_manual(values = c("#16879C", "#BB281E"))+
-  scale_fill_manual(values = c("#16879C", "#BB281E"))+
   scale_shape_manual(values = c(23, 21))+
-  labs(shape="",
-       title = "Overall PCA, both regions",
-       subtitle = "Surface horizons only")+
+  scale_color_manual(values = pnw_palette("Sailboat", 3))+
+  scale_fill_manual(values = pnw_palette("Sailboat", 3))+
+  labs(fill="cluster",
+       color = "cluster",
+       shape = "region")+
   theme_kp()+
-  guides(fill = "none")+
+  theme(legend.position = c(0.8, 0.75))+
+  guides(fill = guide_legend(override.aes = list(shape = 21)))+
   NULL
+  
+```
+
+
+```{r v2-cluster_calc, include=FALSE}
+
+#library(cluster)
+library(factoextra)
+
+
+df = data_wide_PCA2 %>%   drop_na() %>% dplyr::select(where(is.numeric))
+grp = data_wide_PCA2 %>% drop_na() %>% dplyr::select(!where(is.numeric))
+
+fviz_nbclust(df, FUN = hcut, method = "wss")
+fviz_nbclust(df, FUN = hcut, method = "silhouette")
+# three clusters
+
+d <- dist(df, method = "euclidean")
+hc1 <- hclust(d, method = "complete" )
+plot(hc1, cex = 0.6, hang = -1)
+hc5 <- hclust(d, method = "ward.D2" )
+sub_grp <- cutree(hc5, k = 3)
+table(sub_grp)
+plot(hc5, cex = 0.6)
+rect.hclust(hc5, k = 3, border = 2:5)
+
+df_cl <- mutate(df, cluster = sub_grp) %>% cbind(grp) %>% mutate(cluster = as.character(cluster))
+count(df_cl,cluster)
 
 ```
+
+```{r v2-cluster_gg, include=FALSE}
+df_cl %>%
+  ggplot(aes(y = cluster, x = site))+
+  geom_point(aes(color = transect, shape = transect),
+             size = 4, stroke = 1,
+             position = position_jitterdodge(jitter.width = 0.0, jitter.height = 0.1, 
+                                             dodge.width = 0.4))+
+  scale_color_manual(values = pal_transect)
+
+```
+
+---
+
+## PCA by region
 
 ```{r v2-pca_gg_regions, fig.width=12, fig.height=7}
 
@@ -896,7 +947,7 @@ gg_pca_regions
 
 ```
 
-```{r v2-pca_gg_regions-poster, fig.width=7, fig.height=7}
+```{r v2-pca_gg_regions-poster, fig.width=7, fig.height=7, eval=FALSE}
 
 gg_pca_wle = 
   ggbiplot(pca_overall_wle$pca_int, obs.scale = 1, var.scale = 1, varname.size = 5,
@@ -1025,76 +1076,6 @@ pc_all %>%
 
 
 
-### Clustering
-
-```{r v2-cluster_calc, include=FALSE}
-
-#library(cluster)
-library(factoextra)
-
-
-df = data_wide_PCA2 %>%   drop_na() %>% dplyr::select(where(is.numeric))
-grp = data_wide_PCA2 %>% drop_na() %>% dplyr::select(!where(is.numeric))
-
-fviz_nbclust(df, FUN = hcut, method = "wss")
-fviz_nbclust(df, FUN = hcut, method = "silhouette")
-# three clusters
-
-d <- dist(df, method = "euclidean")
-hc1 <- hclust(d, method = "complete" )
-plot(hc1, cex = 0.6, hang = -1)
-hc5 <- hclust(d, method = "ward.D2" )
-sub_grp <- cutree(hc5, k = 3)
-table(sub_grp)
-plot(hc5, cex = 0.6)
-rect.hclust(hc5, k = 3, border = 2:5)
-
-df_cl <- mutate(df, cluster = sub_grp) %>% cbind(grp) %>% mutate(cluster = as.character(cluster))
-count(df_cl,cluster)
-
-```
-
-```{r v2-cluster_gg}
-df_cl %>%
-  ggplot(aes(y = cluster, x = site))+
-  geom_point(aes(color = transect, shape = transect),
-             size = 4, stroke = 1,
-             position = position_jitterdodge(jitter.width = 0.0, jitter.height = 0.1, 
-                                             dodge.width = 0.4))+
-  scale_color_manual(values = pal_transect)
-
-```
-
-### PCA with clusters
-
-```{r v2-cluster_pca, fig.width=10, fig.height=6}
-library(ggConvexHull)
-
-pca_cluster = fit_pca_function(df_cl) 
-
-ggbiplot::ggbiplot(pca_cluster$pca_int, obs.scale = 1, var.scale = 1, varname.size = 5,
-                   groups = as.character(pca_cluster$grp$cluster), 
-                   ellipse = F, circle = FALSE, var.axes = TRUE, alpha = 0) +
-  geom_convexhull(aes(group = pca_cluster$grp$cluster,
-                      fill = pca_cluster$grp$cluster), alpha = 0.2)+
-  geom_point(size=4,stroke=1, alpha = 1,
-             aes(shape = pca_cluster$grp$region,
-                 fill = groups))+ 
-  scale_shape_manual(values = c(23, 21))+
-  scale_color_manual(values = pnw_palette("Sailboat", 3))+
-  scale_fill_manual(values = pnw_palette("Sailboat", 3))+
-  labs(fill="cluster",
-       color = "cluster",
-       shape = "region")+
-  theme_kp()+
-  theme(legend.position = c(0.8, 0.75))+
-  guides(fill = guide_legend(override.aes = list(shape = 21)))+
-  NULL
-  
-```
-
----
-
 
 ## 1b. PERMANOVA
 
@@ -1109,8 +1090,6 @@ adonis2((data_wide_PCA2 %>% dplyr::select(where(is.numeric)) %>% drop_na()) ~
 
 
 ## 2. Each analyte
-
-### Normalized values - v1
 
 ```{r v2-scaled_gg1, fig.height = 8, fig.width = 7, eval=FALSE}
 data_long = 
@@ -1188,9 +1167,9 @@ data_scaled2 %>%
 
 ```
 
-### Normalized values - v2
+### Normalized values
 
-```{r v2-scaled_gg2, fig.height = 8, fig.width = 8}
+```{r v2-scaled_gg2, fig.height = 8, fig.width = 8, eval=FALSE}
 data_long_all = 
   data_combined_wide %>% 
   dplyr::select(-c(TN, CEC, K, Mg, Sulfate, NO3N, pH, spConductance, SOM, DIC, Al)) %>% 
@@ -1224,7 +1203,7 @@ data_scaled_NEW %>%
 
 ```
 
-```{r v2-scaled_gg2_split, fig.height = 10, fig.width = 14}
+```{r v2-scaled_gg2_split, fig.height = 10, fig.width = 14, eval=FALSE}
 library(ggh4x) # for nested facets
 # https://teunbrand.github.io/ggh4x/reference/facet_nested.html
 
@@ -1244,6 +1223,8 @@ data_scaled_NEW %>%
   theme(axis.text.y = element_blank(),
         panel.grid = element_blank())
 ```
+
+### only select analytes
 
 ```{r v2-scaled_gg2_split-NEW, fig.height = 10, fig.width = 12}
 library(ggh4x) # for nested facets
@@ -1282,9 +1263,7 @@ data_scaled_NEW2 %>%
 ```
 
 
-### GWI only
-
-```{r v2-scaled_gg2_gwi, fig.height = 8, fig.width = 8}
+```{r v2-scaled_gg2_gwi, fig.height = 8, fig.width = 8, eval=FALSE}
 data_scaled_NEW %>% 
   filter(site == "GWI") %>% 
   ggplot(aes(x = transect, y = value_scaled, group = site, color = site))+
@@ -1420,7 +1399,7 @@ cowplot::plot_grid(gg_fe, gg_p, ncol = 1)
 
 ```
 
-```{r analytesx-4, fig.height = 15, fig.width = 8}
+```{r analytesx-4, fig.height = 15, fig.width = 8, eval=FALSE}
 cowplot::plot_grid(gg_tc, gg_fe, gg_p, ncol = 1)
 ```
 

@@ -11,8 +11,6 @@ Synpotic Soil Characterization
 
 ![](manuscript_figures_files/figure-gfm/map-1.png)<!-- -->
 
-![](manuscript_figures_files/figure-gfm/map-poster-1.png)<!-- -->
-
 ------------------------------------------------------------------------
 
 ## 0. Correlations
@@ -44,21 +42,15 @@ Click to Open
 
 ### Overall PCAs
 
-![](manuscript_figures_files/figure-gfm/pca_gg-1.png)<!-- -->
+### PCA with clusters
+
+![](manuscript_figures_files/figure-gfm/cluster_pca-1.png)<!-- -->
 
 ![](manuscript_figures_files/figure-gfm/pca_gg_regions-1.png)<!-- -->
 
 ### Drivers and loadings
 
 ![](manuscript_figures_files/figure-gfm/pc_gg-1.png)<!-- -->
-
-### Clustering
-
-![](manuscript_figures_files/figure-gfm/cluster_gg-1.png)<!-- -->
-
-### PCA with clusters
-
-![](manuscript_figures_files/figure-gfm/cluster_pca-1.png)<!-- -->
 
 ------------------------------------------------------------------------
 
@@ -85,10 +77,6 @@ Click to Open
 
 ## 2. Each analyte
 
-### Normalized values - v1
-
-![](manuscript_figures_files/figure-gfm/scaled_gg1-1.png)<!-- -->
-
 ### Normalized values - v2
 
 ![](manuscript_figures_files/figure-gfm/scaled_gg2-1.png)<!-- -->
@@ -105,25 +93,19 @@ Click to Open
 
 ### Overall PCAs
 
-![](manuscript_figures_files/figure-gfm/v2-pca_gg-1.png)<!-- -->
-
-![](manuscript_figures_files/figure-gfm/v2-pca_gg_regions-1.png)<!-- -->
-
-![](manuscript_figures_files/figure-gfm/v2-pca_gg_regions-poster-1.png)<!-- -->![](manuscript_figures_files/figure-gfm/v2-pca_gg_regions-poster-2.png)<!-- -->
-
-### Drivers and loadings
-
-![](manuscript_figures_files/figure-gfm/v2-pc_gg-1.png)<!-- -->
-
-### Clustering
-
-![](manuscript_figures_files/figure-gfm/v2-cluster_gg-1.png)<!-- -->
-
 ### PCA with clusters
 
 ![](manuscript_figures_files/figure-gfm/v2-cluster_pca-1.png)<!-- -->
 
 ------------------------------------------------------------------------
+
+## PCA by region
+
+![](manuscript_figures_files/figure-gfm/v2-pca_gg_regions-1.png)<!-- -->
+
+### Drivers and loadings
+
+![](manuscript_figures_files/figure-gfm/v2-pc_gg-1.png)<!-- -->
 
 ## 1b. PERMANOVA
 
@@ -148,25 +130,15 @@ Click to Open
 
 ## 2. Each analyte
 
-### Normalized values - v1
+### Normalized values
 
-### Normalized values - v2
-
-![](manuscript_figures_files/figure-gfm/v2-scaled_gg2-1.png)<!-- -->
-
-![](manuscript_figures_files/figure-gfm/v2-scaled_gg2_split-1.png)<!-- -->
+### only select analytes
 
 ![](manuscript_figures_files/figure-gfm/v2-scaled_gg2_split-NEW-1.png)<!-- -->
-
-### GWI only
-
-![](manuscript_figures_files/figure-gfm/v2-scaled_gg2_gwi-1.png)<!-- -->
 
 # Specific analytes
 
 ![](manuscript_figures_files/figure-gfm/analytesx-3-1.png)<!-- -->
-
-![](manuscript_figures_files/figure-gfm/analytesx-4-1.png)<!-- -->
 
 ## Chesapeake-only plots for GWI
 
