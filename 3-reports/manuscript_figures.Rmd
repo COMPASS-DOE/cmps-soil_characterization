@@ -1502,7 +1502,7 @@ wrc_processed %>%
 
 ```{r, gg_elevation, fig.height=8, fig.width=10}
 
-elevation = read.csv("synoptic-distances.csv", na = "")
+elevation = read.csv("1-data/synoptic-elevations.csv", na = "")
 elevation_processed = 
   elevation %>% 
   mutate(transect = factor(transect, levels = c("water edge", "wetland", "transition", "upland"))) %>% 
