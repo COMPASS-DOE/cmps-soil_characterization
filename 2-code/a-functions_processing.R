@@ -850,10 +850,17 @@ import_wrc_parameters = function(FILEPATH){
     pivot_wider(names_from = "parameter", values_from = "value") %>% 
     mutate(transect = tolower(transect)) %>% 
     mutate(m = 1 - (1/n),
-           transect = case_match(transect, "upland" ~ "UP", "transition" ~ "TR", "wetland" ~ "W")) %>% 
-    rename(location = transect,
+           #transect = case_match(transect, "upland" ~ "UP", "transition" ~ "TR", "wetland" ~ "W")
+           ) %>% 
+    rename(
            theta_r = th_r,
-           theta_s = th_s)
+           theta_s = th_s) %>% 
+    mutate(region = case_when(site %in% c("GCW", "GWI", "MSM") ~ "Chesapeake",
+                              site %in% c("CRC", "PTR", "OWC") ~ "Erie")) %>% 
+    dplyr::select(region, everything()) %>% 
+    reorder_site() %>% 
+    reorder_transect() %>% 
+    arrange(region, site, transect)
   
   #parameters_processed %>% write.csv("1-data/wrc/wrc_msm_mcdowell/wrc_parameters_all_sites.csv", row.names = F, na = "")
   
@@ -861,9 +868,9 @@ import_wrc_parameters = function(FILEPATH){
 
 
 # soil texture
-compute_texture = function(sample_key){
+compute_texture = function(FILEPATH, sample_key){
   
-  hydrometer_df = googlesheets4::read_sheet("https://docs.google.com/spreadsheets/d/13yOYC7vVzVzatXgJUaey2RYdmsJnfnmLmnVWVt4mOXo/edit#gid=0")
+  hydrometer_df = googlesheets4::read_sheet(FILEPATH)
   
   hydrometer_data_processed = 
     hydrometer_df %>% 
@@ -1067,7 +1074,9 @@ make_data_wide = function(data_combined_subset, sample_key){
 
 #
 # make summary tables ----
-make_summary_tables <- function(data_combined, xrd_processed){
+make_summary_tables <- function(data_combined, 
+                                pd_processed,
+                                xrd_processed, texture_processed, wrc_parameters){
   
   # CHEMISTRY ----
   data_combined_subset = make_data_subset(data_combined)
@@ -1247,7 +1256,7 @@ make_summary_tables <- function(data_combined, xrd_processed){
   # summary_WRC
   
   summary_texture = 
-    soil_texture %>% 
+    texture_processed %>% 
     subset_surface_horizons(.) %>% 
     pivot_longer(cols = contains("percent"), names_to = "class") %>% 
     filter(!is.na(value)) %>% 
@@ -1283,7 +1292,7 @@ make_summary_tables <- function(data_combined, xrd_processed){
     arrange(region, site, transect) %>% 
     pivot_wider(names_from = "transect", values_from = "summary")
   
-  
+  summary_wrc = wrc_parameters
   
   list(summary_BULK = summary_BULK,
        summary_ICP = summary_ICP,
@@ -1291,10 +1300,12 @@ make_summary_tables <- function(data_combined, xrd_processed){
        summary_NUTRIENTS = summary_NUTRIENTS,
        summary_DOC_DIC = summary_DOC_DIC,
        summary_texture = summary_texture,
+       summary_PD = summary_PD,
+       summary_wrc = summary_wrc,
        summary_XRD = summary_XRD)
   
 }
 # summary_table = make_summary_tables(data_combined)
-# openxlsx::write.xlsx(summary_table, "summary_tables.xlsx")
+# openxlsx::write.xlsx(summary_tables, "summary_tables.xlsx")
 
 

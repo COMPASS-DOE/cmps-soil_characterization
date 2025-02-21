@@ -62,7 +62,8 @@ list(
   tar_target(xrd_processed, process_xrd(xrd_data, sample_key)),
   tar_target(wrc_data, import_wrc_data(FILEPATH = "1-data/raw/wrc")),
   tar_target(wrc_processed, process_wrc(wrc_data)),
-  tar_target(texture_processed, compute_texture()),
+  tar_target(wrc_parameters, import_wrc_parameters(FILEPATH = "1-data/raw/wrc")),
+  tar_target(texture_processed, compute_texture(FILEPATH = "https://docs.google.com/spreadsheets/d/13yOYC7vVzVzatXgJUaey2RYdmsJnfnmLmnVWVt4mOXo/", sample_key)),
   # bulk density
   tar_target(pd_data, read_sheet("https://docs.google.com/spreadsheets/d/1wHmiOvxa2SQhiGLIiUkNqiDpJQk__XjfrmA1fyuVYEA/")),
   tar_target(pd_processed, process_pd(pd_data)),
@@ -85,14 +86,17 @@ list(
 ##  tar_target(gg_by_site_oab, make_graphs_by_site(data_combined_all_horizons)),
 ##  tar_target(gg_xrd, plot_xrd(xrd_processed)),
 ##  
-##  tar_target(summary_tables, make_summary_tables(data_combined)),
+  tar_target(summary_tables, make_summary_tables(data_combined, pd_processed, xrd_processed, texture_processed, wrc_parameters)),
   
   # export
   tar_target(export, {
     write.csv(data_combined, "1-data/processed/chemistry_combined_surface_horizon.csv", row.names = FALSE)
     write.csv(data_combined_all_horizons, "1-data/processed/chemistry_combined_all_horizons.csv", row.names = FALSE)
     write.csv(data_combined_wide, "1-data/processed/chemistry_combined_wide.csv", row.names = FALSE)
-
+# texture
+# PD
+# BD
+# WRC
   }, format = "file")
    
    
