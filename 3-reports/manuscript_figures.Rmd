@@ -1472,6 +1472,84 @@ cowplot::plot_grid(gg_spc, gg_cl, ncol = 1)
 ```
 
 
+
+## Water retention curves
+
+```{r gg_hyprop, fig.height=8, fig.width=10}
+library(ggh4x)
+ 
+tar_load(wrc_processed)
+
+wrc_processed %>% 
+  reorder_site() %>% 
+    filter(kpa_fit >= 0 | kpa_eval >= 0) %>% 
+    mutate(region = factor(region, levels = c("Erie", "Chesapeake"))) %>% 
+    ggplot(aes(y = water_content_vol_percent, color = transect))+
+    geom_line(aes(x = kpa_fit))+
+    geom_point(aes(x = kpa_eval), shape = 1)+
+    scale_x_log10(labels = scales::comma)+
+  scale_color_manual(values = rev(soilpalettes::soil_palette("redox2", 3)))+
+  labs(x = "Water potential, kPa",
+       y = "Water content, % v/v",
+       color = "")+
+  #    facet_wrap(~region + site)+
+  facet_nested_wrap(region ~ site)+
+  theme_kp()
+```
+
+
+## Elevation
+
+```{r, gg_elevation, fig.height=8, fig.width=10}
+
+elevation = read.csv("synoptic-distances.csv", na = "")
+elevation_processed = 
+  elevation %>% 
+  mutate(transect = factor(transect, levels = c("water edge", "wetland", "transition", "upland"))) %>% 
+  reorder_site()
+
+
+gg_wle = 
+  elevation_processed %>% 
+  filter(region == "Erie") %>% 
+  ggplot(aes(x = distance_to_water_m, y = elev_m, color = transect))+
+  geom_line(color = "black")+
+  geom_point(size = 4)+
+  scale_color_manual(values = c("grey", "#2E5894", "#FFB200", "#96001B"),
+                     breaks = c("water edge", "wetland", "transition", "upland"))+
+  facet_nested_wrap(region ~ site)+
+  labs(x = "",
+       y = "Elevation, m
+       ",
+       color = "")+
+#  theme(legend.position = c(0.1,0.61))+
+  NULL
+
+
+gg_cb = 
+  elevation_processed %>% 
+  filter(region == "Chesapeake") %>%
+  filter(site != "Sweet Hall Marsh") %>% 
+  ggplot(aes(x = distance_to_water_m, y = elev_m, color = transect))+
+  geom_line(color = "black")+
+  geom_point(size = 4)+
+  scale_color_manual(values = c("grey", "#2E5894", "#FFB200", "#96001B"),
+                     breaks = c("water edge", "wetland", "transition", "upland"))+
+  facet_nested_wrap(region ~ site)+
+  labs(x = "Distance to water, m",
+       y = "Elevation, m
+       ",
+       color = "")
+
+ggpubr::ggarrange(gg_wle, gg_cb, common.legend = T, nrow = 2)
+
+
+  
+  
+
+```
+
+
 ---
 
 ## Session Info 

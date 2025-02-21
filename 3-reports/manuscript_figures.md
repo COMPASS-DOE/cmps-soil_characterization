@@ -172,6 +172,14 @@ Click to Open
 
 ![](manuscript_figures_files/figure-gfm/analytes-gwi-1.png)<!-- -->
 
+## Water retention curves
+
+![](manuscript_figures_files/figure-gfm/gg_hyprop-1.png)<!-- -->
+
+## Elevation
+
+![](manuscript_figures_files/figure-gfm/gg_elevation-1.png)<!-- -->
+
 ------------------------------------------------------------------------
 
 ## Session Info
@@ -181,7 +189,7 @@ Click to Open
 Session Info
 </summary>
 
-Date run: 2024-12-03
+Date run: 2025-02-20
 
     ## R version 4.2.1 (2022-06-23)
     ## Platform: x86_64-apple-darwin17.0 (64-bit)
@@ -198,31 +206,32 @@ Date run: 2024-12-03
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ##  [1] multcomp_1.4-25     TH.data_1.1-1       MASS_7.3-60        
-    ##  [4] survival_3.3-1      mvtnorm_1.1-3       ggh4x_0.2.8.9000   
+    ##  [1] ggh4x_0.2.8.9000    ggConvexHull_0.1.0  factoextra_1.0.7   
+    ##  [4] ggspatial_1.1.9     sf_1.0-8            patchwork_1.1.2    
     ##  [7] vegan_2.6-4         lattice_0.20-45     permute_0.9-7      
-    ## [10] ggConvexHull_0.1.0  factoextra_1.0.7    ggspatial_1.1.9    
-    ## [13] sf_1.0-8            ggbiplot_0.55       googlesheets4_1.0.1
-    ## [16] soilpalettes_0.1.0  PNWColors_0.1.0     magrittr_2.0.3     
-    ## [19] lubridate_1.9.2     forcats_1.0.0       stringr_1.5.0      
-    ## [22] dplyr_1.1.4         purrr_1.0.2         readr_2.1.4        
-    ## [25] tidyr_1.3.1         tibble_3.2.1        ggplot2_3.5.1      
-    ## [28] tidyverse_2.0.0    
+    ## [10] ggbiplot_0.55       multcompView_0.1-9  multcomp_1.4-25    
+    ## [13] TH.data_1.1-1       MASS_7.3-60         survival_3.3-1     
+    ## [16] mvtnorm_1.1-3       googlesheets4_1.0.1 soilpalettes_0.1.0 
+    ## [19] PNWColors_0.1.0     magrittr_2.0.3      lubridate_1.9.2    
+    ## [22] forcats_1.0.0       stringr_1.5.0       dplyr_1.1.4        
+    ## [25] purrr_1.0.2         readr_2.1.4         tidyr_1.3.1        
+    ## [28] tibble_3.2.1        ggplot2_3.5.1       tidyverse_2.0.0    
+    ## [31] tarchetypes_0.7.2   targets_0.14.0     
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] googledrive_2.0.0  minqa_1.2.4        colorspace_2.0-3   ggsignif_0.6.4    
+    ##  [1] minqa_1.2.4        googledrive_2.0.0  colorspace_2.0-3   ggsignif_0.6.4    
     ##  [5] ellipsis_0.3.2     class_7.3-20       fs_1.5.2           rstudioapi_0.16.0 
     ##  [9] proxy_0.4-27       ggpubr_0.6.0       farver_2.1.1       ggrepel_0.9.3     
     ## [13] fansi_1.0.3        codetools_0.2-18   splines_4.2.1      knitr_1.42        
-    ## [17] nloptr_2.0.3       broom_1.0.6        cluster_2.1.3      targets_0.14.0    
-    ## [21] compiler_4.2.1     backports_1.4.1    ggcorrplot_0.1.4   Matrix_1.5-1      
-    ## [25] fastmap_1.1.0      gargle_1.2.0       cli_3.6.3          s2_1.1.0          
-    ## [29] htmltools_0.5.7    tools_4.2.1        igraph_1.5.1       gtable_0.3.0      
-    ## [33] glue_1.6.2         reshape2_1.4.4     wk_0.6.0           Rcpp_1.0.11       
-    ## [37] carData_3.0-5      cellranger_1.1.0   vctrs_0.6.5        nlme_3.1-160      
-    ## [41] xfun_0.42          ps_1.7.1           lme4_1.1-31        timechange_0.2.0  
-    ## [45] lifecycle_1.0.3    rstatix_0.7.2      zoo_1.8-11         scales_1.3.0      
-    ## [49] hms_1.1.2          parallel_4.2.1     sandwich_3.0-2     yaml_2.3.5        
+    ## [17] nloptr_2.0.3       broom_1.0.6        cluster_2.1.3      compiler_4.2.1    
+    ## [21] backports_1.4.1    ggcorrplot_0.1.4   Matrix_1.5-1       fastmap_1.1.0     
+    ## [25] gargle_1.2.0       cli_3.6.3          s2_1.1.0           htmltools_0.5.7   
+    ## [29] tools_4.2.1        igraph_1.5.1       gtable_0.3.0       glue_1.6.2        
+    ## [33] reshape2_1.4.4     wk_0.6.0           Rcpp_1.0.11        carData_3.0-5     
+    ## [37] cellranger_1.1.0   vctrs_0.6.5        nlme_3.1-160       xfun_0.42         
+    ## [41] ps_1.7.1           lme4_1.1-31        timechange_0.2.0   lifecycle_1.0.3   
+    ## [45] rstatix_0.7.2      zoo_1.8-11         scales_1.3.0       hms_1.1.2         
+    ## [49] parallel_4.2.1     sandwich_3.0-2     yaml_2.3.5         gridExtra_2.3     
     ## [53] stringi_1.7.8      highr_0.9          e1071_1.7-11       boot_1.3-28       
     ## [57] rlang_1.1.4.9000   pkgconfig_2.0.3    evaluate_0.16      labeling_0.4.2    
     ## [61] cowplot_1.1.1      processx_3.7.0     tidyselect_1.2.0   plyr_1.8.7        
