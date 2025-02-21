@@ -1307,7 +1307,7 @@ make_summary_tables <- function(data_combined,
        summary_XRD = summary_XRD)
   
 }
-# summary_tables = make_summary_tables(data_combined)
+# targets::tar_load(summary_tables)
 # openxlsx::write.xlsx(summary_tables, "summary_tables.xlsx")
 
 
