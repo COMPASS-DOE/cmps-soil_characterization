@@ -1226,16 +1226,16 @@ data_scaled_NEW %>%
 
 ### only select analytes
 
-```{r v2-scaled_gg2_split-NEW, fig.height = 10, fig.width = 12}
+```{r v2-scaled_gg2_split-NEW, fig.height = 13, fig.width = 12}
 library(ggh4x) # for nested facets
 # https://teunbrand.github.io/ggh4x/reference/facet_nested.html
 
 data_scaled_NEW2 = 
   data_scaled_NEW %>% 
-  filter(name %in% c("WEOC", "TS", "Na", "Chloride", "Fe", "P")) %>% 
+  filter(name %in% c("WEOC", "TS", "Na", "Chloride", "Fe", "P", "NH4N")) %>% 
     mutate(name = factor(name, levels = c("TC", "TS", "WEOC",
                                         "Ca", "Na", "Chloride",
-                                        "NH4N", "Fe", "P"))) 
+                                        "Fe", "P", "NH4N"))) 
 
 data_scaled_NEW2 %>% 
   ggplot(aes(x = transect, y = value_scaled, group = site, color = site))+
