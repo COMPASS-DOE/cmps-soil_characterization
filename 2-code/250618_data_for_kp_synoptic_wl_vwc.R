@@ -37,7 +37,7 @@ common_tz = "Etc/GMT+5"
 sites_to_pull = "PTR|CRC|OWC|MSM|GCW|GWI"
 years_to_pull = "2022|2023"
 
-temp_storage = "data/raw_from_gdrive/synoptic_kaizad/"
+temp_storage = "TEMP/"
 
 
 # 2. Pull L1 data --------------------------------------------------------------
@@ -221,4 +221,46 @@ percent_flooded <- troll %>%
 
 write_csv(percent_flooded, paste0(temp_storage, "/250620_kaizad_synoptic_troll_percent_flooded.csv"))
 
+
+troll_outlier = 
+  troll %>% 
+  arrange(site, plot, datetime_est) %>% 
+  group_by(site, plot) %>% 
+  mutate(rollmean = zoo::rollmean(wl_below_surface_m, 70, fill = NA),
+         lag = - wl_below_surface_m + lag(wl_below_surface_m),
+         outlier = case_when(abs(lag) >= 0.3 ~ "outlier"),
+         outlier2 = case_when(abs(wl_below_surface_m - rollmean) > 1 ~ "outlier"),
+         plot = factor(plot, levels = c("UP", "TR", "W")),
+         region = case_when(site %in% c("GCW", "MSM", "GWI") ~ "Chesapeake",
+                            site %in% c("CRC", "PTR", "OWC") ~ "Erie"))
+  
+##  group_by(site, plot) %>% 
+##  dplyr::summarise(mean_wl = mean(wl_below_surface_m),
+##                   median_wl = median(wl_below_surface_m),
+##                   min_wl = min(wl_below_surface_m),
+##                   max_wl = max(wl_below_surface_m))
+
+
+troll_outlier %>% 
+  filter(!(site == "GCW" & plot == "UP")) %>% 
+  ggplot(aes(x = datetime_est, y = wl_below_surface_m))+
+  geom_point(aes(color = outlier2))+
+  geom_line(aes(y = rollmean))+
+  facet_grid(site ~ plot)
+
+library(ggh4x) # for nested facets
+troll_outlier %>% 
+  #filter(!site == "GCW") %>%
+  mutate(rollmean = case_when(site == "GCW" ~ NA, .default = rollmean)) %>% 
+  filter(is.na(outlier2)) %>% 
+  ggplot(aes(x = datetime_est, y = wl_below_surface_m, color = plot))+
+  geom_hline(yintercept = 0, alpha = 0.8)+
+ # geom_point(aes(color = outlier2))+
+  geom_line(aes(y = rollmean), linewidth = 1)+
+#  facet_wrap(~site)+
+#  facet_grid(site ~ plot)+ 
+  facet_nested_wrap(~region + site,
+                    nest_line = element_line(colour = "grey"))+ 
+  theme_kp()+
+  theme(panel.grid = element_blank())
 
