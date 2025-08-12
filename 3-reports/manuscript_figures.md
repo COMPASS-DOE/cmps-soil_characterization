@@ -243,19 +243,19 @@ Date run: 2025-08-12
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ##  [1] vegan_2.7-1         permute_0.9-7       ggConvexHull_0.1.0 
-    ##  [4] factoextra_1.0.7    ggspatial_1.1.9     sf_1.0-21          
-    ##  [7] ggh4x_0.3.1         ggbiplot_0.55       furrr_0.3.1        
-    ## [10] future_1.58.0       googledrive_2.1.1   beepr_2.0          
-    ## [13] tictoc_1.2.1        cowplot_1.1.3       parsedate_1.3.2    
-    ## [16] janitor_2.2.1       pacman_0.5.1        multcompView_0.1-10
-    ## [19] multcomp_1.4-28     TH.data_1.1-3       MASS_7.3-65        
-    ## [22] survival_3.8-3      mvtnorm_1.3-3       googlesheets4_1.1.1
-    ## [25] soilpalettes_0.1.0  PNWColors_0.1.0     magrittr_2.0.3     
-    ## [28] lubridate_1.9.4     forcats_1.0.0       stringr_1.5.1      
-    ## [31] dplyr_1.1.4         purrr_1.0.4         readr_2.1.5        
-    ## [34] tidyr_1.3.1         tibble_3.3.0        ggplot2_3.5.2      
-    ## [37] tidyverse_2.0.0     tarchetypes_0.13.1  targets_1.11.3     
+    ##  [1] multcomp_1.4-28     TH.data_1.1-3       MASS_7.3-65        
+    ##  [4] survival_3.8-3      mvtnorm_1.3-3       vegan_2.7-1        
+    ##  [7] permute_0.9-7       ggConvexHull_0.1.0  factoextra_1.0.7   
+    ## [10] ggspatial_1.1.9     sf_1.0-21           ggh4x_0.3.1        
+    ## [13] ggbiplot_0.55       furrr_0.3.1         future_1.58.0      
+    ## [16] googledrive_2.1.1   beepr_2.0           tictoc_1.2.1       
+    ## [19] cowplot_1.1.3       parsedate_1.3.2     janitor_2.2.1      
+    ## [22] pacman_0.5.1        googlesheets4_1.1.1 soilpalettes_0.1.0 
+    ## [25] PNWColors_0.1.0     magrittr_2.0.3      lubridate_1.9.4    
+    ## [28] forcats_1.0.0       stringr_1.5.1       dplyr_1.1.4        
+    ## [31] purrr_1.0.4         readr_2.1.5         tidyr_1.3.1        
+    ## [34] tibble_3.3.0        ggplot2_3.5.2       tidyverse_2.0.0    
+    ## [37] tarchetypes_0.13.1  targets_1.11.3     
     ## 
     ## loaded via a namespace (and not attached):
     ##  [1] Rdpack_2.6.4       DBI_1.2.3          gridExtra_2.3      s2_1.1.8          
@@ -265,11 +265,11 @@ Date run: 2025-08-12
     ## [17] backports_1.5.0    labeling_0.4.3     rmarkdown_2.29     tzdb_0.5.0        
     ## [21] nloptr_2.2.1       ps_1.9.1           xfun_0.52          broom_1.0.8       
     ## [25] parallel_4.5.0     prettyunits_1.2.0  cluster_2.1.8.1    R6_2.6.1          
-    ## [29] stringi_1.8.7      RColorBrewer_1.1-3 boot_1.3-31        car_3.1-3         
-    ## [33] parallelly_1.45.1  cellranger_1.1.0   Rcpp_1.0.14        knitr_1.50        
+    ## [29] stringi_1.8.7      RColorBrewer_1.1-3 boot_1.3-31        parallelly_1.45.1 
+    ## [33] car_3.1-3          cellranger_1.1.0   Rcpp_1.0.14        knitr_1.50        
     ## [37] zoo_1.8-14         audio_0.1-11       Matrix_1.7-3       splines_4.5.0     
-    ## [41] igraph_2.1.4       timechange_0.3.0   tidyselect_1.2.1   abind_1.4-8       
-    ## [45] rstudioapi_0.17.1  yaml_2.3.10        codetools_0.2-20   processx_3.8.6    
+    ## [41] igraph_2.1.4       timechange_0.3.0   tidyselect_1.2.1   rstudioapi_0.17.1 
+    ## [45] abind_1.4-8        yaml_2.3.10        codetools_0.2-20   processx_3.8.6    
     ## [49] listenv_0.9.1      lattice_0.22-6     plyr_1.8.9         withr_3.0.2       
     ## [53] evaluate_1.0.3     units_0.8-7        proxy_0.4-27       pillar_1.10.2     
     ## [57] ggpubr_0.6.0       carData_3.0-5      KernSmooth_2.23-26 reformulas_0.4.1  
