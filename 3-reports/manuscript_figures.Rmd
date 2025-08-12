@@ -17,6 +17,7 @@ knitr::opts_chunk$set(echo = FALSE,
 ```{r}
 source("2-code/0-packages.R")
 library(ggbiplot)
+library(targets)
 
 pal_transect = rev(soilpalettes::soil_palette("redox2", 4))
 theme_set(theme_kp())
@@ -916,7 +917,10 @@ gg_pca_wle =
   ylim(-2.5, 3.5)+
   labs(shape="", fill = "", color = "")+ 
   theme_kp()+
-  theme(legend.position = "top", legend.box = "vertical")+
+  theme(legend.position = "top", legend.box = "vertical",
+        axis.text = element_text(size = 16, color = "black"),
+        axis.title = element_text(size = 16, face = "bold", color = "black"),
+  )+
   guides(fill = guide_legend(override.aes = list(alpha=1, shape = 21, size = 3)))+
   NULL
 
@@ -937,7 +941,10 @@ gg_pca_cb =
   ylim(-2.5, 3.5)+
   labs(shape="", fill = "", color = "")+ 
   theme_kp()+
-  theme(legend.position = "top", legend.box = "vertical")+
+  theme(legend.position = "top", legend.box = "vertical",
+        axis.text = element_text(size = 16, color = "black"),
+        axis.title = element_text(size = 16, face = "bold", color = "black"),
+  )+
   guides(fill = guide_legend(override.aes = list(alpha=1, shape = 21, size = 3)))+
   NULL
 
@@ -1255,10 +1262,13 @@ data_scaled_NEW2 %>%
                                 "GCW", "MSM", "GWI"),
                      values = c(21, 23, 24, 21, 23, 24))+
   scale_x_discrete(labels = c("U", "T" , "W" ))+
-  labs(x = "Transect", y = "Normalized concentration")+
+  scale_y_continuous(breaks = c(0, 0.5, 1), labels = c(0, "" , 1))+
+  labs(x = "Transect", y = "Scaled concentration
+       ")+
   theme_kp()+
-  theme(axis.text.y = element_blank(),
-        panel.grid = element_blank())
+  theme(#axis.text.y = element_blank(),
+        panel.grid = element_blank()
+        )
 
 ```
 
@@ -1274,7 +1284,9 @@ data_scaled_NEW %>%
                      values = c("#d73027", "#fc8d59", "#fdbb84", 
                                 "#74a9cf", "#2b8cbe", "#045a8d"))+
   scale_x_discrete(labels = c("U", "T" , "W" ))+
-  labs(x = "Transect", y = "Normalized concentration")+
+  scale_y_continuous(breaks = c(0, 0.5, 1), labels = c(0, "" , 1))+
+  labs(x = "Transect", y = "Scaled concentration
+       ")+
   theme(axis.text.y = element_blank(),
         panel.grid = element_blank())
 
