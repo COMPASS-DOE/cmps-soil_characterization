@@ -17,9 +17,7 @@ p_load(tidyverse,
 
 
 
-SENSOR_PATH = "TEMP/csvs_to_process"
-
-## read in TEROS/TROLL data. gives df_trim
+## read in TEROS/TROLL data. gives sensor_df_trim
 process_teros = function(SENSOR_PATH){
   
   to_read <- list.files(SENSOR_PATH, full.names = T)
@@ -31,28 +29,25 @@ process_teros = function(SENSOR_PATH){
   
   ## Summary of start dates gives 3/22 to 4/22 coinciding with synoptic installs
   ## I'm setting 4/22 - 4/23 as a consistent(ish) time-frame for all sites
-  df_trim <- df_raw %>% 
+  sensor_df_trim <- df_raw %>% 
     filter(datetime_est > "2022-04-01") %>% 
     filter(datetime_est < "2023-04-01")
   
   ## Monster 68M dataset, free up memory
   rm(df_raw)
   
-  df_trim %>% 
+  sensor_df_trim %>% 
     rename(transect = plot) %>% 
     mutate(region = case_when(site %in% c("GCW", "MSM", "GWI") ~ "Chesapeake",
                        site %in% c("CRC", "PTR", "OWC") ~ "Erie"),
            transect = case_match(transect, "UP" ~ "upland", "TR" ~ "transition", "W" ~ "wetland"))
 }
-df_trim = process_teros(SENSOR_PATH)
-
-
 
 # summarize VWC means
-get_vwc_data = function(df_trim){
+get_vwc_data = function(sensor_df_trim){
   
   tic("bin teros") # only 5s!
-  vwc_data <- df_trim %>% 
+  vwc_data <- sensor_df_trim %>% 
     filter(research_name == "soil_vwc_10cm") %>% 
     group_by(datetime_est, region, site, transect) %>% 
     summarize(value = mean(value, na.rm = T),
@@ -62,7 +57,6 @@ get_vwc_data = function(df_trim){
   toc()
   vwc_data
 }
-vwc_data = get_vwc_data(df_trim)
 
 summarize_vwc = function(vwc_data){
 
@@ -71,41 +65,20 @@ summarize_vwc = function(vwc_data){
     ungroup() %>% 
     group_by(region, site, transect) %>% 
     summarize(mean_vwc = round(mean(value, na.rm = T), 2),
-              sd_vwc = round(sd(value, na.rm = T), 2)) %>% 
+              sd_vwc = round(sd(value, na.rm = T), 2),
+              median_vwc = round(median(value, na.rm = T), 2)) %>% 
     reorder_site() %>% 
     reorder_transect()
   
 } 
-vwc_means = summarize_vwc(vwc_data)
-
-# plot vwc
-library(ggh4x)
-
-vwc_data %>% 
-  filter(value > 0) %>% 
-  reorder_site() %>% 
-  reorder_transect() %>% 
-  ggplot(aes(x = datetime_est, y = value, color = transect))+
-  geom_line()+
-#  facet_wrap(~ site + transect)+
-  facet_nested_wrap(~region + site,
-                    nest_line = element_line(colour = "grey")) +
-  scale_color_manual(values = pal_transect)+
-  labs(x = "Date", y = "Water content (% v/v)")+
-  theme_kp()+
-  theme(axis.text.x = element_text(size = 14, angle = 45, hjust = 1),
-        panel.grid = element_blank())
-
-
 
 ## WATER LEVELS
 
-
-calculate_water_levels = function(df_trim){
+calculate_water_levels = function(sensor_df_trim){
   
   tic("pivot troll")
   troll_raw_unbinned <- 
-    df_trim %>% 
+    sensor_df_trim %>% 
     filter(grepl("gw", research_name)) %>% 
     group_by(datetime_est, region, site, transect) %>% 
     pivot_wider(names_from = "research_name", 
@@ -162,48 +135,31 @@ calculate_water_levels = function(df_trim){
     reorder_transect()
     
 }
-troll = calculate_water_levels(df_trim)
 
-calculate_percent_flooded = function(){
+calculate_percent_flooded = function(troll){
   
-  percent_flooded <- troll %>% 
+  percent_flooded <- 
+    troll %>% 
     mutate(flooded = ifelse(wl_below_surface_m >= 0, "flooded", "not")) %>% 
     ungroup() %>% 
     group_by(region, site, transect) %>% 
     summarize(percent_flooded = sum(flooded == "flooded") / n() * 100) %>% 
+    mutate_if(is.numeric, round, 2) %>% 
     filter(!(site == "GCW"))
-  
-  # write_csv(percent_flooded, paste0(temp_storage, "/250620_kaizad_synoptic_troll_percent_flooded.csv"))  
-  
+
 }
 
- 
+summarize_water_table = function(troll){
   
-  ##  group_by(site, plot) %>% 
-  ##  dplyr::summarise(mean_wl = mean(wl_below_surface_m),
-  ##                   median_wl = median(wl_below_surface_m),
-  ##                   min_wl = min(wl_below_surface_m),
-  ##                   max_wl = max(wl_below_surface_m))
-  
-  
-  library(ggh4x) # for nested facets
   troll %>% 
-    #filter(!site == "GCW") %>%
-  #  mutate(rollmean = case_when(site == "GCW" ~ NA, .default = rollmean)) %>% 
-  #  filter(is.na(outlier2)) %>% 
-    ggplot(aes(x = datetime_est, y = wl_below_surface_m, color = transect))+
-    geom_hline(yintercept = 0, alpha = 0.8)+
-    # geom_point(aes(color = outlier2))+
-    geom_line(aes(y = rollmean), linewidth = 1)+
-    #  facet_wrap(~site)+
-    #  facet_grid(site ~ plot)+ 
-    facet_nested_wrap(~region + site,
-                      nest_line = element_line(colour = "grey"))+ 
-    scale_color_manual(values = pal_transect)+
-    labs(x = "",
-         y = "Water level below surface (m)",
-         color = "")+
-    theme_kp()+
-    theme(panel.grid = element_blank(),
-          axis.text.x = element_text(size = 14, angle = 45, hjust = 1))
+      group_by(region, site, transect) %>% 
+      dplyr::summarise(mean_wl = mean(wl_below_surface_m),
+                       median_wl = median(wl_below_surface_m),
+                       min_wl = min(wl_below_surface_m),
+                       max_wl = max(wl_below_surface_m)) %>% 
+    mutate_if(is.numeric, round, 2) %>% 
+    filter(!site %in% "GCW") %>% 
+    reorder_site() %>% 
+    reorder_transect()
 
+}

@@ -18,6 +18,7 @@ knitr::opts_chunk$set(echo = FALSE,
 source("2-code/0-packages.R")
 library(ggbiplot)
 library(targets)
+library(ggh4x)
 
 pal_transect = rev(soilpalettes::soil_palette("redox2", 4))
 theme_set(theme_kp())
@@ -25,6 +26,7 @@ theme_set(theme_kp())
 
 ```{r targets}
 targets::tar_load(c(data_combined, sample_key))
+targets::tar_load_everything()
 ```
 
 ```{r data_processing}
@@ -1539,6 +1541,85 @@ ggpubr::ggarrange(gg_wle, gg_cb, common.legend = T, nrow = 2)
   
 
 ```
+
+--- 
+
+## SOIL MOISTURE SENSORS
+
+Processed data are available here in this repository. Raw data are available on Google Drive (access needed).
+
+### Soil water content for 2022-23
+
+```{r gg_vwc, fig.height=8, fig.width=10}
+# plot vwc
+
+vwc_data %>% 
+  filter(value > 0) %>% 
+  reorder_site() %>% 
+  reorder_transect() %>% 
+  ggplot(aes(x = datetime_est, y = value, color = transect))+
+  geom_line()+
+  #  facet_wrap(~ site + transect)+
+  facet_nested_wrap(~region + site,
+                    nest_line = element_line(colour = "grey")) +
+  scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
+                     values = pal_transect)+
+  labs(x = "", 
+       y = "Water content (% v/v)",
+       color = "")+
+  theme_kp()+
+  theme(axis.text.x = element_text(size = 14, angle = 45, hjust = 1),
+        panel.grid = element_blank())
+
+```
+
+### Summarized soil water content
+
+```{r}
+vwc_means %>% knitr::kable()
+```
+
+
+### Water level in soil
+
+When water level is positive (above surface), it means the soil is flooded.
+
+```{r gg_water_level, fig.height=8, fig.width=10}
+
+troll %>% 
+  ggplot(aes(x = datetime_est, y = wl_below_surface_m, color = transect))+
+  geom_hline(yintercept = 0, alpha = 0.8)+
+  geom_line(aes(y = rollmean), linewidth = 1)+
+  facet_nested_wrap(~region + site,
+                    nest_line = element_line(colour = "grey"))+ 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
+                     values = pal_transect)+
+  labs(x = "",
+       y = "Water level below surface (m)",
+       color = "")+
+  theme_kp()+
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_text(size = 14, angle = 45, hjust = 1))   ## 
+
+```
+
+
+### Water table summary
+
+```{r}
+water_table %>% knitr::kable()
+```
+
+
+### Calculating time flooded (% of the year)
+
+```{r}
+percent_flooded %>% knitr::kable()
+```
+
+
+
+
 
 
 ---

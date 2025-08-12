@@ -15,8 +15,9 @@ tar_option_set(
 source("2-code/0-packages.R")
 #source("2-code/1-initial_processing.R")
 source("2-code/a-functions_processing.R")
-source("2-code/b-functions_analysis.R")
-source("2-code/c-functions_fticrrr.R")
+#source("2-code/b-functions_analysis.R")
+#source("2-code/c-functions_fticrrr.R")
+source("2-code/c-functions_soil_moisture_sensors.R")
 
 # Replace the target list below with your own:
 list(
@@ -82,13 +83,21 @@ list(
     write.csv(data_combined, "1-data/processed/chemistry_combined_surface_horizon.csv", row.names = FALSE)
     write.csv(data_combined_all_horizons, "1-data/processed/chemistry_combined_all_horizons.csv", row.names = FALSE)
     write.csv(data_combined_wide, "1-data/processed/chemistry_combined_wide.csv", row.names = FALSE)
-# texture
-# PD
-# BD
-# WRC
+    # texture
+    # PD
+    # BD
+    # WRC
   }, format = "file"),
-   
-   
+  
+  
+  # soil moisture sensors
+  tar_target(sensor_df_trim, process_teros(SENSOR_PATH = "TEMP/csvs_to_process")),
+  tar_target(vwc_data, get_vwc_data(sensor_df_trim)),
+  tar_target(vwc_means, summarize_vwc(vwc_data)),
+  tar_target(troll, calculate_water_levels(sensor_df_trim)),
+  tar_target(percent_flooded, calculate_percent_flooded(troll)),
+  tar_target(water_table, summarize_water_table(troll)),
+
    # report  
 #   tar_render(report, path = "3-reports/characterization_report.Rmd")
    tar_render(report, path = "3-reports/manuscript_figures.Rmd")
