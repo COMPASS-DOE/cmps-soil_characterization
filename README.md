@@ -1,1 +1,8 @@
-# cmps-soil_characterization
+## Transition zones at the changing coastal terrestrial-aquatic interface
+
+This repository contains data and code for the manuscript "Transition zones at the changing coastal terrestrial-aquatic interface".
+
+### Abstract
+Coastal soils are a significant but highly uncertain component of global biogeochemical cycles. These systems experience spatial and temporal variability in biogeochemical processes, driven by wetland-to-upland gradients and hydrological fluctuations. These fluctuations make it difficult to understand and predict biogeochemical processes in these highly dynamic systems. We studied coastal soil biogeochemistry and its variability (a) at regional scales and (b) across transects from upland forest to wetland, in two contrasting regions — Lake Erie, a freshwater lacustrine system, and Chesapeake Bay, a saltwater estuarine system. Salinity-related analytes were a key source of variability in soil biogeochemistry, not just in the saltwater system, but surprisingly, also in the freshwater system. We had hypothesized linear trends in biogeochemical parameters along the TAI – however, contrary to expectations, transition soils were not consistently intermediate between upland and wetland endmembers; the non-monotonic trends of C, P, Fe along our transects suggest that these do not behave as expected and may be difficult to model and predict – thus these are key analytes to study in our regions. Rapidly changing soil factors across coastal gradients (e.g., Ca, K, CEC, and TS) may act as precursors to ecosystem shifts. Our comprehensive soil characterization across the coastal transects provides essential data for mechanistic modeling of ecosystem dynamics.
+
+<img align = "center" height = "400" src="https://github.com/COMPASS-DOE/cmps-soil_characterization/blob/main/3-reports/manuscript_figures_files/figure-gfm/map-1.png">
