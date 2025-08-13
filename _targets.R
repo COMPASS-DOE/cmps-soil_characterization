@@ -14,10 +14,8 @@ tar_option_set(
 # Load the R scripts with your custom functions:
 source("2-code/0-packages.R")
 #source("2-code/1-initial_processing.R")
-source("2-code/a-functions_processing.R")
-#source("2-code/b-functions_analysis.R")
-#source("2-code/c-functions_fticrrr.R")
-source("2-code/c-functions_soil_moisture_sensors.R")
+source("2-code/2-functions_processing.R")
+source("2-code/3a-functions_soil_moisture_sensors.R")
 
 # Replace the target list below with your own:
 list(

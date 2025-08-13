@@ -68,7 +68,8 @@ summarize_vwc = function(vwc_data){
               sd_vwc = round(sd(value, na.rm = T), 2),
               median_vwc = round(median(value, na.rm = T), 2)) %>% 
     reorder_site() %>% 
-    reorder_transect()
+    reorder_transect() %>% 
+    arrange(site, transect)
   
 } 
 
@@ -154,6 +155,7 @@ summarize_water_table = function(troll){
   troll %>% 
       group_by(region, site, transect) %>% 
       dplyr::summarise(mean_wl = mean(wl_below_surface_m),
+                       sd_wl = sd(wl_below_surface_m),
                        median_wl = median(wl_below_surface_m),
                        min_wl = min(wl_below_surface_m),
                        max_wl = max(wl_below_surface_m)) %>% 
