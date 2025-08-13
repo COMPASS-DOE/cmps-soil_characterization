@@ -1491,7 +1491,7 @@ wrc_processed %>%
 ```
 
 
-## Elevation
+## Elevation 
 
 ```{r, gg_elevation, fig.height=8, fig.width=10}
 
@@ -1505,11 +1505,13 @@ elevation_processed =
 gg_wle = 
   elevation_processed %>% 
   filter(region == "Erie") %>% 
-  ggplot(aes(x = distance_to_water_m, y = elev_m, color = transect))+
-  geom_line(color = "black")+
+  ggplot(aes(x = distance_to_water_m, y = elev_m, color = transect, linetype = site))+
+  geom_line(color = "black", show.legend = F)+
   geom_point(size = 4)+
   scale_color_manual(values = c("grey", "#2E5894", "#FFB200", "#96001B"),
                      breaks = c("water edge", "wetland", "transition", "upland"))+
+  scale_linetype_manual(values = c("dashed", "solid", "solid"),
+                     breaks = c("CRC", "PTR", "OWC"))+
   facet_nested_wrap(region ~ site)+
   labs(x = "",
        y = "Elevation, m
