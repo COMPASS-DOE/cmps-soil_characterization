@@ -89,7 +89,7 @@ list(
   
   
   # soil moisture sensors
-  tar_target(sensor_df_trim, process_teros(SENSOR_PATH = "TEMP/csvs_to_process")),
+  tar_target(sensor_df_trim, process_teros(SENSOR_PATH = "1-data/soil_moisture_sensors/csvs_to_process")),
   tar_target(vwc_data, get_vwc_data(sensor_df_trim)),
   tar_target(vwc_means, summarize_vwc(vwc_data)),
   tar_target(troll, calculate_water_levels(sensor_df_trim)),
