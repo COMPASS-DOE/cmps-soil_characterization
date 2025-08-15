@@ -153,23 +153,23 @@ available on Google Drive (access needed).
 
 | region     | site | transect   | mean_vwc | sd_vwc | median_vwc |
 |:-----------|:-----|:-----------|---------:|-------:|-----------:|
+| Erie       | CRC  | upland     |    27.31 |   9.90 |      28.53 |
+| Erie       | CRC  | transition |    37.15 |   9.74 |      40.66 |
+| Erie       | CRC  | wetland    |    48.33 |   4.94 |      49.43 |
+| Erie       | PTR  | upland     |    24.81 |  10.44 |      25.35 |
+| Erie       | PTR  | transition |    27.49 |   9.97 |      27.90 |
+| Erie       | PTR  | wetland    |    39.09 |  13.14 |      43.38 |
+| Erie       | OWC  | upland     |    32.74 |   2.96 |      33.66 |
+| Erie       | OWC  | transition |    39.47 |   6.48 |      38.67 |
+| Erie       | OWC  | wetland    |    47.66 |   1.86 |      47.53 |
 | Chesapeake | GCW  | transition |    50.89 |   2.57 |      52.22 |
 | Chesapeake | GCW  | wetland    |    57.96 |   0.79 |      57.79 |
-| Chesapeake | GWI  | transition |    54.47 |   3.36 |      54.77 |
-| Chesapeake | GWI  | upland     |    30.41 |   3.67 |      30.12 |
-| Chesapeake | GWI  | wetland    |    61.86 |   0.94 |      62.06 |
-| Chesapeake | MSM  | transition |    48.43 |   2.98 |      47.93 |
 | Chesapeake | MSM  | upland     |    41.57 |   2.40 |      41.65 |
+| Chesapeake | MSM  | transition |    48.43 |   2.98 |      47.93 |
 | Chesapeake | MSM  | wetland    |    62.49 |   1.01 |      62.46 |
-| Erie       | CRC  | transition |    37.15 |   9.74 |      40.66 |
-| Erie       | CRC  | upland     |    27.31 |   9.90 |      28.53 |
-| Erie       | CRC  | wetland    |    48.33 |   4.94 |      49.43 |
-| Erie       | OWC  | transition |    39.47 |   6.48 |      38.67 |
-| Erie       | OWC  | upland     |    32.74 |   2.96 |      33.66 |
-| Erie       | OWC  | wetland    |    47.66 |   1.86 |      47.53 |
-| Erie       | PTR  | transition |    27.49 |   9.97 |      27.90 |
-| Erie       | PTR  | upland     |    24.81 |  10.44 |      25.35 |
-| Erie       | PTR  | wetland    |    39.09 |  13.14 |      43.38 |
+| Chesapeake | GWI  | upland     |    30.41 |   3.67 |      30.12 |
+| Chesapeake | GWI  | transition |    54.47 |   3.36 |      54.77 |
+| Chesapeake | GWI  | wetland    |    61.86 |   0.94 |      62.06 |
 
 ### Water level in soil
 
@@ -180,21 +180,21 @@ flooded.
 
 ### Water table summary
 
-| region     | site | transect   | mean_wl | median_wl | min_wl | max_wl |
-|:-----------|:-----|:-----------|--------:|----------:|-------:|-------:|
-| Chesapeake | MSM  | upland     |   -0.19 |     -0.13 |  -0.62 |   0.01 |
-| Chesapeake | MSM  | transition |   -0.11 |     -0.10 |  -0.79 |   0.23 |
-| Chesapeake | MSM  | wetland    |   -0.11 |     -0.10 |  -0.61 |   0.34 |
-| Chesapeake | GWI  | upland     |   -0.49 |     -0.47 |  -1.00 |   0.03 |
-| Chesapeake | GWI  | transition |   -0.22 |     -0.14 |  -0.93 |   0.38 |
-| Chesapeake | GWI  | wetland    |   -0.06 |     -0.03 |  -0.42 |   0.54 |
-| Erie       | CRC  | upland     |   -2.49 |     -2.79 |  -4.91 |  -0.04 |
-| Erie       | CRC  | transition |   -0.63 |     -0.43 |  -1.38 |   0.42 |
-| Erie       | CRC  | wetland    |   -0.12 |     -0.03 |  -0.38 |   0.66 |
-| Erie       | PTR  | upland     |   -3.06 |     -3.36 |  -5.07 |  -0.29 |
-| Erie       | PTR  | transition |   -1.26 |     -1.11 |  -2.55 |  -0.02 |
-| Erie       | PTR  | wetland    |   -0.46 |     -0.29 |  -0.97 |   0.27 |
-| Erie       | OWC  | wetland    |    0.03 |      0.00 |  -0.36 |   0.69 |
+| region     | site | transect   | mean_wl | sd_wl | median_wl | min_wl | max_wl |
+|:-----------|:-----|:-----------|--------:|------:|----------:|-------:|-------:|
+| Chesapeake | MSM  | upland     |   -0.19 |  0.15 |     -0.13 |  -0.62 |   0.01 |
+| Chesapeake | MSM  | transition |   -0.11 |  0.07 |     -0.10 |  -0.79 |   0.23 |
+| Chesapeake | MSM  | wetland    |   -0.11 |  0.09 |     -0.10 |  -0.61 |   0.34 |
+| Chesapeake | GWI  | upland     |   -0.49 |  0.15 |     -0.47 |  -1.00 |   0.03 |
+| Chesapeake | GWI  | transition |   -0.22 |  0.18 |     -0.14 |  -0.93 |   0.38 |
+| Chesapeake | GWI  | wetland    |   -0.06 |  0.10 |     -0.03 |  -0.42 |   0.54 |
+| Erie       | CRC  | upland     |   -2.49 |  1.52 |     -2.79 |  -4.91 |  -0.04 |
+| Erie       | CRC  | transition |   -0.63 |  0.52 |     -0.43 |  -1.38 |   0.42 |
+| Erie       | CRC  | wetland    |   -0.12 |  0.17 |     -0.03 |  -0.38 |   0.66 |
+| Erie       | PTR  | upland     |   -3.06 |  1.16 |     -3.36 |  -5.07 |  -0.29 |
+| Erie       | PTR  | transition |   -1.26 |  0.69 |     -1.11 |  -2.55 |  -0.02 |
+| Erie       | PTR  | wetland    |   -0.46 |  0.33 |     -0.29 |  -0.97 |   0.27 |
+| Erie       | OWC  | wetland    |    0.03 |  0.14 |      0.00 |  -0.36 |   0.69 |
 
 ### Calculating time flooded (% of the year)
 
@@ -223,7 +223,7 @@ flooded.
 Session Info
 </summary>
 
-Date run: 2025-08-12
+Date run: 2025-08-15
 
     ## R version 4.5.0 (2025-04-11)
     ## Platform: aarch64-apple-darwin20

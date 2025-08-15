@@ -831,33 +831,6 @@ pca_overall_cb = fit_pca_function(data_wide_PCA2 %>% filter(region == "Chesapeak
 
 ### PCA with clusters
 
-```{r v2-cluster_pca, fig.width=10, fig.height=6}
-library(ggConvexHull)
-
-pca_cluster = fit_pca_function(df_cl) 
-
-ggbiplot::ggbiplot(pca_cluster$pca_int, obs.scale = 1, var.scale = 1, varname.size = 5,
-                   groups = as.character(pca_cluster$grp$cluster), 
-                   ellipse = F, circle = FALSE, var.axes = TRUE, alpha = 0) +
-  geom_convexhull(aes(group = pca_cluster$grp$cluster,
-                      fill = pca_cluster$grp$cluster), alpha = 0.2)+
-  geom_point(size=4,stroke=1, alpha = 1,
-             aes(shape = pca_cluster$grp$region,
-                 fill = groups))+ 
-  scale_shape_manual(values = c(23, 21))+
-  scale_color_manual(values = pnw_palette("Sailboat", 3))+
-  scale_fill_manual(values = pnw_palette("Sailboat", 3))+
-  labs(fill="cluster",
-       color = "cluster",
-       shape = "region")+
-  theme_kp()+
-  theme(legend.position = c(0.8, 0.75))+
-  guides(fill = guide_legend(override.aes = list(shape = 21)))+
-  NULL
-  
-```
-
-
 ```{r v2-cluster_calc, include=FALSE}
 
 #library(cluster)
@@ -895,6 +868,33 @@ df_cl %>%
   scale_color_manual(values = pal_transect)
 
 ```
+
+```{r v2-cluster_pca, fig.width=10, fig.height=6}
+library(ggConvexHull)
+
+pca_cluster = fit_pca_function(df_cl) 
+
+ggbiplot::ggbiplot(pca_cluster$pca_int, obs.scale = 1, var.scale = 1, varname.size = 5,
+                   groups = as.character(pca_cluster$grp$cluster), 
+                   ellipse = F, circle = FALSE, var.axes = TRUE, alpha = 0) +
+  geom_convexhull(aes(group = pca_cluster$grp$cluster,
+                      fill = pca_cluster$grp$cluster), alpha = 0.2)+
+  geom_point(size=4,stroke=1, alpha = 1,
+             aes(shape = pca_cluster$grp$region,
+                 fill = groups))+ 
+  scale_shape_manual(values = c(23, 21))+
+  scale_color_manual(values = pnw_palette("Sailboat", 3))+
+  scale_fill_manual(values = pnw_palette("Sailboat", 3))+
+  labs(fill="cluster",
+       color = "cluster",
+       shape = "region")+
+  theme_kp()+
+  theme(legend.position = c(0.8, 0.75))+
+  guides(fill = guide_legend(override.aes = list(shape = 21)))+
+  NULL
+  
+```
+
 
 ---
 
