@@ -29,11 +29,27 @@ targets::tar_load(c(data_combined, sample_key))
 targets::tar_load_everything()
 ```
 
+```{r}
+reorder_transect = function(dat){
+  dat %>% 
+    mutate(transect = case_match(transect, "wetland" ~ "marsh", .default = transect),
+           transect = factor(transect, levels = c("upland", "transition", "wte", "marsh")))
+}
+
+# update transect names in sample_key
+sample_key = 
+  sample_key %>% 
+  reorder_transect()
+
+```
+
+
 ```{r data_processing}
 make_data_subset = function(data_combined){
   
  # data_combined_subset = 
     data_combined %>% 
+    reorder_transect() %>% 
     filter(!transect %in% "wte") %>% 
     force()
 }
@@ -405,7 +421,7 @@ fit_pca_function = function(dat){
   
   grp = 
     dat %>% 
-    dplyr::select(where(is.character)) %>% 
+    dplyr::select(where(is.character) | where(is.factor)) %>% 
     dplyr::mutate(row = row_number()) %>% 
     right_join(num_row_numbers)
   
@@ -424,7 +440,7 @@ fit_pca_function = function(dat){
 ### Overall PCAs
 
 ```{r pca_input}
-pca_overall = fit_pca_function(data_wide_PCA) 
+pca_overall = fit_pca_function(dat = data_wide_PCA) 
 pca_overall_wle = fit_pca_function(dat = data_wide_PCA %>% filter(region == "Erie"))
 pca_overall_cb = fit_pca_function(data_wide_PCA %>% filter(region == "Chesapeake"))
 ```
@@ -530,7 +546,7 @@ gg_pca_wle =
   geom_point(size=3,stroke=1, alpha = 1,
              aes(shape = pca_overall_wle$grp$site,
                  color = groups))+ 
-  scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "marsh"), 
                      values = pal_transect)+
   xlim(-6,6)+
   ylim(-4.5,4.5)+
@@ -548,7 +564,7 @@ gg_pca_cb =
   geom_point(size=3,stroke=1, alpha = 1,
              aes(shape = pca_overall_cb$grp$site,
                  color = groups))+ 
-  scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "marsh"), 
                      values = pal_transect)+
   xlim(-5.5,7.5)+
   ylim(-5,5)+
@@ -681,12 +697,12 @@ data_scaled2 =
   mutate(scaled = (value - min) / (max - min)) %>% 
   dplyr::select(region, site, transect, horizon, name, scaled) %>%
   pivot_wider(names_from = "transect", values_from = "scaled") %>% 
-  mutate(correction = case_when(upland < wetland ~ 1,
-                                upland > wetland ~ -1)) %>% 
-  pivot_longer(cols = c(upland, wetland, transition), names_to = "transect", values_to = "scaled") %>% 
+  mutate(correction = case_when(upland < marsh ~ 1,
+                                upland > marsh ~ -1)) %>% 
+  pivot_longer(cols = c(upland, marsh, transition), names_to = "transect", values_to = "scaled") %>% 
   mutate(scaled = scaled * correction,
          scaled = case_when(transect == "upland" ~ 0,
-                            transect == "wetland" ~ 1,
+                            transect == "marsh" ~ 1,
                             TRUE ~ scaled),
          scaled2 = case_when(scaled > 4 ~ 4,
                              scaled < -1 ~ -1,
@@ -713,7 +729,7 @@ data_scaled2 %>%
   geom_point(data = data_scaled2 %>% filter(transect == "transition"), 
              size = 4, aes(color = site), stroke = 1, shape = 21, fill = "white")+
   annotate("text", label = "U", x = 0, y = 21)+
-  annotate("text", label = "W", x = 1, y = 21)+
+  annotate("text", label = "M", x = 1, y = 21)+
   annotate("text", label = "", x = 1, y = 21.5)+
   xlim(-1, 5)+
   scale_y_discrete(limits = rev)+
@@ -756,7 +772,7 @@ data_scaled_NEW %>%
                                 "GCW", "MSM", "GWI"),
                      values = c("#d73027", "#fc8d59", "#fdbb84", 
                                 "#74a9cf", "#2b8cbe", "#045a8d"))+
-  scale_x_discrete(labels = c("U", "T" , "W" ))+
+  scale_x_discrete(labels = c("U", "T" , "M" ))+
   labs(x = "Transect", y = "Normalized concentration")+
   theme_kp()+
   theme(axis.text.y = element_blank(),
@@ -778,7 +794,7 @@ data_scaled_NEW %>%
                                 "GCW", "MSM", "GWI"),
                      values = c("#d73027", "#fc8d59", "#fdbb84", 
                                 "#74a9cf", "#2b8cbe", "#045a8d"))+
-  scale_x_discrete(labels = c("U", "T" , "W" ))+
+  scale_x_discrete(labels = c("U", "T" , "M" ))+
   labs(x = "Transect", y = "Normalized concentration")+
   theme_kp()+
   theme(axis.text.y = element_blank(),
@@ -799,7 +815,7 @@ data_scaled_NEW %>%
                                 "GCW", "MSM", "GWI"),
                      values = c("#d73027", "#fc8d59", "#fdbb84", 
                                 "#74a9cf", "#2b8cbe", "#045a8d"))+
-  scale_x_discrete(labels = c("U", "T" , "W" ))+
+  scale_x_discrete(labels = c("U", "T" , "M" ))+
   labs(x = "Transect", y = "Normalized concentration")+
   theme(axis.text.y = element_blank(),
         panel.grid = element_blank())
@@ -910,9 +926,9 @@ gg_pca_wle =
              aes(shape = pca_overall_wle$grp$site,
                  fill = groups), 
              stroke = 1)+ 
-  scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "marsh"), 
                      values = pal_transect)+
-  scale_fill_manual(breaks = c("upland", "transition", "wte", "wetland"), 
+  scale_fill_manual(breaks = c("upland", "transition", "wte", "marsh"), 
                     values = pal_transect)+
   scale_shape_manual(values = c(21, 24, 22))+
   xlim(-3, 5)+
@@ -934,9 +950,9 @@ gg_pca_cb =
              aes(shape = pca_overall_cb$grp$site,
                  fill = groups), 
              stroke = 1)+ 
-  scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "marsh"), 
                      values = pal_transect)+
-  scale_fill_manual(breaks = c("upland", "transition", "wte", "wetland"), 
+  scale_fill_manual(breaks = c("upland", "transition", "wte", "marsh"), 
                     values = pal_transect)+
   scale_shape_manual(values = c(21, 24, 22))+
   xlim(-5, 3)+
@@ -966,9 +982,9 @@ gg_pca_wle =
              aes(shape = pca_overall_wle$grp$site,
                  fill = groups), 
              stroke = 1)+ 
-  scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "marsh"), 
                      values = pal_transect)+
-  scale_fill_manual(breaks = c("upland", "transition", "wte", "wetland"), 
+  scale_fill_manual(breaks = c("upland", "transition", "wte", "marsh"), 
                     values = pal_transect)+
   scale_shape_manual(values = c(21, 24, 22))+
   xlim(-3, 5)+
@@ -988,9 +1004,9 @@ gg_pca_cb =
              aes(shape = pca_overall_cb$grp$site,
                  fill = groups), 
              stroke = 1)+ 
-  scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "marsh"), 
                      values = pal_transect)+
-  scale_fill_manual(breaks = c("upland", "transition", "wte", "wetland"), 
+  scale_fill_manual(breaks = c("upland", "transition", "wte", "marsh"), 
                     values = pal_transect)+
   scale_shape_manual(values = c(21, 24, 22))+
   xlim(-5, 3)+
@@ -1125,12 +1141,12 @@ data_scaled2 =
   mutate(scaled = (value - min) / (max - min)) %>% 
   dplyr::select(region, site, transect, horizon, name, scaled) %>%
   pivot_wider(names_from = "transect", values_from = "scaled") %>% 
-  mutate(correction = case_when(upland < wetland ~ 1,
-                                upland > wetland ~ -1)) %>% 
-  pivot_longer(cols = c(upland, wetland, transition), names_to = "transect", values_to = "scaled") %>% 
+  mutate(correction = case_when(upland < marsh ~ 1,
+                                upland > marsh ~ -1)) %>% 
+  pivot_longer(cols = c(upland, marsh, transition), names_to = "transect", values_to = "scaled") %>% 
   mutate(scaled = scaled * correction,
          scaled = case_when(transect == "upland" ~ 0,
-                            transect == "wetland" ~ 1,
+                            transect == "marsh" ~ 1,
                             TRUE ~ scaled),
          scaled2 = case_when(scaled > 4 ~ 4,
                              scaled < -1 ~ -1,
@@ -1157,7 +1173,7 @@ data_scaled2 %>%
   geom_point(data = data_scaled2 %>% filter(transect == "transition"), 
              size = 4, aes(color = site), stroke = 1, shape = 21, fill = "white")+
   annotate("text", label = "U", x = 0, y = 21)+
-  annotate("text", label = "W", x = 1, y = 21)+
+  annotate("text", label = "M", x = 1, y = 21)+
   annotate("text", label = "", x = 1, y = 21.5)+
   xlim(-1, 5)+
   scale_y_discrete(limits = rev)+
@@ -1204,7 +1220,7 @@ data_scaled_NEW %>%
                                 "GCW", "MSM", "GWI"),
                      values = c("#d73027", "#fc8d59", "#fdbb84", 
                                 "#74a9cf", "#2b8cbe", "#045a8d"))+
-  scale_x_discrete(labels = c("U", "T" , "W" ))+
+  scale_x_discrete(labels = c("U", "T" , "M" ))+
   labs(x = "Transect", y = "Normalized concentration")+
   theme_kp()+
   theme(axis.text.y = element_blank(),
@@ -1226,7 +1242,7 @@ data_scaled_NEW %>%
                                 "GCW", "MSM", "GWI"),
                      values = c("#d73027", "#fc8d59", "#fdbb84", 
                                 "#74a9cf", "#2b8cbe", "#045a8d"))+
-  scale_x_discrete(labels = c("U", "T" , "W" ))+
+  scale_x_discrete(labels = c("U", "T" , "M" ))+
   labs(x = "Transect", y = "Normalized concentration")+
   theme_kp()+
   theme(axis.text.y = element_blank(),
@@ -1263,7 +1279,7 @@ data_scaled_NEW2 %>%
   scale_shape_manual(breaks = c("CRC", "PTR", "OWC",
                                 "GCW", "MSM", "GWI"),
                      values = c(21, 23, 24, 21, 23, 24))+
-  scale_x_discrete(labels = c("U", "T" , "W" ))+
+  scale_x_discrete(labels = c("U", "T" , "M" ))+
   scale_y_continuous(breaks = c(0, 0.5, 1), labels = c(0, "" , 1))+
   labs(x = "Transect", y = "Scaled concentration
        ")+
@@ -1285,7 +1301,7 @@ data_scaled_NEW %>%
                                 "GCW", "MSM", "GWI"),
                      values = c("#d73027", "#fc8d59", "#fdbb84", 
                                 "#74a9cf", "#2b8cbe", "#045a8d"))+
-  scale_x_discrete(labels = c("U", "T" , "W" ))+
+  scale_x_discrete(labels = c("U", "T" , "M" ))+
   scale_y_continuous(breaks = c(0, 0.5, 1), labels = c(0, "" , 1))+
   labs(x = "Transect", y = "Scaled concentration
        ")+
@@ -1299,7 +1315,7 @@ data_scaled_NEW %>%
 
 ```{r analytesx-2, fig.height = 4, fig.width = 8, eval=FALSE}
 data_combined_wide %>% 
-  mutate(transect = factor(transect, levels = c("upland", "transition", "wetland"))) %>% 
+  mutate(transect = factor(transect, levels = c("upland", "transition", "marsh"))) %>% 
   ggplot(aes(x = transect, y = Fe))+
   geom_violin(aes(fill = region), alpha = 0.6)+
   geom_jitter(width = 0.1)+
@@ -1311,7 +1327,7 @@ data_combined_wide %>%
   theme(legend.position = "none")
 
 data_combined_wide %>% 
-  mutate(transect = factor(transect, levels = c("upland", "transition", "wetland"))) %>% 
+  mutate(transect = factor(transect, levels = c("upland", "transition", "marsh"))) %>% 
   ggplot(aes(x = transect, y = P))+
   geom_violin(aes(fill = transect), alpha = 0.4)+
   geom_jitter(width = 0.1)+
@@ -1328,7 +1344,7 @@ data_combined_wide %>%
 
 plot_transect_as_x = function(data, YLAB = "", TITLE = "", SUBTITLE = "", SCALES = "free_x"){
   
-  data = data %>% mutate(transect = factor(transect, levels = c("upland", "transition", "wetland"))) %>% 
+  data = data %>% mutate(transect = factor(transect, levels = c("upland", "transition", "marsh"))) %>% 
     filter(!is.na(value))
   
   fit_lme_hsd_transect = function(dat){
@@ -1475,6 +1491,7 @@ tar_load(wrc_processed)
 
 wrc_processed %>% 
   reorder_site() %>% 
+  reorder_transect() %>% 
     filter(kpa_fit >= 0 | kpa_eval >= 0) %>% 
     mutate(region = factor(region, levels = c("Erie", "Chesapeake"))) %>% 
     ggplot(aes(y = water_content_vol_percent, color = transect))+
@@ -1498,7 +1515,8 @@ wrc_processed %>%
 elevation = read.csv("1-data/synoptic-elevations.csv", na = "")
 elevation_processed = 
   elevation %>% 
-  mutate(transect = factor(transect, levels = c("water edge", "wetland", "transition", "upland"))) %>% 
+  mutate(transect = case_match(transect, "wetland" ~ "marsh", .default = transect),
+         transect = factor(transect, levels = c("water edge", "marsh", "transition", "upland"))) %>% 
   reorder_site()
 
 
@@ -1509,7 +1527,7 @@ gg_wle =
   geom_line(color = "black", show.legend = F)+
   geom_point(size = 4)+
   scale_color_manual(values = c("grey", "#2E5894", "#FFB200", "#96001B"),
-                     breaks = c("water edge", "wetland", "transition", "upland"))+
+                     breaks = c("water edge", "marsh", "transition", "upland"))+
   scale_linetype_manual(values = c("dashed", "solid", "solid"),
                      breaks = c("CRC", "PTR", "OWC"))+
   facet_nested_wrap(region ~ site)+
@@ -1529,7 +1547,7 @@ gg_cb =
   geom_line(color = "black")+
   geom_point(size = 4)+
   scale_color_manual(values = c("grey", "#2E5894", "#FFB200", "#96001B"),
-                     breaks = c("water edge", "wetland", "transition", "upland"))+
+                     breaks = c("water edge", "marsh", "transition", "upland"))+
   facet_nested_wrap(region ~ site)+
   labs(x = "Distance to water, m",
        y = "Elevation, m
@@ -1537,10 +1555,6 @@ gg_cb =
        color = "")
 
 ggpubr::ggarrange(gg_wle, gg_cb, common.legend = T, nrow = 2)
-
-
-  
-  
 
 ```
 
@@ -1564,7 +1578,7 @@ vwc_data %>%
   #  facet_wrap(~ site + transect)+
   facet_nested_wrap(~region + site,
                     nest_line = element_line(colour = "grey")) +
-  scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "marsh"), 
                      values = pal_transect)+
   labs(x = "", 
        y = "Water content (% v/v)",
@@ -1578,7 +1592,7 @@ vwc_data %>%
 ### Summarized soil water content
 
 ```{r}
-vwc_means %>% knitr::kable()
+vwc_means %>% reorder_transect() %>% knitr::kable()
 ```
 
 
@@ -1589,12 +1603,13 @@ When water level is positive (above surface), it means the soil is flooded.
 ```{r gg_water_level, fig.height=8, fig.width=10}
 
 troll %>% 
+  reorder_transect() %>% 
   ggplot(aes(x = datetime_est, y = wl_below_surface_m, color = transect))+
   geom_hline(yintercept = 0, alpha = 0.8)+
   geom_line(aes(y = rollmean), linewidth = 1)+
   facet_nested_wrap(~region + site,
                     nest_line = element_line(colour = "grey"))+ 
-  scale_color_manual(breaks = c("upland", "transition", "wte", "wetland"), 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "marsh"), 
                      values = pal_transect)+
   labs(x = "",
        y = "Water level below surface (m)",
@@ -1609,14 +1624,14 @@ troll %>%
 ### Water table summary
 
 ```{r}
-water_table %>% knitr::kable()
+water_table %>% reorder_transect() %>% knitr::kable()
 ```
 
 
 ### Calculating time flooded (% of the year)
 
 ```{r}
-percent_flooded %>% knitr::kable()
+percent_flooded %>% reorder_transect() %>% knitr::kable()
 ```
 
 
