@@ -29,18 +29,21 @@ process_teros = function(SENSOR_PATH){
   
   ## Summary of start dates gives 3/22 to 4/22 coinciding with synoptic installs
   ## I'm setting 4/22 - 4/23 as a consistent(ish) time-frame for all sites
-  sensor_df_trim <- df_raw %>% 
-    filter(datetime_est > "2022-04-01") %>% 
-    filter(datetime_est < "2023-04-01")
+  sensor_df_trim1 <- df_raw %>% 
+    rename(transect = plot) %>% 
+  #  filter(datetime_est > "2023-01-01") %>% 
+  #  filter(datetime_est < "2023-12-31") %>% 
+    force()
   
   ## Monster 68M dataset, free up memory
-  rm(df_raw)
+#  rm(df_raw)
   
-  sensor_df_trim %>% 
-    rename(transect = plot) %>% 
+  sensor_df_trim = sensor_df_trim1 %>% 
     mutate(region = case_when(site %in% c("GCW", "MSM", "GWI") ~ "Chesapeake",
                        site %in% c("CRC", "PTR", "OWC") ~ "Erie"),
-           transect = case_match(transect, "UP" ~ "upland", "TR" ~ "transition", "W" ~ "wetland"))
+           transect = case_match(transect, "UP" ~ "upland", "TR" ~ "transition", "W" ~ "wetland")) %>% 
+    filter(!is.na(transect)) %>% 
+    filter(!is.na(value))
 }
 
 # summarize VWC means
@@ -48,7 +51,7 @@ get_vwc_data = function(sensor_df_trim){
   
   tic("bin teros") # only 5s!
   vwc_data <- sensor_df_trim %>% 
-    filter(research_name == "soil_vwc_10cm") %>% 
+    filter(research_name == "soil-vwc-10cm") %>% 
     group_by(datetime_est, region, site, transect) %>% 
     summarize(value = mean(value, na.rm = T),
               value = value * 100) %>% 
@@ -62,6 +65,8 @@ summarize_vwc = function(vwc_data){
 
   vwc_means <- 
     vwc_data %>% 
+    filter(datetime_est > "2023-01-01") %>% 
+    filter(datetime_est < "2023-12-31") %>% 
     ungroup() %>% 
     group_by(region, site, transect) %>% 
     summarize(mean_vwc = round(mean(value, na.rm = T), 2),
@@ -81,10 +86,13 @@ calculate_water_levels = function(sensor_df_trim){
   troll_raw_unbinned <- 
     sensor_df_trim %>% 
     filter(grepl("gw", research_name)) %>% 
+    filter(!is.na(value)) %>% 
     group_by(datetime_est, region, site, transect) %>% 
     pivot_wider(names_from = "research_name", 
                 values_from = "value", 
-                values_fn = mean) 
+                values_fn = mean) %>% 
+    rename(gw_density = `gw-density`,
+           gw_pressure = `gw-pressure`)
   toc()
   
   tic("summarize troll")
@@ -131,7 +139,7 @@ calculate_water_levels = function(sensor_df_trim){
            outlier = case_when(abs(wl_below_surface_m - rollmean) > 1 ~ "outlier")) %>% 
     filter(is.na(outlier)) %>% 
     ## GCW is weird, so converting those to NAs
-    mutate(rollmean = case_when(site == "GCW" ~ NA, .default = rollmean)) %>% 
+   # mutate(rollmean = case_when(site == "GCW" ~ NA, .default = rollmean)) %>% 
     reorder_site() %>% 
     reorder_transect()
     
@@ -141,26 +149,31 @@ calculate_percent_flooded = function(troll){
   
   percent_flooded <- 
     troll %>% 
+    filter(datetime_est > "2023-01-01") %>% 
+    filter(datetime_est < "2023-12-31") %>% 
     mutate(flooded = ifelse(wl_below_surface_m >= 0, "flooded", "not")) %>% 
     ungroup() %>% 
     group_by(region, site, transect) %>% 
     summarize(percent_flooded = sum(flooded == "flooded") / n() * 100) %>% 
     mutate_if(is.numeric, round, 2) %>% 
-    filter(!(site == "GCW"))
+  #  filter(!(site == "GCW")) %>% 
+    force()
 
 }
 
 summarize_water_table = function(troll){
   
   troll %>% 
-      group_by(region, site, transect) %>% 
-      dplyr::summarise(mean_wl = mean(wl_below_surface_m),
-                       sd_wl = sd(wl_below_surface_m),
-                       median_wl = median(wl_below_surface_m),
-                       min_wl = min(wl_below_surface_m),
-                       max_wl = max(wl_below_surface_m)) %>% 
+    filter(datetime_est > "2023-01-01") %>% 
+    filter(datetime_est < "2023-12-31") %>% 
+    group_by(region, site, transect) %>% 
+    dplyr::summarise(mean_wl = mean(wl_below_surface_m),
+                     sd_wl = sd(wl_below_surface_m),
+                     median_wl = median(wl_below_surface_m),
+                     min_wl = min(wl_below_surface_m),
+                     max_wl = max(wl_below_surface_m)) %>% 
     mutate_if(is.numeric, round, 2) %>% 
-    filter(!site %in% "GCW") %>% 
+    #   filter(!site %in% "GCW") %>% 
     reorder_site() %>% 
     reorder_transect()
 
