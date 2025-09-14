@@ -1569,8 +1569,32 @@ Processed data are available here in this repository. Raw data are available on 
 ```{r gg_vwc, fig.height=8, fig.width=10}
 # plot vwc
 
+print("2022-24")
+
 vwc_data %>% 
   filter(value > 0) %>% 
+  reorder_site() %>% 
+  reorder_transect() %>% 
+  ggplot(aes(x = datetime_est, y = value, color = transect))+
+  geom_line()+
+  #  facet_wrap(~ site + transect)+
+  facet_nested_wrap(~region + site,
+                    nest_line = element_line(colour = "grey")) +
+  scale_color_manual(breaks = c("upland", "transition", "wte", "marsh"), 
+                     values = pal_transect)+
+  labs(x = "", 
+       y = "Water content (% v/v)",
+       color = "")+
+  theme_kp()+
+  theme(axis.text.x = element_text(size = 14, angle = 45, hjust = 1),
+        panel.grid = element_blank())
+
+print("Jan-Dec 2023")
+
+vwc_data %>% 
+  filter(value > 0) %>% 
+  filter(datetime_est > "2023-01-01") %>% 
+  filter(datetime_est < "2023-12-31") %>% 
   reorder_site() %>% 
   reorder_transect() %>% 
   ggplot(aes(x = datetime_est, y = value, color = transect))+
@@ -1602,11 +1626,13 @@ When water level is positive (above surface), it means the soil is flooded.
 
 ```{r gg_water_level, fig.height=8, fig.width=10}
 
+print("2022-24")
+
 troll %>% 
   reorder_transect() %>% 
   ggplot(aes(x = datetime_est, y = wl_below_surface_m, color = transect))+
   geom_hline(yintercept = 0, alpha = 0.8)+
-  geom_line(aes(y = rollmean), linewidth = 1)+
+  geom_line(aes(y = wl_below_surface_m), linewidth = 1)+
   facet_nested_wrap(~region + site,
                     nest_line = element_line(colour = "grey"))+ 
   scale_color_manual(breaks = c("upland", "transition", "wte", "marsh"), 
@@ -1616,7 +1642,28 @@ troll %>%
        color = "")+
   theme_kp()+
   theme(panel.grid = element_blank(),
-        axis.text.x = element_text(size = 14, angle = 45, hjust = 1))   ## 
+        axis.text.x = element_text(size = 14, angle = 45, hjust = 1)) 
+
+print("Jan-Dec 2023")
+
+troll %>% 
+  filter(datetime_est > "2023-01-01") %>% 
+  filter(datetime_est < "2023-12-31") %>% 
+  reorder_transect() %>% 
+  ggplot(aes(x = datetime_est, y = wl_below_surface_m, color = transect))+
+  geom_hline(yintercept = 0, alpha = 0.8)+
+  geom_line(aes(y = wl_below_surface_m), linewidth = 1)+
+  facet_nested_wrap(~region + site,
+                    nest_line = element_line(colour = "grey"))+ 
+  scale_color_manual(breaks = c("upland", "transition", "wte", "marsh"), 
+                     values = pal_transect)+
+  labs(x = "",
+       y = "Water level below surface (m)",
+       color = "")+
+  theme_kp()+
+  theme(panel.grid = element_blank(),
+        axis.text.x = element_text(size = 14, angle = 45, hjust = 1)) 
+
 
 ```
 
@@ -1624,6 +1671,8 @@ troll %>%
 ### Water table summary
 
 ```{r}
+print("Jan-Dec 2023")
+
 water_table %>% reorder_transect() %>% knitr::kable()
 ```
 
@@ -1631,6 +1680,8 @@ water_table %>% reorder_transect() %>% knitr::kable()
 ### Calculating time flooded (% of the year)
 
 ```{r}
+print("Jan-Dec 2023")
+
 percent_flooded %>% reorder_transect() %>% knitr::kable()
 ```
 
