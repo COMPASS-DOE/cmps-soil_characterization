@@ -967,7 +967,7 @@ process_xrd = function(xrd_data, sample_key){
 
 
 ## bulk density
-
+## importing calculated directly
 
 ## particle density
 process_pd = function(pd_data){
@@ -1015,7 +1015,6 @@ combine_data = function(moisture_processed, pH_processed, tctnts_data_samples, l
   data_combined_all_horizons
 
 }
-#data_combined = combine_data()  
 
 subset_surface_horizons = function(data_combined_all_horizons){
   
@@ -1307,7 +1306,3 @@ make_summary_tables <- function(data_combined,
        summary_XRD = summary_XRD)
   
 }
-# targets::tar_load(summary_tables)
-# openxlsx::write.xlsx(summary_tables, "summary_tables.xlsx")
-
-
