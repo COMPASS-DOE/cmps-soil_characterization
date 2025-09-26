@@ -1,0 +1,16 @@
+"site","transect","bulk_density_gcm3"
+"PTR","upland",0.87
+"PTR","transition",0.39
+"PTR","wetland",0.29
+"OWC","upland",0.87
+"OWC","transition",0.71
+"OWC","wetland",0.4
+"GWI","upland",0.42
+"GWI","transition",1.01
+"GWI","wetland",1.49
+"MSM","upland",0.15
+"MSM","transition",0.16
+"MSM","wetland",0.1
+"GCW","upland",0.77
+"GCW","transition",0.38
+"GCW","wetland",0.24
