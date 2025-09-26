@@ -4,6 +4,7 @@ library(PNWColors)
 library(soilpalettes)
 library(lubridate)
 library(googlesheets4)
+library(multcomp)
 
 theme_kp <- function() {  # this for all the elements common across plots
   theme_bw() %+replace%
