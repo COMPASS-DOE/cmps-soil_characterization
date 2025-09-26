@@ -1,8 +1,0 @@
-K001	Crane Creek
-K004	Portage River
-K011	Old Woman Creek
-K018	Goodwin Islands
-K059	MoneyStump Marsh/Blackwater National
-K062	GCReW
-
-*** K018 upland and wetland swapped?, so corrected
