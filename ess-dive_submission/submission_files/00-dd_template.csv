@@ -1,0 +1,4 @@
+﻿column_or_row_name,definition,unit,column_or_row_long_name,data_type,"missing_value_code
+",notes
+kit_id,Sample identification code,NA,,text,NA,
+Fmax1,"Total fluorescence signal (Parallel Factor Analysis, PARAFAC) component 1",raman scatter units,,numeric,NA,

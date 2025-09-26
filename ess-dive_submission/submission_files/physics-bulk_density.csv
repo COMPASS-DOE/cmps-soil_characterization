@@ -1,0 +1,16 @@
+region,site,transect,bulk_density_gcm3
+Erie,PTR,upland,0.87
+Erie,PTR,transition,0.39
+Erie,PTR,wetland,0.29
+Erie,OWC,upland,0.87
+Erie,OWC,transition,0.71
+Erie,OWC,wetland,0.4
+Chesapeake,GWI,upland,0.42
+Chesapeake,GWI,transition,1.01
+Chesapeake,GWI,wetland,1.49
+Chesapeake,MSM,upland,0.15
+Chesapeake,MSM,transition,0.16
+Chesapeake,MSM,wetland,0.1
+Chesapeake,GCW,upland,0.77
+Chesapeake,GCW,transition,0.38
+Chesapeake,GCW,wetland,0.24

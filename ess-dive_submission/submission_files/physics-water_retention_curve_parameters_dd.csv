@@ -1,0 +1,10 @@
+﻿column_or_row_name,definition,unit,column_or_row_long_name,data_type,"missing_value_code
+",notes
+region,geographic region -- Erie or Chesapeake,NA,,text,NA,
+site,site code,NA,,text,NA,
+transect,"transect location -- upland, transition, or wetland",NA,,text,NA,
+alpha,scale parameter that is inversely proportional to the mean pore diameter,NA,,numeric,NA,
+n,shape parameter that controls the slope of the soil-water characteristic curve,NA,,numeric,NA,
+theta_r,residual water content,NA,,numeric,NA,
+theta_s,saturated water content,NA,,numeric,NA,
+m,,NA,,numeric,NA,
