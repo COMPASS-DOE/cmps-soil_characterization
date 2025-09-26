@@ -60,7 +60,8 @@ Coastal Observations, Mechanisms, and Predictions Across Systems and Scales (COM
 COMPASS-FME is a multi-institutional project supported by the US Department of Energy, Office of Science, Biological and Environmental Research 
 as part of the Environmental System Science Program.
 
-A portion of this research was performed on project awards ([60602](10.46936/cpcy.proj.2022.60602/60008672), [60511](10.46936/cpcy.proj.2022.60511/60008517), [61038](10.46936/cont.proj.2023.61038/60012321)) 
+A portion of this research was performed on project awards ([60602](https://www.osti.gov/award-doi-service/biblio/10.46936/cpcy.proj.2022.60602/60008672), 
+[60511](https://www.osti.gov/award-doi-service/biblio/10.46936/cpcy.proj.2022.60511/60008517), [61038](https://www.osti.gov/award-doi-service/biblio/10.46936/cont.proj.2023.61038/60012321)) 
 from the Environmental Molecular Sciences Laboratory, 
 a DOE Office of Science User Facility sponsored by the Biological and Environmental Research program under Contract No. DE-AC05-76RL01830.
 
