@@ -15,7 +15,8 @@ tar_option_set(
 source("2-code/0-packages.R")
 #source("2-code/1-initial_processing.R") # use this only once, to pull the necessary sample weights, etc.
 source("2-code/2-functions_processing.R")
-source("2-code/3a-functions_soil_moisture_sensors.R")
+#source("2-code/3a-download_soil_moisture_sensor_data.R") # use this only once, to download the sensor data (HUGE download)
+source("2-code/3b-functions_soil_moisture_sensors.R")
 
 # Replace the target list below with your own:
 list(
