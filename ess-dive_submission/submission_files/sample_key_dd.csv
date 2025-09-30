@@ -1,0 +1,8 @@
+﻿column_or_row_name,definition,unit,column_or_row_long_name,data_type,"missing_value_code
+",notes
+sample_label,sample identifier,,,text,NA,
+region,geographic region -- Erie or Chesapeake,NA,,text,NA,
+site,site code,NA,,text,NA,
+transect,"transect location -- upland, transition, or wetland",NA,,text,NA,
+tree_number,identifying number/name for trees where samples were collected,NA,,text,NA,
+horizon,soil horizon,NA,,text,NA,
