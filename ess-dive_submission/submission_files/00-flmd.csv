@@ -1,0 +1,21 @@
+File_Name,File_Description,Standard,Start_Date,End_Date,Missing_Value_Codes,Header_Orientation
+00-flmd.csv,file-level metadata associated with this dataset,ESS-DIVE File-Level Metadata Reporting Format 1.0,20211206,20220823,NA,Horizontal
+chemistry_combined_all_horizons_dd.csv,data dictionary file,,20211206,20220823,NA,Horizontal
+chemistry_combined_all_horizons.csv,chemistry data for surface and subsurface horizons,,20211206,20220823,NA,Horizontal
+chemistry_combined_surface_horizon_dd.csv,data dictionary file,,20211206,20220823,NA,Horizontal
+chemistry_combined_surface_horizon.csv,"chemistry data for surface horizons, in long form",,20211206,20220823,NA,Horizontal
+chemistry_combined_wide_dd.csv,data dictionary file,,20211206,20220823,NA,Horizontal
+chemistry_combined_wide.csv,"chemistry data for surface horizons, in wide form",,20211206,20220823,NA,Horizontal
+mineralogy-xrd_dd.csv,data dictionary file,,20211206,20220823,NA,Horizontal
+mineralogy-xrd.csv,mineralogy data,,20211206,20220823,NA,Horizontal
+physics-bulk_density_dd.csv,data dictionary file,,20211206,20220823,NA,Horizontal
+physics-bulk_density.csv,bulk density daya,,20211206,20220823,NA,Horizontal
+physics-particle_density_dd.csv,data dictionary file,,20211206,20220823,NA,Horizontal
+physics-particle_density.csv,particle density data,,20211206,20220823,NA,Horizontal
+physics-texture_dd.csv,data dictionary file,,20211206,20220823,NA,Horizontal
+physics-texture.csv,particle size analysis/texture data,,20211206,20220823,NA,Horizontal
+physics-water_retention_curve_data_dd.csv,data dictionary file,,20211206,20220823,NA,Horizontal
+physics-water_retention_curve_data.csv,water retention curve output from LABROS ANALYSIS software,,20211206,20220823,NA,Horizontal
+physics-water_retention_curve_parameters_dd.csv,data dictionary file,,20211206,20220823,NA,Horizontal
+physics-water_retention_curve_parameters.csv,Van Genuchten parameters for water retention curves,,20211206,20220823,NA,Horizontal
+sample_key.csv,sample-level metadata for this dataset,,20211206,20220823,NA,Horizontal
