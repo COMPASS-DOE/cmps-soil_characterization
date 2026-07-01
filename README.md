@@ -1,3 +1,11 @@
+
+```
+This repository has been archived and is no longer maintained.
+The code is provided for historical reference and may contain unpatched or unknown vulnerabilities.
+It should not be used in production systems.
+```
+
+
 ## Transition zones at the changing coastal terrestrial-aquatic interface
 
 This repository contains data and code for the manuscript "Transition zones at the changing coastal terrestrial-aquatic interface" by Patel et al. 2025.
